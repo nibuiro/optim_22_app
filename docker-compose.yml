@@ -20,7 +20,7 @@ services:
       - ./.env
     environment:
       MYSQL_ROOT_HOST: "%"
-      MYSQL_USER: rootuser
+      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_PASSWORD: rootpass
     ports:
