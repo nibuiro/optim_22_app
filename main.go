@@ -1,9 +1,14 @@
 package main
+
 import (
   "net/http"
   "github.com/gin-gonic/gin"
+  "optim_22_app/model"
 )
+
 func main() {
+  // DB接続後、マイグレーションを実行する。
+  model.InitDB()
   // ルーターを作成している
   router := gin.Default()
   // helloメソッドがwebブラウザから指定された場合、Hello World!!を返す。
