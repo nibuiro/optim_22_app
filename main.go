@@ -4,7 +4,7 @@ import (
   "net/http"
   "github.com/gin-gonic/gin"
   // コメントを外す
-  "optim_22_app/model"
+  // "optim_22_app/model"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
   // 手順としては、まずコンテナを立ち上げた後、mysqlでoptim_devデータベースを作成する。
   // その後、model.InitDB(),import(optim_22_app/model)のコメントを外し、カレントディレクトリでgo run main.goを実行する。
   // プログラムの詳細はmodel/migrate.goに記載。
-  model.InitDB()
+  // model.InitDB()
 
   // ルーターを作成している
   router := gin.Default()
