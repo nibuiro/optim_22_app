@@ -10,7 +10,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - .:/go/src/app
+      - .:/go/src/optim_22_app/
   db:
     build:
       context: ./mysql
@@ -20,7 +20,6 @@ services:
       - ./.env
     environment:
       MYSQL_ROOT_HOST: "%"
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_PASSWORD: rootpass
     ports:

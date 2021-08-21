@@ -1,4 +1,4 @@
-module github.com/jokertennnis/gin-practice
+module optim_22_app
 
 go 1.16
 

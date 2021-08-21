@@ -4,15 +4,32 @@ FROM golang:1.16.7
 #vimを利用するため。
 RUN apt-get update && apt-get -y install vim
 
+# プロジェクト用のディレクトリを作成する。
+RUN mkdir -p /go/src/optim_22_app/
+
+# typefile packageのためのディレクトリを作成する。
+RUN mkdir -p /usr/local/go/src/typefile/
+
+# type.goファイルを作成する
+RUN touch /usr/local/go/src/typefile/type.go
+
+# ホストのtype.goの内容をコピーする
+COPY ./typefile/type.go /usr/local/go/src/typefile/type.go
+
 # カレントディレクトリの内容をコピーする
-COPY . /go/src/app
+COPY . /go/src/optim_22_app/
 
 # コンテナ内で各種命令を実行するためのカレントディレクトリを指定
-WORKDIR /go/src/app
+WORKDIR /go/src/optim_22_app/
 
-# ライブラリをインストールする
+# モジュールモードのためにライブラリをインストールする
 RUN go mod download
+
+# GOPATHモードのためにライブラリをインストールする(本当はモジュールモードのみのほうがよいが、完全にモジュールモードにする方法がわからないため、両方利用することにした。)
+RUN go get -u "github.com/gin-gonic/gin"
+RUN go get -u gorm.io/gorm
+RUN go get -u gorm.io/driver/mysql
 
 # イメージを実行する時、コンテナに対して何もオプションを指定しなければ、
 # 自動的に実行するコマンドを CMD 命令で指定
-CMD ["go","run","/go/src/app/main.go"]
+CMD ["go","run","/go/src/optim_22_app/main.go"]
