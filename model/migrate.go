@@ -25,7 +25,7 @@ func InitDB() {
 	// マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
 	// それに対応するテーブルの作成を行う。
 	// テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
-	db.AutoMigrate(&typefile.Request{})
+	db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{})
 
 	// Insert
 	// db.Create(&request)
