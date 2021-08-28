@@ -13,7 +13,7 @@ import (
 )
 
 const (
-  defaultConfigurationFilePath = "./configs/zap.yaml"
+  defaultConfigurationFilePath_ = "./configs/zap.yaml"
 )
 
 // Logger is a logger that supports log levels, context and structured logging.
@@ -52,14 +52,17 @@ const (
 //  l, _ := zap.NewProduction()
 //  return NewWithZap(l)
 //}
-
 func New() Logger {
+  return NewImpl(defaultConfigurationFilePath_)
+}
+
+func NewImpl(defaultConfigurationFilePath string) Logger {
 
   //https://github.com/uber-go/zap/blob/master/config.go
   //zap.Configを定義。ポインタを含み初期値はnilでありそのままではセグフォする。
   var cfg zap.Config
 
-　//Stat returns the FileInfo structure describing file. If there is an error, it will be of type *PathError.
+  //Stat returns the FileInfo structure describing file. If there is an error, it will be of type *PathError.
   _, err := os.Stat(defaultConfigurationFilePath)
 
   //#region ファイルが不在であればNewDevelopmentConfigでロガーを設定し、返す
