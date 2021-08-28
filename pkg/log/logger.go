@@ -2,7 +2,7 @@
 package log
 
 import (
-    "gopkg.in/yaml.v2"
+  "gopkg.in/yaml.v2"
   "context"
   "github.com/google/uuid"
   "go.uber.org/zap"
