@@ -34,21 +34,17 @@ func TestNew(t *testing.T) {
 
   for _, tt := range tests {
 
-    absolutePath := baseDirectory + tt.args.relativePath
-
-    l, got := NewImpl(absolutePath)
-
     t.Run(tt.name, func(t *testing.T) {
+
+      absolutePath := baseDirectory + tt.args.relativePath
+
+      l, configurationType := NewImpl(absolutePath)
 
       //ロガーが生成されることは設定ファイルが存在する場合、しない場合の
       //どちらでもこのテストが満たすべき必要条件
-      if nil == l {
-        t.Errorf("failed to create logger!")
-      }
-
-      if tt.want != got {
-        t.Errorf("NewImpl() = %v, want %v", got, tt.want)
-      }
+      assert.NotNil(t, l)
+      //設定タイプ
+      assert.Equal(t, tt.want, configurationType)
 
     })
   }
