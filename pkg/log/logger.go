@@ -1,5 +1,14 @@
-// Package log provides context-aware and structured logging capabilities.
 package log
+
+/*
+*
+* 
+*  ソース元：https://github.com/qiangxue/go-rest-api/blob/c3101332148b4aa45f637605e394cb0d033dae97/pkg/log/logger.go
+*  改変：New()にて設定をconfigs/zap.yamlから読み取るように変更
+*
+*
+*
+*/
 
 import (
   "gopkg.in/yaml.v2"
@@ -10,10 +19,6 @@ import (
   "go.uber.org/zap/zaptest/observer"
   "net/http"
   "os"
-)
-
-const (
-  defaultConfigurationFilePath_ = "./configs/zap.yaml"
 )
 
 // Logger is a logger that supports log levels, context and structured logging.
@@ -43,20 +48,39 @@ type logger struct {
 type contextKey int
 
 const (
+  defaultConfigurationFilePath_ = "./configs/zap.yaml"
+  developmentConfig_ = 0
+  customConfig_ = 1
   requestIDKey contextKey = iota
   correlationIDKey
 )
 
-// New creates a new logger using the default configuration.
-//func New() Logger {
-//  l, _ := zap.NewProduction()
-//  return NewWithZap(l)
-//}
+// ロガーを生成
 func New() Logger {
-  return NewImpl(defaultConfigurationFilePath_)
+
+  l, configurationType := NewImpl(defaultConfigurationFilePath_)
+
+  switch configurationType {
+  case 0:
+      l.Debugf("configured by zap.NewDevelopmentConfig()")
+  case 1:
+      l.Debugf("configured by configuration file")
+  } 
+  
+  return l
+
 }
 
-func NewImpl(defaultConfigurationFilePath string) Logger {
+//テスト用ロガーによるロガーのためのロガーによるログ出力をしない
+func SilentNew() Logger {
+
+  l, _ := NewImpl(defaultConfigurationFilePath_)
+  
+  return l
+
+}
+
+func NewImpl(defaultConfigurationFilePath string) (Logger, int) {
 
   //https://github.com/uber-go/zap/blob/master/config.go
   //zap.Configを定義。ポインタを含み初期値はnilでありそのままではセグフォする。
@@ -69,7 +93,7 @@ func NewImpl(defaultConfigurationFilePath string) Logger {
   if os.IsNotExist(err) {
     cfg = zap.NewDevelopmentConfig()
     l, _ := cfg.Build()
-    return NewWithZap(l)
+    return NewWithZap(l), developmentConfig_
   }
   //#endregion
 
@@ -86,7 +110,7 @@ func NewImpl(defaultConfigurationFilePath string) Logger {
 
   l, _ := cfg.Build()
 
-  return NewWithZap(l)
+  return NewWithZap(l), customConfig_
   //#endregion
 }
 
