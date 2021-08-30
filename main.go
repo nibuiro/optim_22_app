@@ -3,16 +3,36 @@ package main
 import (
   "net/http"
   "github.com/gin-gonic/gin"
+  "flag"
+  "os"
   // コメントを外す
   "optim_22_app/model"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
+  "optim_22_app/internal/config"
+
 )
 
+var flagConfig = flag.String("config", "./configs/app.yaml", "path to the config file")
+
 func main() {
+  flag.Parse()
   //zapロガーを設定ファイル`config/zap.yaml`を元に取得
   logger := log.New()
   logger.Debugf("start app")
+
+  // load application configurations
+  cfg, err := config.Load(*flagConfig, logger)
+  if err != nil {
+    logger.Errorf("failed to load application configuration: %s", err)
+    os.Exit(-1)
+  }
+
+
+  logger.Debugf(cfg.DSN)
+
+
+  
 
   // DB接続後、マイグレーションを実行する。
   // 手順としては、まずコンテナを立ち上げた後、mysqlでoptim_devデータベースを作成する。
