@@ -23,6 +23,8 @@ import (
 
 // Logger is a logger that supports log levels, context and structured logging.
 type Logger interface {
+
+  Desugar() *zap.Logger
   // With returns a logger based off the root logger and decorates it with the given context and arguments.
   With(ctx context.Context, args ...interface{}) Logger
 
@@ -39,6 +41,7 @@ type Logger interface {
   Infof(format string, args ...interface{})
   // Errorf uses fmt.Sprintf to construct and log a message at ERROR level
   Errorf(format string, args ...interface{})
+
 }
 
 type logger struct {
