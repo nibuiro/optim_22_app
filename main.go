@@ -9,6 +9,7 @@ import (
   "net/http"
 
   "github.com/gin-gonic/gin"
+  "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
   // コメントを外す
 //  "optim_22_app/model"
@@ -91,6 +92,10 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
   e := gin.New()
+  //ginのログをloggerでとる //フォーマット形式はloggerに依存する
+  e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
+  //パニック時ステータスコード500を送出
+  e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
   
 
   e.GET("/hello", func(c *gin.Context) {
