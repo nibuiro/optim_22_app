@@ -16,6 +16,7 @@ import (
  // "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
+  "optim_22_app/internal/pkg/test"
   "optim_22_app/internal/app/user"  
 )
 
