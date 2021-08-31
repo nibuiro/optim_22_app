@@ -15,7 +15,7 @@ import (
 //  "optim_22_app/model"
  // "optim_22_app/typefile"
   "optim_22_app/pkg/log"
-  "optim_22_app/internal/config"
+  "optim_22_app/internal/pkg/config"
 )
 
 var (
