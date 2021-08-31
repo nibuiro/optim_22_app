@@ -16,6 +16,7 @@ import (
  // "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
+  "optim_22_app/internal/app/user"  
 )
 
 var (
@@ -104,10 +105,10 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
 
   //authHandler := auth.Handler(cfg.JWTSigningKey)
 
-//  user.RegisterHandlers(rg.Group(""),
-//    user.NewService(user.NewRepository(db, logger), logger),
-//    authHandler, logger,
-//  )
+  user.RegisterHandlers(e.Group(""),
+    user.StubNewService(user.StubNewRepository()),
+    logger, //authHandler
+  )
 //
 //  auth.RegisterHandlers(rg.Group(""),
 //    auth.NewService(cfg.JWTSigningKey, cfg.JWTExpiration, logger),
