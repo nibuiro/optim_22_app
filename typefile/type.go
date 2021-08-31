@@ -18,7 +18,8 @@ type Engineer struct{
 }
 
 type Winner struct{
-	User           User           `gorm:"embedded"`
+	EngineerID     int            `gorm:"not null"`
+	Engineer       Engineer
 	RequestID      int            `gorm:"not null"`
 }
 

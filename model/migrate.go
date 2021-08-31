@@ -70,7 +70,7 @@ func CreateTestData() {
 	Db.Create(&requests)
 	
 	var winners = []typefile.Winner{
-		{User: typefile.User{ID: 1,Name: "user1"},RequestID: 1},
-		{User: typefile.User{ID: 2,Name: "user2"},RequestID: 2}}
+		{EngineerID: 1,RequestID: 1},
+		{EngineerID: 2,RequestID: 2}}
 	Db.Create(&winners)
 }

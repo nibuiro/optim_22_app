@@ -25,11 +25,6 @@ WORKDIR /go/src/optim_22_app/
 # モジュールモードのためにライブラリをインストールする
 RUN go mod download
 
-# GOPATHモードのためにライブラリをインストールする(本当はモジュールモードのみのほうがよいが、完全にモジュールモードにする方法がわからないため、両方利用することにした。)
-RUN go get -u "github.com/gin-gonic/gin"
-RUN go get -u gorm.io/gorm
-RUN go get -u gorm.io/driver/mysql
-
 # イメージを実行する時、コンテナに対して何もオプションを指定しなければ、
 # 自動的に実行するコマンドを CMD 命令で指定
 CMD ["go","run","/go/src/optim_22_app/main.go"]
