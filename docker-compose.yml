@@ -19,6 +19,7 @@ services:
     env_file:
       - ./.env
     environment:
+      MYSQL_DATABASE: optim_dev
       MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_PASSWORD: rootpass
