@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-  //zapロガーを設定ファイル`config/zap.yaml`を元に取得
+  //zapロガーを設定ファイル`configs/zap.yaml`を元に取得
   logger := log.New()
   logger.Debugf("start app")
   // DB接続後、マイグレーションを実行する。
@@ -24,15 +24,8 @@ func main() {
   // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
   model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{})
 
-  // Insert
-  // db.Create(&request)
-
-  // Select
-  // db.Find(&request, "id = ?", 10)
-
-  // Batch Insert
-  // var requests = []User{request1, request2, request3}
-  // db.Create(&users)
+  // テスト実行前に利用するデータを作成する
+  model.CreateTestData()
 
   // ルーターを作成している
   router := gin.Default()

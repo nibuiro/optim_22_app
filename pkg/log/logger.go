@@ -51,7 +51,7 @@ const (
 
 func New() Logger {
 
-  configYaml, err := os.ReadFile("./config/zap.yaml")
+  configYaml, err := os.ReadFile("./configs/zap.yaml")
   
   if err != nil {
     panic(err)

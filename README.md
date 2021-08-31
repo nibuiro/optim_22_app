@@ -4,7 +4,7 @@
 
 ```
 .
-├──config               #各種設定ファイル（例：app.yaml, zap.yaml）。
+├──configs               #各種設定ファイル（例：app.yaml, zap.yaml）。
 ├──controller               
 │  ├──request
 │  ├──top
