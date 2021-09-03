@@ -25,9 +25,7 @@
     <template #end>
       <b-navbar-item tag="div">
         <div class="buttons">
-          <a class="button is-primary">
-            <strong>新規登録</strong>
-          </a>
+          <register-form />
           <login-form />
         </div>
       </b-navbar-item>
@@ -36,11 +34,13 @@
 </template>
 
 <script>
+import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
 
 export default {
-  name: "LoginForm",
+  name: "NavBar",
   components: {
+    "register-form": RegisterForm,
     "login-form": LoginForm
   }
 };
