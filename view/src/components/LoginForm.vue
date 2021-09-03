@@ -37,15 +37,20 @@ const ModalForm = {
                     </header>
                     <section class="modal-card-body">
                         <b-field label="メールアドレス">
+                          <div class="control has-icons-left">
+                            <b-icon icon="email" size="is-small"></b-icon>
                             <b-input
                                 type="email"
                                 :value="email"
                                 placeholder="email@example.com"
                                 required>
                             </b-input>
+                          </div>
                         </b-field>
 
                         <b-field label="パスワード">
+                          <div class="control has-icons-left">
+                            <b-icon icon="key" size="is-small"></b-icon>
                             <b-input
                                 type="password"
                                 :value="password"
@@ -53,6 +58,7 @@ const ModalForm = {
                                 placeholder="Enter password"
                                 required>
                             </b-input>
+                          </div>
                         </b-field>
 
                         <!--b-checkbox>Remember me</!--b-checkbox-->
