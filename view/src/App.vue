@@ -10,4 +10,7 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+/* Material Design Icons CDN */
+@import url("https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css");
+</style>
