@@ -24,9 +24,9 @@
 
     <template #end>
       <b-navbar-item tag="div">
-        <div class="buttons">
-          <register-form />
-          <login-form />
+        <div class="columns is-variable is-1">
+          <register-form class="column" />
+          <login-form class="column" />
         </div>
       </b-navbar-item>
     </template>
