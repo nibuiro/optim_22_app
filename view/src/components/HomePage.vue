@@ -8,7 +8,7 @@
         <b-button class="is-light" label="新規リクエスト" outlined />
       </div>
     </section>
-    <section class="content">
+    <section class="mb-3">
       <div class="is-flex is-justify-content-space-between">
         <div class="control is-flex">
           <b-switch v-model="isAccepting" :disabled="!isAccepting"
