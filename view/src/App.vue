@@ -2,16 +2,19 @@
   <div id="app">
     <nav-bar />
     <router-view />
+    <copyright />
   </div>
 </template>
 
 <script>
 import NavBar from "@/components/NavBar";
+import Copyright from "@/components/Copyright";
 
 export default {
   name: "App",
   components: {
-    "nav-bar": NavBar
+    "nav-bar": NavBar,
+    copyright: Copyright
   }
 };
 </script>
