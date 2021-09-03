@@ -1,0 +1,88 @@
+<template>
+  <section>
+    <b-button
+      label="ログイン"
+      type="is-light"
+      @click="isComponentModalActive = true"
+    />
+
+    <b-modal
+      v-model="isComponentModalActive"
+      has-modal-card
+      trap-focus
+      :destroy-on-hide="false"
+      aria-role="dialog"
+      aria-label="Example Modal"
+      aria-modal
+    >
+      <template #default="props">
+        <modal-form v-bind="formProps" @close="props.close"></modal-form>
+      </template>
+    </b-modal>
+  </section>
+</template>
+
+<script>
+const ModalForm = {
+  props: ["email", "password", "canCancel"],
+  template: `
+            <form action="">
+                <div class="modal-card" style="width: auto">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title has-text-centered">ログイン</p>
+                        <button
+                            type="button"
+                            class="delete"
+                            @click="$emit('close')"/>
+                    </header>
+                    <section class="modal-card-body">
+                        <b-field label="メールアドレス">
+                            <b-input
+                                type="email"
+                                :value="email"
+                                placeholder="email@example.com"
+                                required>
+                            </b-input>
+                        </b-field>
+
+                        <b-field label="パスワード">
+                            <b-input
+                                type="password"
+                                :value="password"
+                                password-reveal
+                                placeholder="Enter password"
+                                required>
+                            </b-input>
+                        </b-field>
+
+                        <!--b-checkbox>Remember me</!--b-checkbox-->
+                    </section>
+                    <footer class="modal-card-foot is-flex is-justify-content-center">
+                        <b-button
+                            label="ログイン"
+                            type="is-primary" />
+                        <b-button
+                            label="キャンセル"
+                            @click="$emit('close')" />
+                        
+                    </footer>
+                </div>
+            </form>
+        `
+};
+
+export default {
+  components: {
+    ModalForm
+  },
+  data() {
+    return {
+      isComponentModalActive: false,
+      formProps: {
+        email: "",
+        password: ""
+      }
+    };
+  }
+};
+</script>

@@ -28,11 +28,20 @@
           <a class="button is-primary">
             <strong>新規登録</strong>
           </a>
-          <a class="button is-light">
-            ログイン
-          </a>
+          <login-form />
         </div>
       </b-navbar-item>
     </template>
   </b-navbar>
 </template>
+
+<script>
+import LoginForm from "@/components/LoginForm";
+
+export default {
+  name: "LoginForm",
+  components: {
+    "login-form": LoginForm
+  }
+};
+</script>
