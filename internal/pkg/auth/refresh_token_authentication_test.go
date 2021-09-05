@@ -68,9 +68,9 @@ func TestRefreshTokenAuthentication(t *testing.T) {
     "access-token refresh success": TestAccessTokenRefresh,
   }
 
-  //cfg.JWTExpiration => 200年 => 6307200000秒
+  //cfg.JWTExpiration => 5年 => 157680000秒
   auth.RegisterHandlers(router.Group(""),
-    auth.NewService(cfg.JWTSigningKey, 6307200000, logger),
+    auth.NewService(cfg.JWTSigningKey, 157680000, logger),
     logger,
   )
 
