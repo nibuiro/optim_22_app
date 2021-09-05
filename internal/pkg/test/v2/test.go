@@ -41,21 +41,25 @@ func Endpoint(t *testing.T, router *gin.Engine, tc APITestCase) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    StringEq(res.Body.String(), tc.WantResponse)
+    stringEq(res.Body.String(), tc.WantResponse)
 
-    for k, v := range tc.WantHeader {
-      StringEq(req.Header.Get(k), v)
+    if tc.WantHeader != nil {
+      for k, v := range tc.WantHeader {
+        stringEq(req.Header.Get(k), v)
+      }
     }
-    
-    for k, v := range tc.WantCookie {
-      cookie, _ := req.Cookie(k)
-      StringEq(cookie.Value, v)
+
+    if tc.WantCookie != nil {
+      for k, v := range tc.WantCookie {
+        cookie, _ := req.Cookie(k)
+        stringEq(cookie.Value, v)
+      }
     }
   })
 }
 
 
-func StringEq(given string, want string) {
+func stringEq(given string, want string) {
   if want != "" {
     pattern := strings.Trim(want, "*")
     if pattern != tc.WantBody {
