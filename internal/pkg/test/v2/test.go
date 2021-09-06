@@ -16,7 +16,7 @@ type APITestCase struct {
   Name         string
   Method, URL  string
   Header       http.Header
-  Cookie       http.Cookie
+  Cookie       *http.Cookie
   Body         string
   WantStatus   int
   WantHeader   map[string]string
@@ -41,28 +41,28 @@ func Endpoint(t *testing.T, router *gin.Engine, tc APITestCase) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    stringEq(res.Body.String(), tc.WantResponse)
+    stringEq(t, res.Body.String(), tc.WantResponse)
 
     if tc.WantHeader != nil {
       for k, v := range tc.WantHeader {
-        stringEq(req.Header.Get(k), v)
+        stringEq(t, req.Header.Get(k), v)
       }
     }
 
     if tc.WantCookie != nil {
       for k, v := range tc.WantCookie {
         cookie, _ := req.Cookie(k)
-        stringEq(cookie.Value, v)
+        stringEq(t, cookie.Value, v)
       }
     }
   })
 }
 
-
-func stringEq(given string, want string) {
+//文字列表現が等しいか確認 //JSONの表記ゆれに対応
+func stringEq(t *testing.T, given string, want string) {
   if want != "" {
     pattern := strings.Trim(want, "*")
-    if pattern != tc.WantBody {
+    if pattern != want {
       assert.Contains(t, given, pattern, "response mismatch")
     } else {
       assert.JSONEq(t, want, given, "response mismatch")
