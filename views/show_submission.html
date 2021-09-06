@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang=ja>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="サンプルアプリケーション">
+        <title>SampleApp</title>
+    </head>
+    <body>
+        <form class="submissions-form" action="//localhost:8080/client/decide_winner" method="post">
+            {{.request_id}},{{.size}}
+            <ul>
+                {{range .submissions}}
+                <p><input type="radio" name="engineer_id" value={{.EngineerID}}>{{.EngineerID}}<b>{{.Content}}</b><b>{{.CreatedAt}}</b><b>{{.UpdatedAt}}</b></p>
+                {{end}}
+            </ul>
+            <input type="hidden" name="request_id" value={{.request_id}}>
+            <input type="submit" value="勝者を決定する">
+        </form>
+    </body>
+</html>

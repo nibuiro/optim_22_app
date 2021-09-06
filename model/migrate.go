@@ -17,7 +17,7 @@ func InitDB() {
 	// https://github.com/go-sql-driver/mysql#dsn-data-source-name に詳細が記載されている。
 	// DSN(データソース名)の作成。
 	// 開発用のデータベース名はoptim_dev,テスト用のデータベース名はotpim_testである。
-	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev"
+	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev?parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -73,4 +73,10 @@ func CreateTestData() {
 		{EngineerID: 1,RequestID: 1},
 		{EngineerID: 2,RequestID: 2}}
 	Db.Create(&winners)
+
+	var submissions = []typefile.Submission{
+		{RequestID: 3,EngineerID: 1,Content: "submission1 of engineerID 1"},
+		{RequestID: 3,EngineerID: 2,Content: "submission1 of engineerID 2"},
+		{RequestID: 3,EngineerID: 3,Content: "submission1 of engineerID 3"}}
+	Db.Create(&submissions)
 }
