@@ -51,22 +51,12 @@ const (
   */
 )
 
-type authEndpoint func(*testing.T, *gin.Engine, APITestCase)
 
-
-
-func TestRefreshTokenAuthentication(t *testing.T) {
+//期限切れのリフレッシュトークンで新しいアクセストークンは取得不可能か
+func TestRefreshTokenRefreshDenied(t *testing.T) {
 
   router := gin.New()
   logger := gin.Logger()
-
-  testMenu := map[string]authEndpoint{
-    //
-    "refresh-token refresh denied": Endpoint,
-    "refresh-token refresh success": TestRefreshTokenRefresh,
-    "access-token refresh denied": Endpoint,
-    "access-token refresh success": TestAccessTokenRefresh,
-  }
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth.RegisterHandlers(router.Group(""),
@@ -74,125 +64,60 @@ func TestRefreshTokenAuthentication(t *testing.T) {
     logger,
   )
 
-  tests := []test.APITestCase{
-    //
-    {
-      Name: "refresh-token refresh denied", 
-      Method: "POST", 
-      URL: "/auth/refresh_token", 
-      Header: nil, 
-      Cookie: &http.Cookie{
-          Name: "JWT", 
-          Value: refreshToken2020, 
-          HttpOnly: true, 
-          Path: "/", 
-          Secure: false
-        },
-      Body: "",
-      WantStatus: http.StatusUnauthorized, 
-      WantHeader: nil,
-      WantCookie: nil,
-      WantBody: ""
-    },
-    {
-      Name: "refresh-token refresh success", 
-      Method: "POST", 
-      URL: "/auth/refresh_token", 
-      Header: nil, 
-      Cookie: &http.Cookie{
-          Name: "JWT", 
-          Value: refreshToken2030, 
-          HttpOnly: true, 
-          Path: "/", 
-          Secure: false
-        },
-      Body: "",
-      WantStatus: http.StatusOK, 
-      WantHeader: nil,
-      WantCookie: nil,
-      WantBody: ""
-    },
-    {
-      Name: "access-token refresh denied", 
-      Method: "POST", 
-      URL: "/auth/access_token", 
-      Header: nil, 
-      Cookie: &http.Cookie{
-          Name: "JWT", 
-          Value: refreshToken2020, 
-          HttpOnly: true, 
-          Path: "/", 
-          Secure: false
-        },
-      Body: "",
-      WantStatus: http.StatusUnauthorized, 
-      WantHeader: nil,
-      WantCookie: nil,
-      WantBody: ""
-    },
-    {
-      Name: "access-token refresh success", 
-      Method: "POST", 
-      URL: "/auth/access_token", 
-      Header: nil, 
-      Cookie: &http.Cookie{
-          Name: "JWT", 
-          Value: refreshToken2020, 
-          HttpOnly: true, 
-          Path: "/", 
-          Secure: false
-        },
-      Body: "",
-      WantStatus: http.StatusOK, 
-      WantHeader: nil,
-      WantCookie: nil,
-      WantBody: ""
-    },
+  tc := test.APITestCase{
+    Name: "refresh-token refresh denied", 
+    Method: "POST", 
+    URL: "/auth/refresh_token", 
+    Header: nil, 
+    Cookie: &http.Cookie{
+        Name: "JWT", 
+        Value: refreshToken2020, 
+        HttpOnly: true, 
+        Path: "/", 
+        Secure: false
+      },
+    Body: "",
+    WantStatus: http.StatusUnauthorized, 
+    WantHeader: nil,
+    WantCookie: nil,
+    WantBody: ""
   }
-  for _, tc := range tests {
-    testMenu[tc.Name](t, router, tc)
-  }
+
+  test.Endpoint(t, router, tc)
 }
 
 
-func TestRefreshTokenRefresh(t *testing.T, router *gin.Engine, tc APITestCase) {
-  t.Run(tc.Name, func(t *testing.T) {
-    req, _ := http.NewRequest(tc.Method, tc.URL, bytes.NewBufferString(tc.Body))
-    if tc.Header != nil {
-      req.Header = tc.Header
-    }
-    if tc.Cookie != nil {
-      req.AddCookie(tc.Cookie)
-    }
-    res := httptest.NewRecorder()
-    if req.Header.Get("Content-Type") == "" {
-      req.Header.Set("Content-Type", "application/json")
-    }
-    router.ServeHTTP(res, req)
-    assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
+//有効期限内のリフレッシュトークンで新しいリフレッシュトークンは取得可能か
+func TestRefreshTokenRefreshSuccess(t *testing.T) {
 
-    stringEq(res.Body.String(), tc.WantResponse)
+  router := gin.New()
+  logger := gin.Logger()
 
-    if tc.WantHeader != nil {
-      for k, v := range tc.WantHeader {
-        stringEq(req.Header.Get(k), v)
-      }
-    }
+  //cfg.JWTExpiration => 5年 => 157680000秒
+  auth.RegisterHandlers(router.Group(""),
+    auth.NewService(cfg.JWTSigningKey, 157680000, logger),
+    logger,
+  )
 
-    //#region CookieからJWTをパースし有効期限内であることを検証
-    _, tokenString := tc.WantCookie //("refresh_token", refreshToken2030) :=
+  tc := test.APITestCase{
+    Name: "refresh-token refresh success", 
+    Method: "POST", 
+    URL: "/auth/refresh_token", 
+    Header: nil, 
+    Cookie: &http.Cookie{
+        Name: "JWT", 
+        Value: refreshToken2030, 
+        HttpOnly: true, 
+        Path: "/", 
+        Secure: false
+      },
+    Body: "",
+    WantStatus: http.StatusOK, 
+    WantHeader: nil,
+    WantCookie: nil,
+    WantBody: ""
+  }
 
-    token, _ := jwt.Parse(tokenString, refreshTokenSecretSender)
-    claims, _ := token.Claims.(jwt.MapClaims);
-    
-    ts := time.Unix(claims.exp, 0) //第2引数でナノ秒を指定
-    assert.True(t, ts.After(time.Now()))
-    //#endregion
-  })
-}
-
-
-func TestAccessTokenRefresh(t *testing.T, router *gin.Engine, tc APITestCase) {
   t.Run(tc.Name, func(t *testing.T) {
     req, _ := http.NewRequest(tc.Method, tc.URL, bytes.NewBufferString(tc.Body))
     if tc.Header != nil {
@@ -227,15 +152,116 @@ func TestAccessTokenRefresh(t *testing.T, router *gin.Engine, tc APITestCase) {
 }
 
 
+//期限切れのリフレッシュトークンで新しいアクセストークンは取得不可能か
+func TestAccessTokenRefreshDenied(t *testing.T) {
+
+  router := gin.New()
+  logger := gin.Logger()
+
+  //cfg.JWTExpiration => 5年 => 157680000秒
+  auth.RegisterHandlers(router.Group(""),
+    auth.NewService(cfg.JWTSigningKey, 157680000, logger),
+    logger,
+  )
+
+  tc := test.APITestCase{
+    Name: "access-token refresh denied", 
+    Method: "POST", 
+    URL: "/auth/access_token", 
+    Header: nil, 
+    Cookie: &http.Cookie{
+        Name: "JWT", 
+        Value: refreshToken2020, 
+        HttpOnly: true, 
+        Path: "/", 
+        Secure: false
+      },
+    Body: "",
+    WantStatus: http.StatusUnauthorized, 
+    WantHeader: nil,
+    WantCookie: nil,
+    WantBody: ""
+  }
+
+  test.Endpoint(t, router, tc)
+}
+
+//有効期限内のリフレッシュトークンで新しいアクセストークンは取得可能か
+func TestAccessTokenRefreshSuccess(t *testing.T) {
+
+  router := gin.New()
+  logger := gin.Logger()
+
+  //cfg.JWTExpiration => 5年 => 157680000秒
+  auth.RegisterHandlers(router.Group(""),
+    auth.NewService(cfg.JWTSigningKey, 157680000, logger),
+    logger,
+  )
+
+  tc := test.APITestCase{
+    Name: "access-token refresh success", 
+    Method: "POST", 
+    URL: "/auth/access_token", 
+    Header: nil, 
+    Cookie: &http.Cookie{
+        Name: "JWT", 
+        Value: refreshToken2030, 
+        HttpOnly: true, 
+        Path: "/", 
+        Secure: false
+      },
+    Body: "",
+    WantStatus: http.StatusOK, 
+    WantHeader: nil,
+    WantCookie: nil,
+    WantBody: ""
+  }
+
+  t.Run(tc.Name, func(t *testing.T) {
+    req, _ := http.NewRequest(tc.Method, tc.URL, bytes.NewBufferString(tc.Body))
+    if tc.Header != nil {
+      req.Header = tc.Header
+    }
+    if tc.Cookie != nil {
+      req.AddCookie(tc.Cookie)
+    }
+    res := httptest.NewRecorder()
+    if req.Header.Get("Content-Type") == "" {
+      req.Header.Set("Content-Type", "application/json")
+    }
+    router.ServeHTTP(res, req)
+    assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
+
+    if tc.WantHeader != nil {
+      for k, v := range tc.WantHeader {
+        stringEq(req.Header.Get(k), v)
+      }
+    }
+
+    //#region BodyからJWTをパースし有効期限内であることを検証
+    tokenString := res.Body.String() //("access_token", _) :=
+
+    token, _ := jwt.Parse(tokenString, accessTokenSecretSender)
+    claims, _ := token.Claims.(jwt.MapClaims);
+    
+    ts := time.Unix(claims.exp, 0) //第2引数でナノ秒を指定
+    assert.True(t, ts.After(time.Now()))
+    //#endregion
+  })
+}
+
+
+//パース関数に秘密鍵を渡すコールバック
 func accessTokenSecretSender(token *jwt.Token) (string, error) {
   return "secret_key", nil
 }
 
+//パース関数に秘密鍵を渡すコールバック
 func refreshTokenSecretSender(token *jwt.Token) (string, error) {
   return "secret_key_for_refresh", nil
 }
 
-
+//文字列表現が等しいか確認 //JSONの表記ゆれに対応
 func stringEq(given string, want string) {
   if want != "" {
     pattern := strings.Trim(want, "*")
