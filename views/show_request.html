@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang=ja>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="サンプルアプリケーション">
+        <title>SampleApp</title>
+    </head>
+    <body>
+        {{.client_id}},{{.size}}
+    	<ul>
+    		{{range .requests}}
+    		<p>{{.Finish}}<b>{{.ClientID}}</b><b>{{.RequestName}}</b><b>{{.Content}}</b></p>
+    		{{end}}
+    	</ul>
+    </body>
+</html>
