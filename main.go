@@ -14,6 +14,9 @@ import (
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/server"
+  "optim_22_app/model"
+  "optim_22_app/typefile"
+  "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
 )
 
@@ -92,6 +95,7 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   e.GET("/hello", func(c *gin.Context) {
     c.String(http.StatusOK, "Hello World!!")
   })
+
 
   // 事前にテンプレートをロード
   e.LoadHTMLGlob("views/*.html")
