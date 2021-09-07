@@ -68,7 +68,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2100), 
+      MakeAuthorizationHeader(accessToken2100, nil), 
       http.StatusCreated, 
       "",
     },
@@ -77,7 +77,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2000), 
+      MakeAuthorizationHeader(accessToken2000, nil), 
       http.StatusUnauthorized, 
       "",
     },
@@ -85,10 +85,4 @@ func TestAccessTokenAuthentication(t *testing.T) {
   for _, tc := range tests {
     test.Endpoint(t, router, tc)
   }
-}
-
-func MakeAuthorizationHeader(token string) http.Header {
-  header := http.Header{}
-  header.Add("Authorization", token)
-  return header
 }

@@ -8,6 +8,10 @@ import (
   "github.com/golang-jwt/jwt/v4"
 )
 
+const (
+  ndaysPerYear = 365
+  nhoursPerDay = 24
+)
 
 
 type Authorizer struct {
@@ -17,11 +21,11 @@ type Authorizer struct {
 }
 
 
-func New(refreshTokenSecret string, accessTokenSecret string, expiration int) *Authorizer {
+func New(refreshTokenSecret string, accessTokenSecret string, validityPeriod int) *Authorizer {
   return &Authorizer{
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
-    expiration: expiration,
+    validityPeriod: validityPeriod * ndaysPerYear * nhoursPerDay,
   }
 }
 

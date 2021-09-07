@@ -41,7 +41,7 @@ func Endpoint(t *testing.T, router *gin.Engine, tc APITestCase) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    stringEq(t, res.Body.String(), tc.WantBody)
+    stringEq(t, res.Body.String(), tc.WantResponse)
 
     if tc.WantHeader != nil {
       for k, v := range tc.WantHeader {

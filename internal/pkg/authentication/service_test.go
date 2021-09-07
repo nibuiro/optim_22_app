@@ -4,9 +4,14 @@ import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
-  "time"
+//  "time"
   "github.com/golang-jwt/jwt/v4"
-  "optim_22_app/internal/pkg/test/v2"
+  "optim_22_app/internal/pkg/test"
+  "net/http/httptest"
+  "github.com/stretchr/testify/assert"
+  "bytes"
+  "strings"
+//  "fmt"
 )
 
 
@@ -25,11 +30,11 @@ import (
 //)
 
 
-//期限切れのリフレッシュトークンで新しいアクセストークンは取得不可能か
+//期限切れのリフレッシュトークンで新しいリフレッシュトークンは取得不可能か
 func TestRefreshTokenRefreshDenied(t *testing.T) {
 
   router := gin.New()
-  logger := gin.Logger()
+  //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
@@ -37,23 +42,24 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
 
+  cookies := []http.Cookie{
+    http.Cookie{
+      Name: "refresh_token", 
+      Value: refreshToken2020, 
+      HttpOnly: true, 
+      Path: "/", 
+      Secure: false,
+    },
+  }
+
   tc := test.APITestCase{
     Name: "refresh-token refresh denied", 
     Method: "POST", 
     URL: "/auth/refresh_token", 
-    Header: nil, 
-    Cookie: &http.Cookie{
-        Name: "JWT", 
-        Value: refreshToken2020, 
-        HttpOnly: true, 
-        Path: "/", 
-        Secure: false,
-      },
+    Header: MakeAuthorizationHeader("", cookies), 
     Body: "",
     WantStatus: http.StatusUnauthorized, 
-    WantHeader: nil,
-    WantCookie: nil,
-    WantBody: "",
+    WantResponse: "",
   }
 
   test.Endpoint(t, router, tc)
@@ -64,30 +70,31 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
 func TestRefreshTokenRefreshSuccess(t *testing.T) {
 
   router := gin.New()
-  logger := gin.Logger()
+  //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
   //router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
 
+  cookies := []http.Cookie{
+    http.Cookie{
+      Name: "refresh_token", 
+      Value: refreshToken2030, 
+      HttpOnly: true, 
+      Path: "/", 
+      Secure: false,
+    },
+  }
+
   tc := test.APITestCase{
     Name: "refresh-token refresh success", 
     Method: "POST", 
     URL: "/auth/refresh_token", 
-    Header: nil, 
-    Cookie: &http.Cookie{
-        Name: "JWT", 
-        Value: refreshToken2030, 
-        HttpOnly: true, 
-        Path: "/", 
-        Secure: false,
-      },
+    Header: MakeAuthorizationHeader("", cookies), 
     Body: "",
     WantStatus: http.StatusOK, 
-    WantHeader: nil,
-    WantCookie: nil,
-    WantBody: "",
+    WantResponse: "",
   }
 
   t.Run(tc.Name, func(t *testing.T) {
@@ -95,9 +102,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
     if tc.Header != nil {
       req.Header = tc.Header
     }
-    if tc.Cookie != nil {
-      req.AddCookie(tc.Cookie)
-    }
+
     res := httptest.NewRecorder()
     if req.Header.Get("Content-Type") == "" {
       req.Header.Set("Content-Type", "application/json")
@@ -105,16 +110,13 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    if tc.WantHeader != nil {
-      for k, v := range tc.WantHeader {
-        stringEq(t, req.Header.Get(k), v)
-      }
-    }
+    onlyCookiePacket := &http.Request{Header: http.Header{"Cookie": res.HeaderMap["Set-Cookie"]}}
 
     //#region BodyからJWTをパースし有効期限内であることを検証
-    tokenString := res.Body.String() //("access_token", _) :=
+    cookie, _  := onlyCookiePacket.Cookie("refresh_token") //("access_token", _) :=
+    tokenString := cookie.Value
 
-    token, _ := jwt.Parse(tokenString, accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -126,30 +128,31 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
 func TestAccessTokenRefreshDenied(t *testing.T) {
 
   router := gin.New()
-  logger := gin.Logger()
+  //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
   router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
 
+  cookies := []http.Cookie{
+    http.Cookie{
+      Name: "refresh_token", 
+      Value: refreshToken2020, 
+      HttpOnly: true, 
+      Path: "/", 
+      Secure: false,
+    },
+  }
+
   tc := test.APITestCase{
     Name: "access-token refresh denied", 
     Method: "POST", 
     URL: "/auth/access_token", 
-    Header: nil, 
-    Cookie: &http.Cookie{
-        Name: "JWT", 
-        Value: refreshToken2020, 
-        HttpOnly: true, 
-        Path: "/", 
-        Secure: false,
-      },
+    Header: MakeAuthorizationHeader(accessToken2000, cookies), 
     Body: "",
-    WantStatus: http.StatusUnauthorized, 
-    WantHeader: nil,
-    WantCookie: nil,
-    WantBody: "",
+    WantStatus: http.StatusUnauthorized,
+    WantResponse: "",
   }
 
   test.Endpoint(t, router, tc)
@@ -159,30 +162,31 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
 func TestAccessTokenRefreshSuccess(t *testing.T) {
 
   router := gin.New()
-  logger := gin.Logger()
+  //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
   router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
 
+  cookies := []http.Cookie{
+    http.Cookie{
+      Name: "refresh_token", 
+      Value: refreshToken2030, 
+      HttpOnly: true, 
+      Path: "/", 
+      Secure: false,
+    },
+  }
+
   tc := test.APITestCase{
     Name: "access-token refresh success", 
     Method: "POST", 
     URL: "/auth/access_token", 
-    Header: nil, 
-    Cookie: &http.Cookie{
-        Name: "JWT", 
-        Value: refreshToken2030, 
-        HttpOnly: true, 
-        Path: "/", 
-        Secure: false,
-      },
+    Header: MakeAuthorizationHeader(accessToken2000, cookies), 
     Body: "",
     WantStatus: http.StatusOK, 
-    WantHeader: nil,
-    WantCookie: nil,
-    WantBody: "",
+    WantResponse: "",
   }
 
   t.Run(tc.Name, func(t *testing.T) {
@@ -190,9 +194,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
     if tc.Header != nil {
       req.Header = tc.Header
     }
-    if tc.Cookie != nil {
-      req.AddCookie(tc.Cookie)
-    }
+
     res := httptest.NewRecorder()
     if req.Header.Get("Content-Type") == "" {
       req.Header.Set("Content-Type", "application/json")
@@ -200,16 +202,10 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    if tc.WantHeader != nil {
-      for k, v := range tc.WantHeader {
-        stringEq(t, req.Header.Get(k), v)
-      }
-    }
-
     //#region BodyからJWTをパースし有効期限内であることを検証
-    tokenString := res.Body.String() //("access_token", _) :=
+    tokenString := res.HeaderMap["Authorization"][0]
 
-    token, _ := jwt.Parse(tokenString, accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -237,4 +233,18 @@ func stringEq(t *testing.T, given string, want string) {
       assert.JSONEq(t, want, given, "response mismatch")
     }
   }
+}
+
+
+func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
+  header := http.Header{}
+  header.Add("Authorization", token)
+
+  cookieCount := len(cookies)
+  if cookieCount != 0 {
+    for _, cookie := range cookies {
+      header.Add("Cookie", cookie.String())
+    }
+  }
+  return header
 }
