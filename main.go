@@ -6,18 +6,15 @@ import (
   "fmt"
   "time"
   "net/http"
-
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
   "optim_22_app/model"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
-  "optim_22_app/server"
-  "optim_22_app/model"
-  "optim_22_app/typefile"
-  "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
+  "optim_22_app/internal/hello"
+  "optim_22_app/internal/client"
 )
 
 var (
@@ -90,32 +87,26 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
-  
-
-  e.GET("/hello", func(c *gin.Context) {
-    c.String(http.StatusOK, "Hello World!!")
-  })
-
 
   // 事前にテンプレートをロード
   e.LoadHTMLGlob("views/*.html")
 
   // ハンドラの指定
-  e.GET("/hello", server.Hello)
+  e.GET("/hello", hello.Hello)
 
   // ハンドラの指定
-  e.GET("/newhello", server.NewHello)
+  e.GET("/newhello", hello.NewHello)
 
-  client := e.Group("/client")
+  client_e := e.Group("/client")
   {
-    client.GET("/new_request", server.NewRequest)
-    client.POST("/create_request",server.CreateRequest)
+    client_e.GET("/new_request", client.NewRequest)
+    client_e.POST("/create_request",client.CreateRequest)
     // client_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
-    client.GET("/show_request/:client_id", server.ShowRequest)
+    client_e.GET("/show_request/:client_id", client.ShowRequest)
     // request_idをparamにして特定リクエストのサブミッションを表示するハンドラ
-    client.GET("/show_submission/:request_id",server.ShowSubmission)
+    client_e.GET("/show_submission/:request_id",client.ShowSubmission)
     // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
-    client.POST("/decide_winner",server.DecideWinner)
+    client_e.POST("/decide_winner",client.DecideWinner)
   }
 
   e.NoRoute(func(c *gin.Context) {
