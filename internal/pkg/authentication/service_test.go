@@ -38,8 +38,8 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
-  //router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
-  router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
+  //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
+  router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
 
   cookies := []http.Cookie{
@@ -74,8 +74,8 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
-  //router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
-  router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
+  //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
+  router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
   cookies := []http.Cookie{
     http.Cookie{
@@ -132,8 +132,8 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
-  router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
-  //router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
+  router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
+  //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
   cookies := []http.Cookie{
     http.Cookie{
@@ -166,8 +166,8 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   auth := New("secret_key_for_refresh", "secret_key", 157680000)
-  router.POST("/auth/access_token", auth.accessTokenRefreshHandler())
-  //router.POST("/auth/refresh_token", auth.refreshTokenRefreshHandler())
+  router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
+  //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
   cookies := []http.Cookie{
     http.Cookie{

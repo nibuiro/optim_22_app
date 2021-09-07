@@ -7,7 +7,7 @@ import (
   "github.com/golang-jwt/jwt/v4"
 )
 
-func (auth *Authorizer) refreshTokenRefreshHandler() gin.HandlerFunc {
+func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     refreshToken, err := c.Cookie("refresh_token")
@@ -23,7 +23,7 @@ func (auth *Authorizer) refreshTokenRefreshHandler() gin.HandlerFunc {
         if token.Valid {
           //なにもしない
         } else {
-          c.AbortWithStatus(http.StatusUnauthorized)
+          auth.
         }
       } else {
         c.AbortWithStatus(http.StatusBadRequest)
@@ -33,7 +33,7 @@ func (auth *Authorizer) refreshTokenRefreshHandler() gin.HandlerFunc {
 }
 
 //リフレッシュトークンが有効期限内のとき任意のアクセストークンの有効期限を延長
-func (auth *Authorizer) accessTokenRefreshHandler() gin.HandlerFunc {
+func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     refreshToken, err := c.Cookie("refresh_token")
@@ -87,7 +87,7 @@ func (auth *Authorizer) accessTokenRefreshHandler() gin.HandlerFunc {
 
 
 
-func (auth *Authorizer) revokeHandler() gin.HandlerFunc {
+func (auth *Authorizer) RevokeHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     c.AbortWithStatus(http.StatusBadRequest)
