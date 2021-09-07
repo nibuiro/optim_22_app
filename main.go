@@ -10,7 +10,10 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
-  // コメントを外す
+  "optim_22_app/model"
+  "optim_22_app/typefile"
+  "optim_22_app/pkg/log"
+  "optim_22_app/server"
   "optim_22_app/model"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
@@ -52,8 +55,7 @@ func main() {
   // マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
   // それに対応するテーブルの作成を行う。
   // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
-  model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{})
-
+  model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{},&typefile.Submission{})
   // テスト実行前に利用するデータを作成する
   model.CreateTestData()
 
@@ -93,6 +95,31 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   e.GET("/hello", func(c *gin.Context) {
     c.String(http.StatusOK, "Hello World!!")
   })
+
+
+  // 事前にテンプレートをロード
+  e.LoadHTMLGlob("views/*.html")
+
+  // ハンドラの指定
+  e.GET("/hello", server.Hello)
+
+  // ハンドラの指定
+  e.GET("/newhello", server.NewHello)
+
+  client := e.Group("/client")
+  {
+    client.GET("/new_request", server.NewRequest)
+    client.POST("/create_request",server.CreateRequest)
+    // client_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
+    client.GET("/show_request/:client_id", server.ShowRequest)
+    // request_idをparamにして特定リクエストのサブミッションを表示するハンドラ
+    client.GET("/show_submission/:request_id",server.ShowSubmission)
+    // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
+    client.POST("/decide_winner",server.DecideWinner)
+  }
+
+  e.NoRoute(func(c *gin.Context) {
+    c.HTML(http.StatusOK, "error404.html", gin.H{})})
 
   //authHandler := auth.Handler(cfg.JWTSigningKey)
 
