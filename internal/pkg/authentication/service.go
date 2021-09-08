@@ -7,6 +7,16 @@ import (
   "github.com/golang-jwt/jwt/v4"
 )
 
+//type ginHandler func(*gin.Context)
+//
+//
+//type AuthorizationService interface {
+//  Endpoint ginHandler
+//}
+
+
+
+
 func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
@@ -17,13 +27,13 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
     } else {
 
       token, _ := jwt.Parse(refreshToken, auth.refreshTokenSecretSender)
-      _, ok := token.Claims.(jwt.MapClaims)
+      claims, ok := token.Claims.(jwt.MapClaims)
   
       if ok {
         if token.Valid {
           //なにもしない
         } else {
-          auth.
+          auth.authorizationService.Endpoint(c)
         }
       } else {
         c.AbortWithStatus(http.StatusBadRequest)
@@ -63,10 +73,10 @@ func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
             expiration = expiration.Add(time.Duration(auth.validityPeriod) * time.Hour)
 
             claims["exp"] = expiration.Unix()
-            new_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
+            newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
             // Sign and get the complete encoded token as a string using the secret
-            new_tokenString, _ := new_token.SignedString([]byte(auth.accessTokenSecret))
-            c.Header("Authorization", new_tokenString)
+            newTokenString, _ := newToken.SignedString([]byte(auth.accessTokenSecret))
+            c.Header("Authorization", newTokenString)
 
             c.Status(http.StatusOK)
           } else {
@@ -85,11 +95,11 @@ func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
   }
 }
 
-
-
+//認証情報を空文字列で上書き
 func (auth *Authorizer) RevokeHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
-
-    c.AbortWithStatus(http.StatusBadRequest)
+    c.SetCookie("refresh_token", "", 0, "/", "", false, true)
+    c.Header("Authorization", "")
   }
 }
+
