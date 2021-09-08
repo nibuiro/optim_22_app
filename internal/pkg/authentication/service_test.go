@@ -4,7 +4,7 @@ import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
-//  "time"
+  "time"
   "github.com/golang-jwt/jwt/v4"
   "optim_22_app/internal/pkg/test"
   "net/http/httptest"
@@ -37,7 +37,7 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000)
+  auth := New("secret_key_for_refresh", "secret_key", 157680000, &FakeAuthorizationService{})
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
@@ -73,7 +73,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000)
+  auth := New("secret_key_for_refresh", "secret_key", 157680000, &FakeAuthorizationService{})
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -131,7 +131,7 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000)
+  auth := New("secret_key_for_refresh", "secret_key", 157680000, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -165,7 +165,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000)
+  auth := New("secret_key_for_refresh", "secret_key", 157680000, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -248,3 +248,4 @@ func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
   }
   return header
 }
+
