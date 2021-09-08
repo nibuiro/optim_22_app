@@ -5,8 +5,10 @@ import (
 //  "net/http"
   "github.com/gin-gonic/gin"
 //  "fmt"
-  "github.com/golang-jwt/jwt/v4"
+//  "github.com/golang-jwt/jwt/v4"
+  "time"
 )
+
 
 const (
   ndaysPerYear = 365
@@ -14,31 +16,25 @@ const (
 )
 
 
-type Authorizer struct {
-  refreshTokenSecret []byte
-  accessTokenSecret []byte
-  validityPeriod int
-  authorizationService interface{ Endpoint func(*gin.Context), }
+type AuthorizationService interface {
+  Endpoint(c *gin.Context)
 }
 
 
-func New(refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService interface{}) *Authorizer {
+type Authorizer struct {
+  refreshTokenSecret []byte
+  accessTokenSecret []byte
+  validityPeriod time.Duration
+  authorizationService AuthorizationService
+}
+
+
+func New(refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService AuthorizationService) *Authorizer {
   return &Authorizer{
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
-    validityPeriod: validityPeriod * ndaysPerYear * nhoursPerDay,
+    validityPeriod: time.Duration(validityPeriod * ndaysPerYear * nhoursPerDay) * time.Hour,
     authorizationService: authorizationService,
   }
 }
 
-
-
-//パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
-func (auth *Authorizer) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return auth.refreshTokenSecret, nil
-}
-
-//パース関数にアクセストークン用秘密鍵を渡すコールバック
-func (auth *Authorizer) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return auth.accessTokenSecret, nil
-}

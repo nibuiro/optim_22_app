@@ -37,7 +37,7 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000, &FakeAuthorizationService{})
+  auth := New("secret_key_for_refresh", "secret_key", 5, &FakeAuthorizationService{})
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
@@ -73,7 +73,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000, &FakeAuthorizationService{})
+  auth := New("secret_key_for_refresh", "secret_key", 5, &FakeAuthorizationService{})
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -116,7 +116,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
     cookie, _  := onlyCookiePacket.Cookie("refresh_token") //("access_token", _) :=
     tokenString := cookie.Value
 
-    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, auth.refreshTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -131,7 +131,7 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000, nil)
+  auth := New("secret_key_for_refresh", "secret_key", 5, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -165,7 +165,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("secret_key_for_refresh", "secret_key", 157680000, nil)
+  auth := New("secret_key_for_refresh", "secret_key", 5, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -260,7 +260,7 @@ func (as *FakeAuthorizationService) Endpoint(c *gin.Context) {
       return "secret_key_for_refresh", nil
     }
     token, _ := jwt.Parse(refreshToken, sender)
-    claims, ok := token.Claims.(jwt.MapClaims)
+    claims, _ := token.Claims.(jwt.MapClaims)
 
     expiration := time.Now()
     expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)

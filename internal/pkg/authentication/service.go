@@ -5,15 +5,12 @@ import (
   "time"
   "github.com/gin-gonic/gin"
   "github.com/golang-jwt/jwt/v4"
+//  "fmt"
 )
 
 //type ginHandler func(*gin.Context)
 //
 //
-//type AuthorizationService interface {
-//  Endpoint ginHandler
-//}
-
 
 
 
@@ -27,13 +24,13 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
     } else {
 
       token, _ := jwt.Parse(refreshToken, auth.refreshTokenSecretSender)
-      claims, ok := token.Claims.(jwt.MapClaims)
+      _, ok := token.Claims.(jwt.MapClaims)
   
       if ok {
         if token.Valid {
-          //なにもしない
-        } else {
           auth.authorizationService.Endpoint(c)
+        } else {
+          c.AbortWithStatus(http.StatusUnauthorized)
         }
       } else {
         c.AbortWithStatus(http.StatusBadRequest)
@@ -70,7 +67,7 @@ func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
       
           if ok {
             expiration := time.Now()
-            expiration = expiration.Add(time.Duration(auth.validityPeriod) * time.Hour)
+            expiration = expiration.Add(auth.validityPeriod)
 
             claims["exp"] = expiration.Unix()
             newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
@@ -103,3 +100,12 @@ func (auth *Authorizer) RevokeHandler() gin.HandlerFunc {
   }
 }
 
+//パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
+func (auth *Authorizer) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
+  return auth.refreshTokenSecret, nil
+}
+
+//パース関数にアクセストークン用秘密鍵を渡すコールバック
+func (auth *Authorizer) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
+  return auth.accessTokenSecret, nil
+}
