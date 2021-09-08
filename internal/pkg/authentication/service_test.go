@@ -249,3 +249,33 @@ func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
   return header
 }
 
+
+type FakeAuthorizationService struct {
+  repository interface{}
+}
+
+func (as *FakeAuthorizationService) Endpoint(c *gin.Context) {
+    refreshToken, err := c.Cookie("refresh_token")
+    sender :=  func (token *jwt.Token) (interface{}, error) {
+      return "secret_key_for_refresh", nil
+    }
+    token, _ := jwt.Parse(refreshToken, sender)
+    claims, ok := token.Claims.(jwt.MapClaims)
+
+    expiration := time.Now()
+    expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)
+
+    claims["exp"] = expiration.Unix()
+    newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
+    // Sign and get the complete encoded token as a string using the secret
+    newTokenString, _ := newToken.SignedString([]byte("secret_key_for_refresh"))
+
+    if err != nil {
+      c.AbortWithStatus(http.StatusUnauthorized)
+    } else {
+      c.SetCookie("refresh_token", newTokenString, 1, "/", "localhost", false, true)
+      //func (c *Context) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
+    }
+}
+
+

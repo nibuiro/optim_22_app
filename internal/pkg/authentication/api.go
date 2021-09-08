@@ -3,7 +3,7 @@ package authentication
 
 import (
 //  "net/http"
-//  "github.com/gin-gonic/gin"
+  "github.com/gin-gonic/gin"
 //  "fmt"
   "github.com/golang-jwt/jwt/v4"
 )
@@ -17,15 +17,17 @@ const (
 type Authorizer struct {
   refreshTokenSecret []byte
   accessTokenSecret []byte
-  expiration int
+  validityPeriod int
+  authorizationService interface{ Endpoint func(*gin.Context), }
 }
 
 
-func New(refreshTokenSecret string, accessTokenSecret string, validityPeriod int) *Authorizer {
+func New(refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService interface{}) *Authorizer {
   return &Authorizer{
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
     validityPeriod: validityPeriod * ndaysPerYear * nhoursPerDay,
+    authorizationService: authorizationService,
   }
 }
 
