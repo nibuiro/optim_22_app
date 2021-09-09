@@ -7,12 +7,23 @@ import (
   "optim_22_app/internal/pkg/Config"
 )
 
+
+
+
 //`POST /api/user`が要求する情報
 type registrationInformation struct {
   name     string `json:"name"`
   email    string `json:"email"`
   password string `json:"password"`
 }
+
+
+//`POST /api/session`が要求する情報
+type loginInformation struct {
+  email    string `json:"email"`
+  password string `json:"password"`
+}
+
 
 //ユーザ操作の依存関係
 type resource struct {
@@ -42,7 +53,7 @@ func (rc resource) create(c *gin.Context) error {
 
   var input registrationInformation
 
-  //BOdyからJSONをパースして読み取る
+  //BodyからJSONをパースして読み取る
   if err := c.BindJSON(&input); err != nil {
     return err
   }
@@ -58,6 +69,39 @@ func (rc resource) create(c *gin.Context) error {
   c.SetCookie(name, refreshToken, 1, "/",  rc.config.domain, false, true)
   c.Status(http.StatusCreated)
   //#endregion
+}
+
+
+func (rc resource) delete(c *gin.Context) error {
+  err := rc.service.delete(c.Request.Context())
+}
+
+
+func (rc resource) login(c *gin.Context) error {
+
+  var input loginInformation
+
+  //BodyからJSONをパースして読み取る
+  if err := c.BindJSON(&input); err != nil {
+    return err
+  }
+
+  //資格情報確認及び認証情報取得
+  refreshToken, accessToken, err := rc.service.login(c.Request.Context(), input)
+  if err != nil {
+    return err
+  }
+  
+  //#region ヘッダに認証情報を付加
+  c.Header("Authorization", accessToken)
+  c.SetCookie(name, refreshToken, 1, "/",  rc.config.domain, false, true)
+  c.Status(http.StatusCreated)
+  //#endregion
+}
+
+
+func (rc resource) logout(c *gin.Context) error {
+
 }
 
 
