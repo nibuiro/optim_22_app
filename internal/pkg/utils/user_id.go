@@ -9,7 +9,7 @@ import (
 
 //ユーザIDを取得するインターフェイス<I>
 func GetUserIdFromHeaderAsInt(c *gin.Context) int {
-  return 0 //#0
+  return getUserIdAsInt(c)
 }
 
 //ユーザIDを整数型として取得

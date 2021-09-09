@@ -73,7 +73,8 @@ func (rc resource) create(c *gin.Context) error {
 
 
 func (rc resource) delete(c *gin.Context) error {
-  err := rc.service.delete(c.Request.Context())
+  userId := GetUserIdFromHeaderAsInt(c)
+  err := rc.service.delete(c.Request.Context(), userId)
 }
 
 
