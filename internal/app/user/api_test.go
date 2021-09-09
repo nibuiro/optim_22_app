@@ -55,6 +55,41 @@ func TestGetNewIdWithToken(t *testing.T) {
   //#endregion
 }
 
+//同一メールアドレスによる多重登録の検証
+func TestDoubleRegistration(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), StubNewService(repo), logger)
+
+  testCase := test.APITestCase{
+    Name: "register success", 
+    Method: "POST", 
+    URL: "/api/user", 
+    Header: nil, 
+    Body: `{name":"testA", "email":"test@test.test", "password":"test"}`,
+    WantStatus: http.StatusCreated, 
+    WantResponse: "",
+  }
+  
+  //ヘッダとCookie以外について検証
+  res := test.Endpoint(t, router, testCase)
+
+  //名前を変えて同一メールアドレスで再登録
+  testCase := test.APITestCase{
+    Name: "register success", 
+    Method: "POST", 
+    URL: "/api/user", 
+    Header: nil, 
+    Body: `{name":"testB", "email":"test@test.test", "password":"test"}`,
+    WantStatus: http.StatusBadRequest, 
+    WantResponse: "",
+  }
+  
+  //ヘッダとCookie以外について検証
+  res := test.Endpoint(t, router, testCase)
+}
 
 
 func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
