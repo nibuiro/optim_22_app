@@ -33,9 +33,9 @@ type resource struct {
 }
 
 //ユーザ操作についてエンドポイントを登録
-func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
+func RegisterHandlers(r *gin.RouterGroup, config Config, service Service, logger log.Logger) {
 
-  rc := resource{service, logger}
+  rc := resource{config, service, logger}
 
   //登録する
   r.POST("/api/user", rc.create)
@@ -101,7 +101,8 @@ func (rc resource) login(c *gin.Context) error {
 
 
 func (rc resource) logout(c *gin.Context) error {
-
+    c.SetCookie("refresh_token", "", 1, "/", "", false, true)
+    c.Header("Authorization", "")
 }
 
 
