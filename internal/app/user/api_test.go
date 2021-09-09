@@ -3,35 +3,76 @@ package user
 import (
   "net/http"
   "testing"
+  "strconv"
   "github.com/gin-gonic/gin"
   "optim_22_app/internal/pkg/test"
   "optim_22_app/pkg/log"
 )
   
+/* 
+ * APIとして機能するか？
+ */
 
-func TestAPI(t *testing.T) {
+//ユーザ作成時にIDが決定されトークンが発行されるか
+func TestGetNewIdWithToken(t *testing.T) {
 
   logger := log.New()
   router := gin.New()
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), StubNewService(repo), logger) //auth.MockAuthHandler
-  header := auth.MockAuthHeader()
+  RegisterHandlers(router.Group(""), StubNewService(repo), logger)
+
+  testCase := test.APITestCase{
+    Name: "register success", 
+    Method: "POST", 
+    URL: "/api/user", 
+    Header: nil, 
+    Body: `{name":"test", "email":"test@test.test", "password":"test"}`,
+    WantStatus: http.StatusCreated, 
+    WantResponse: "",
+  }
+  
+  //ヘッダとCookie以外について検証
+  res := test.Endpoint(t, router, testCase)
+
+  //#region ヘッダからJWTをパースし有効期限内であることを検証
+  tokenString := res.HeaderMap["Authorization"][0]
+  token, _ := jwt.Parse(tokenString, "secret_key")
+  assert.True(t, token.Valid)
+  //#endregion
+
+  //#region CookieからJWTをパースし有効期限内であることを検証
+  onlyCookiePacket := &http.Request{Header: http.Header{"Cookie": res.HeaderMap["Set-Cookie"]}}
+  cookie, _  := onlyCookiePacket.Cookie("refresh_token")
+  tokenString = cookie.Value
+  token, _ = jwt.Parse(tokenString, auth.refreshTokenSecretSender)
+  assert.True(t, token.Valid)
+  //#endregion
+
+  //#region CookieからJWTをパースし有効期限内であることを検証
+  claims, _ := token.Claims.(jwt.MapClaims)
+  i, _ := strconv.Atoi(claims["userID"])
+  assert.Equal(t, 0, i)
+  //#endregion
+}
+
+
+
+func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
+  header := http.Header{}
+  header.Add("Authorization", token)
+
+  cookieCount := len(cookies)
+  if cookieCount != 0 {
+    for _, cookie := range cookies {
+      header.Add("Cookie", cookie.String())
+    }
+  }
+  return header
+}
 
   
-  tests := []test.APITestCase{
-    //前提を正常なbodyとして認証についてテスト
-    {"create ok", "POST", "/user", `{"userID":"test", "name":"test", "email":"test", "password":"test"}`, nil, http.StatusCreated, ""},
-    {"create auth error", "POST", "/user", `{"userID":"test", "name":"test", "email":"test", "password":"test"}`, header, http.StatusUnauthorized, ""},
 
-//    bodyの検証はserviceの仕事
-//    {"create missing bracket error", "POST", "/user", `"userID":"test", "name":"test", "email":"test", "password":"test"}`, nil, http.StatusBadRequest, ""},
-//    {"create missing key error", "POST", "/user", `"userID":"test", "name":"test", "email":"test"}`, nil, http.StatusBadRequest, ""},
-//    {"create missing value error", "POST", "/user", `"userID":"test", "name":"test", "email":"test", "password":""}`, nil, http.StatusBadRequest, ""},
-//    ...
-  }
-  for _, tc := range tests {
-    test.Endpoint(t, router, tc)
-  }
-}
+
+
 
 
