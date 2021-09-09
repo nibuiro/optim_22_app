@@ -8,10 +8,6 @@ import (
 //  "fmt"
 )
 
-//type ginHandler func(*gin.Context)
-//
-//
-
 
 
 func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
@@ -28,7 +24,10 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
   
       if ok {
         if token.Valid {
-          auth.authorizationService.Endpoint(c)
+          newRefreshToken := auth.authorizationService.Refresh(refreshToken)
+          c.SetCookie("refresh_token", newRefreshToken, 1, "/", auth.domain, false, true)
+            //func (c *Context) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
+
         } else {
           c.AbortWithStatus(http.StatusUnauthorized)
         }
