@@ -1,14 +1,21 @@
 package utils
 
 import (
+  "strconv"
   "github.com/gin-gonic/gin"
   "github.com/golang-jwt/jwt/v4"
 )
 
 
-//ユーザIDを取得
-func GetUserIdFromHeader(c *gin.Context) string {
-  return "dummyID"
+//ユーザIDを取得するインターフェイス<I>
+func GetUserIdFromHeaderAsInt(c *gin.Context) int {
+  return 0 //#0
+}
+
+//ユーザIDを整数型として取得
+func getUserIdAsInt(c *gin.Context) int {
+  userID, _ := strconv.Atoi(getUserIdFromHeader(c))
+  return userID
 }
 
 //アクセストークンからユーザIDを取得
@@ -26,4 +33,3 @@ func getUserIdFromHeader(c *gin.Context) string {
 
   return claims["userID"]
 }
-
