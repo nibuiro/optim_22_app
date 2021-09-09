@@ -3,9 +3,9 @@ package test
 import (
   "bytes"
   "github.com/gin-gonic/gin"
+  "net/http/httptest"
   "github.com/stretchr/testify/assert"
   "net/http"
-  "net/http/httptest"
   "strings"
   "testing"
 )
