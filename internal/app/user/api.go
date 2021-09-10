@@ -25,10 +25,6 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
   r.POST("/api/user", rc.create())
   //退会する
   r.DELETE("/api/user", rc.delete())
-  //ログイン
-  r.POST("/api/session", rc.login())
-  //ログアウト
-  r.DELETE("/api/session", rc.logout())
 
 }
 
@@ -68,37 +64,6 @@ func (rc resource) delete() gin.HandlerFunc {
 }
 
 
-func (rc resource) login() gin.HandlerFunc {
-  return func(c *gin.Context) {
-
-    var input loginInformation
-  
-    //BodyからJSONをパースして読み取る
-    if err := c.BindJSON(&input); err != nil {
-      rc.logger.Error(err)
-    }
-  
-    //資格情報確認及び認証情報取得
-    refreshToken, accessToken, err := rc.service.Login(c.Request.Context(), input)
-    if err != nil {
-      rc.logger.Error(err)
-    }
-    
-    //#region ヘッダに認証情報を付加
-    c.Header("Authorization", accessToken)
-    c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.config.Domain, false, true)
-    c.Status(http.StatusCreated)
-    //#endregion
-  }
-}
-
-
-func (rc resource) logout() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    c.SetCookie("refresh_token", "", 0, "/", "", false, true)
-    c.Status(http.StatusOK)
-  }
-}
 
 
 
