@@ -13,6 +13,6 @@ type repository struct {
   logger log.Logger
 }
 
-func StubNewRepository(args ...interface{}) Service {
+func StubNewRepository(args ...interface{}) Repository {
   return repository{nil}
 }

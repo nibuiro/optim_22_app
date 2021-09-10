@@ -21,7 +21,7 @@ type APITestCase struct {
 }
 
 // Endpoint tests an HTTP endpoint using the given APITestCase spec.
-func Endpoint(t *testing.T, router *gin.Engine, tc APITestCase) httptest.ResponseRecorder {
+func Endpoint(t *testing.T, router *gin.Engine, tc APITestCase) *httptest.ResponseRecorder {
   res := httptest.NewRecorder()
   t.Run(tc.Name, func(t *testing.T) {
     req, _ := http.NewRequest(tc.Method, tc.URL, bytes.NewBufferString(tc.Body))

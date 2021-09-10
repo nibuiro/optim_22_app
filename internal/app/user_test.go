@@ -1,18 +1,18 @@
 package user
 
-import (
-  "net/http"
-  "testing"
-  "strconv"
-  "github.com/gin-gonic/gin"
-  "optim_22_app/internal/pkg/test"
-  "optim_22_app/pkg/log"
-)
+//import (
+//  "net/http"
+//  "testing"
+//  "strconv"
+//  "github.com/gin-gonic/gin"
+//  "optim_22_app/internal/pkg/test"
+//  "optim_22_app/pkg/log"
+//)
   
 /* 
  * APIとして機能するか？
  */
-
+/*
 //ユーザ作成時にIDが決定されトークンが発行されるか
 func TestGetNewIdWithToken(t *testing.T) {
 
@@ -107,7 +107,7 @@ func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
 
   
 
-
+*/
 
 
 

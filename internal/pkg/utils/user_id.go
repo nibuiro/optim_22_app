@@ -9,7 +9,12 @@ import (
 
 //ユーザIDを取得するインターフェイス<I>
 func GetUserIdFromHeaderAsInt(c *gin.Context) int {
-  return getUserIdAsInt(c)
+  return stubGetUserIdAsInt(c)
+}
+
+//ユーザIDを整数型として取得
+func stubGetUserIdAsInt(c *gin.Context) int {
+  return 0
 }
 
 //ユーザIDを整数型として取得
@@ -31,5 +36,6 @@ func getUserIdFromHeader(c *gin.Context) string {
   //claimsを辞書型として取得
   claims, _ := token.Claims.(jwt.MapClaims)
 
-  return claims["userID"]
+
+  return claims["userID"].(string)
 }
