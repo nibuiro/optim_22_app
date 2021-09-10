@@ -55,6 +55,15 @@ func (s service) Create(ctx context.Context, req registrationInformation) (strin
 }
 
 
+func (s service) Delete(ctx context.Context, userId int) error {
+  //該当useriDのエントリを削除
+  if err = s.repo.Delete(ctx, userId); err != nil {
+    return err
+  } else {
+    return nil
+  }
+}
+
 
 func StubNewService(args ...interface{}) Service { return service{nil, nil}}
 func StubCreate(args ...interface{}) (string, string, error)  {return "", "", nil}
