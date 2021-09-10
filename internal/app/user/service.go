@@ -18,6 +18,15 @@ type registrationInformation struct {
 }
 
 
+func (m registrationInformation) Validate() error {
+  return validation.ValidateStruct(&m,
+    validation.Field(&m.Name, validation.Required, validation.Length(3, 128)),
+    validation.Field(&m.Email, validation.Required, is.Email),
+    //is SHA256
+    validation.Field(&m.Password, validation.Required, validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+  )
+}
+
 type Service interface {
   Create(ctx context.Context, input registrationInformation) (string, string, error)
   Delete(ctx context.Context, userId int) error
