@@ -7,24 +7,6 @@ import (
   "optim_22_app/internal/pkg/Config"
 )
 
-
-
-
-//`POST /api/user`が要求する情報
-type registrationInformation struct {
-  name     string `json:"name"`
-  email    string `json:"email"`
-  password string `json:"password"`
-}
-
-
-//`POST /api/session`が要求する情報
-type loginInformation struct {
-  email    string `json:"email"`
-  password string `json:"password"`
-}
-
-
 //ユーザ操作の依存関係
 type resource struct {
   config Config
