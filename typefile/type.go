@@ -1,6 +1,5 @@
 // type.goに利用する構造体をまとめる。
 // 構造体の属性は必ず最初の文字を大文字にする。
-// Winnerが必要になるかもしれない
 package typefile
 
 import (
@@ -34,7 +33,6 @@ type Request struct{
 	RequestName    string         `gorm:"not null"`
 	Content        string         `gorm:"not null"`
 	Winner         Winner
-	Finish         bool           `gorm:"not null"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

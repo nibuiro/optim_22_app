@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang=ja>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="サンプルアプリケーション">
+        <title>SampleApp</title>
+    </head>
+    <body>
+        提出物提出ページ
+        <article>
+            <form class="request-form" action="//localhost:8080/engineer/create_submission" method="post">
+                <label>提出物の内容</label><br>
+                <input type="text" name="Content"><br>
+                <input type="hidden" name="engineer_id" value={{.engineer_id}}>
+                <input type="hidden" name="request_id" value={{.request_id}}>
+                <input type="submit" value="送信">
+            </form>
+        </article>
+    </body>
+</html>

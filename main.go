@@ -15,6 +15,8 @@ import (
   "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/hello"
   "optim_22_app/internal/client"
+  "optim_22_app/internal/request"
+  "optim_22_app/internal/engineer"
 )
 
 var (
@@ -89,7 +91,7 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
 
   // 事前にテンプレートをロード
-  e.LoadHTMLGlob("views/*.html")
+  e.LoadHTMLGlob("views/*/*.html")
 
   // ハンドラの指定
   e.GET("/hello", hello.Hello)
@@ -99,7 +101,9 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
 
   client_e := e.Group("/client")
   {
+    // クライアントが新規リクエストを作成するためのページを表示するハンドラ
     client_e.GET("/new_request", client.NewRequest)
+    // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
     client_e.POST("/create_request",client.CreateRequest)
     // client_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
     client_e.GET("/show_request/:client_id", client.ShowRequest)
@@ -107,6 +111,34 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
     client_e.GET("/show_submission/:request_id",client.ShowSubmission)
     // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
     client_e.POST("/decide_winner",client.DecideWinner)
+    // クライアントが依頼済みの特定リクエストを編集できるようにするハンドラ
+    client_e.GET("/edit_request/:request_id",client.EditRequest)
+    // クライアントが編集したリクエストを更新できるようにするハンドラ
+    client_e.POST("/update_request/",client.UpdateRequest)
+  }
+
+  request_e := e.Group("/request")
+  {
+    // request_idをparamにして特定リクエストの詳細を標示する。
+    request_e.GET("/show_request/:request_id",request.ShowRequest)
+  }
+
+  engineer_e := e.Group("/engineer")
+  {
+    // 特定リクエストに参加するためのページを表示するハンドラ
+    engineer_e.GET("/join_request/:request_id", engineer.JoinRequest)
+    // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
+    engineer_e.POST("/create_engineer_join",engineer.CreateEngineerJoin)
+    // submissionを提出するためのページを標示するハンドラ
+    engineer_e.GET("/new_submission/:request_id",engineer.NewSubmission)
+    // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
+    engineer_e.POST("/create_submission",engineer.CreateSubmission)
+    // engineer_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
+    engineer_e.GET("/show_join_request/:engineer_id", engineer.ShowJoinRequest)
+    // エンジニアが提出済みのsubmissionを編集できるようにするハンドラ
+    engineer_e.GET("/edit_submission/:submission_id",engineer.EditSubmission)
+    // エンジニアが編集したsubmissionを更新できるようにするハンドラ
+    engineer_e.POST("/update_submission",engineer.UpdateSubmission)
   }
 
   e.NoRoute(func(c *gin.Context) {

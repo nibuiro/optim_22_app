@@ -45,28 +45,27 @@ func CreateTestData() {
 	var users = []typefile.User{
 		{Name: "user1"},
 		{Name: "user2"},
-		{Name: "user3"},
-		{Name: "user4"},
-		{Name: "user5"},
-		{Name: "user6"}}
+		{Name: "user3"}}
 	Db.Create(&users)
 
+	// userが作成された直後にengineerも作成する。
 	var engineers = []typefile.Engineer{
 		{User: typefile.User{ID: 1,Name: "user1"}},
 		{User: typefile.User{ID: 2,Name: "user2"}},
 		{User: typefile.User{ID: 3,Name: "user3"}}}
 	Db.Create(&engineers)
-	
+
+	//userが作成された直後にclientも作成する。
 	var clients = []typefile.Client{
-		{User: typefile.User{ID: 4,Name: "user4"}},
-		{User: typefile.User{ID: 5,Name: "user5"}},
-		{User: typefile.User{ID: 6,Name: "user6"}}}
+		{User: typefile.User{ID: 1,Name: "user1"}},
+		{User: typefile.User{ID: 2,Name: "user2"}},
+		{User: typefile.User{ID: 3,Name: "user3"}}}
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
-		{ClientID: 4,RequestName: "request1",Content: "request1 content",Finish: true},
-		{ClientID: 4,RequestName: "request2",Content: "request2 content",Finish: true},
-		{ClientID: 5,RequestName: "request3",Content: "request3 content",Finish: false}}
+		{ClientID: 1,RequestName: "request1 from clientID 1",Content: "request1 content"},
+		{ClientID: 1,RequestName: "request2 from clientID 1",Content: "request2 content"},
+		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content"}}
 	Db.Create(&requests)
 	
 	var winners = []typefile.Winner{
