@@ -55,13 +55,14 @@ func (s service) Create(ctx context.Context, req registrationInformation) (strin
     Password:  req.Password,
   }
   //INSERTと割り当てられるuserIDを取得
+  var userId int
   if err := s.repo.Create(ctx, &insertValues); err != nil {
     return "", "", err
   } else {
-    userId := insertValues.ID
+    userId = insertValues.ID
   }
   //トークン発行
-  refreshToken, accessToken := auth.AuthorizationService.New(userId)
+  refreshToken, accessToken := s.auth.AuthorizationService.New(userId)
 
   return refreshToken, accessToken, nil
 }
@@ -69,7 +70,7 @@ func (s service) Create(ctx context.Context, req registrationInformation) (strin
 
 func (s service) Delete(ctx context.Context, userId int) error {
   //該当useriDのエントリを削除
-  if err = s.repo.Delete(ctx, userId); err != nil {
+  if err := s.repo.Delete(ctx, userId); err != nil {
     return err
   } else {
     return nil
@@ -77,7 +78,7 @@ func (s service) Delete(ctx context.Context, userId int) error {
 }
 
 
-func StubNewService(args ...interface{}) Service { return service{nil, nil}}
+func StubNewService(args ...interface{}) Service { return service{nil, nil, nil}}
 func StubCreate(args ...interface{}) (string, string, error)  {return "", "", nil}
 func StubDelete(args ...interface{}) error {return nil}
 func StubLogin(args ...interface{}) (string, string, error) {return "", "", nil}
