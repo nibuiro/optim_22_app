@@ -254,8 +254,8 @@ type FakeAuthorizationService struct {
   repository interface{}
 }
 
-func (as *FakeAuthorizationService) New(args ...interface{}) string { 
-  return ""
+func (as *FakeAuthorizationService) New(args ...interface{}) (string, string) { 
+  return "", ""
 }
 
 func (as *FakeAuthorizationService) Refresh(refreshToken string) string {
