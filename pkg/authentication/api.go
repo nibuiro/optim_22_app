@@ -16,7 +16,9 @@ const (
 
 
 type AuthorizationService interface {
-  New(args ...interface{}) string
+  //リフレッシュトークンとアクセストークンを返す
+  New(args ...interface{}) (string, string)
+  //リフレッシュトークンのリフレッシュ
   Refresh(refreshToken string) string
 }
 
