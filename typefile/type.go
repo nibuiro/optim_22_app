@@ -4,7 +4,7 @@
 package typefile
 
 type User struct{
-	ID             int            `gorm:"primaryKey"`
+  ID        uint           `gorm:"primaryKey;autoIncrement:true"`
 	Name           string         `gorm:"not null"`
 	Email       string         `gorm:"not null"`  
 	Password       string         `gorm:"not null"`     

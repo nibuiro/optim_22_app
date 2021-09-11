@@ -49,13 +49,12 @@ func (s service) Create(ctx context.Context, req registrationInformation) (strin
   }
   //クエリの値を定義
   insertValues := typefile.User{
-    ID:        0,         //無視される、nil `gorm:"primaryKey;autoIncrement:true"`
     Name:      req.Name,
     Email:     req.Email,
     Password:  req.Password,
   }
   //INSERTと割り当てられるuserIDを取得
-  var userId int
+  var userId uint
   if err := s.repo.Create(ctx, &insertValues); err != nil {
     return "", "", err
   } else {
