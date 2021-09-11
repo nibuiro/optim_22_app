@@ -10,6 +10,7 @@ import (
   "context"
 )
 
+//#region 登録情報
 //`POST /api/user`が要求する情報
 type registrationInformation struct {
   Name     string `json:"name"`
@@ -26,11 +27,13 @@ func (m registrationInformation) Validate() error {
     validation.Field(&m.Password, validation.Required, validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
   )
 }
+//#endregion
 
 type Service interface {
   Create(ctx context.Context, input registrationInformation) (string, string, error)
   Delete(ctx context.Context, userId int) error
 }
+
 
 type service struct {
   auth   *authentication.Authorizer
