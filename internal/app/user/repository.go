@@ -25,6 +25,12 @@ func (r Repository) Create(ctx context.Context, user *typefile.User) error {
 }
 
 
+func (r Repository) Delete(ctx context.Context, userId string) error {
+  result := r.db.WithContext(ctx).Delete(&typefile.User{}, userId)
+  return result.Error
+}
+
+
 func StubNewRepository(args ...interface{}) Repository {
   return repository{nil}
 }
