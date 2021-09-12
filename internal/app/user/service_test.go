@@ -19,7 +19,7 @@ func TestRegistrationInformationValidate(t *testing.T) {
     wantError bool
   }{
     {
-      "success#0", 
+      "normal address", 
       RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
@@ -28,7 +28,7 @@ func TestRegistrationInformationValidate(t *testing.T) {
       false,
     },
     {
-      "success#1", 
+      "academic address", 
       RegistrationInformation{
         Name:"test", 
         Email:"test@inc.test-ac.jp", 
@@ -37,7 +37,7 @@ func TestRegistrationInformationValidate(t *testing.T) {
       false,
     },
     {
-      "success#2", 
+      "has dot", 
       RegistrationInformation{
         Name:"test", 
         Email:"test.test@test.com", 
@@ -100,7 +100,7 @@ func TestRegistrationInformationValidate(t *testing.T) {
       true,
     },
     {
-      "invalid email type: !format", 
+      "invalid email type: no at", 
       RegistrationInformation{
         Name:"test", 
         Email:"testtest.com", 
@@ -109,7 +109,16 @@ func TestRegistrationInformationValidate(t *testing.T) {
       true,
     },
     {
-      "invalid email type: !format", 
+      "invalid email type: invalid hyphen", 
+      RegistrationInformation{
+        Name:"test", 
+        Email:"test@test-.com", 
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
+      }, 
+      true,
+    },
+    {
+      "invalid email type: no TLD", 
       RegistrationInformation{
         Name:"test", 
         Email:"test@testcom", 
