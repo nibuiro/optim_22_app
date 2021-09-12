@@ -3,7 +3,7 @@ package user
 import (
   "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
-  "github.com/go-ozzo/ozzo-validation/v4/is"
+//  "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/authentication"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
@@ -12,25 +12,26 @@ import (
 
 //#region 登録情報
 //`POST /api/user`が要求する情報
-type registrationInformation struct {
+type RegistrationInformation struct {
   Name     string `json:"name"`
   Email    string `json:"email"`
   Password string `json:"password"`
 }
 
 
-func (m registrationInformation) Validate() error {
+func (m RegistrationInformation) Validate() error {
   return validation.ValidateStruct(&m,
     validation.Field(&m.Name, validation.Required, validation.Length(3, 128)),
-    validation.Field(&m.Email, validation.Required, is.Email),
+    //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
+    validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+(\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+"))),
     //is SHA256
-    validation.Field(&m.Password, validation.Required, validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+    validation.Field(&m.Password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
   )
 }
 //#endregion
 
 type Service interface {
-  Create(ctx context.Context, input registrationInformation) (string, string, error)
+  Create(ctx context.Context, input RegistrationInformation) (string, string, error)
   Delete(ctx context.Context, userId int) error
 }
 
@@ -42,7 +43,7 @@ type service struct {
 }
 
 
-func (s service) Create(ctx context.Context, req registrationInformation) (string, string, error) {
+func (s service) Create(ctx context.Context, req RegistrationInformation) (string, string, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     return "", "", err

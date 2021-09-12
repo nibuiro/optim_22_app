@@ -31,7 +31,7 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
 
 func (rc resource) create() gin.HandlerFunc {
   return func(c *gin.Context) {
-    var input registrationInformation
+    var input RegistrationInformation
   
     //BodyからJSONをパースして読み取る
     if err := c.BindJSON(&input); err != nil {
