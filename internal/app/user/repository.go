@@ -21,6 +21,11 @@ type repository struct {
 }
 
 
+func NewRepository(db *gorm.DB, logger log.Logger) Repository {
+  return repository{db, logger}
+}
+
+
 func (r repository) Create(ctx context.Context, user *typefile.User) error {
   result := r.db.WithContext(ctx).Create(user)
   return result.Error
