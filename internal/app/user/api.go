@@ -1,8 +1,8 @@
 package user
 
 import (
-  "github.com/gin-gonic/gin"
   "net/http"
+  "github.com/gin-gonic/gin"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/pkg/utils"
@@ -36,19 +36,21 @@ func (rc resource) create() gin.HandlerFunc {
     //BodyからJSONをパースして読み取る
     if err := c.BindJSON(&input); err != nil {
       rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
     }
   
-    //ユーザ作成及び認証情報取得
-    refreshToken, accessToken, err := rc.service.Create(c.Request.Context(), input)
+    //ユーザ作成及び認証情報取得 
+    userId, err := rc.service.Create(c.Request.Context(), input)
     if err != nil {
       rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      rc.logger.Debug(userId)
+      c.Status(http.StatusCreated)
+      return 
     }
-    
-    //#region ヘッダに認証情報を付加
-    c.Header("Authorization", accessToken)
-    c.SetCookie("refresh_token", refreshToken, 1, "/", rc.config.Domain, false, true)
-    c.Status(http.StatusCreated)
-    //#endregion
   }
 }
 
@@ -59,6 +61,11 @@ func (rc resource) delete() gin.HandlerFunc {
     err := rc.service.Delete(c.Request.Context(), userId)
     if err != nil {
       rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      c.Status(http.StatusOK)
+      return 
     }
   }
 }

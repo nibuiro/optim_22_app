@@ -4,7 +4,6 @@ import (
   "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
 //  "github.com/go-ozzo/ozzo-validation/v4/is"
-  "optim_22_app/pkg/authentication"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
   "context"
@@ -31,27 +30,26 @@ func (m RegistrationInformation) Validate() error {
 //#endregion
 
 type Service interface {
-  Create(ctx context.Context, input RegistrationInformation) (string, string, error)
+  Create(ctx context.Context, input RegistrationInformation) (int, error)
   Delete(ctx context.Context, userId int) error
 }
 
 
 type service struct {
-  auth   *authentication.Authorizer
   repo   Repository
   logger log.Logger
 }
 
 //新たなuser作成サービスを作成
-func NewService(auth *authentication.Authorizer, repo Repository, logger log.Logger) Service {
-  return service{auth, repo, logger}
+func NewService(repo Repository, logger log.Logger) Service {
+  return service{repo, logger}
 }
 
 
-func (s service) Create(ctx context.Context, req RegistrationInformation) (string, string, error) {
+func (s service) Create(ctx context.Context, req RegistrationInformation) (int, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
-    return "", "", err
+    return 0, err
   }
   //クエリの値を定義
   insertValues := typefile.User{
@@ -60,16 +58,14 @@ func (s service) Create(ctx context.Context, req RegistrationInformation) (strin
     Password:  req.Password,
   }
   //INSERTと割り当てられるuserIDを取得
-  var userId uint
+  var userId int
   if err := s.repo.Create(ctx, &insertValues); err != nil {
-    return "", "", err
+    return 0, err
   } else {
     userId = insertValues.ID
   }
-  //トークン発行
-  refreshToken, accessToken := s.auth.AuthorizationService.New(userId)
 
-  return refreshToken, accessToken, nil
+  return userId, nil
 }
 
 
@@ -83,7 +79,7 @@ func (s service) Delete(ctx context.Context, userId int) error {
 }
 
 
-func StubNewService(args ...interface{}) Service { return service{nil, nil, nil}}
+func StubNewService(args ...interface{}) Service { return service{nil, nil}}
 func StubCreate(args ...interface{}) (string, string, error)  {return "", "", nil}
 func StubDelete(args ...interface{}) error {return nil}
 func StubLogin(args ...interface{}) (string, string, error) {return "", "", nil}

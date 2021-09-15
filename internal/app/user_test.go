@@ -15,7 +15,6 @@ import (
  // "optim_22_app/typefile"
   "optim_22_app/internal/app/user"
   "optim_22_app/internal/pkg/config"
-  "optim_22_app/pkg/authentication"
   "optim_22_app/internal/pkg/test/v2"
 )
 
@@ -62,10 +61,9 @@ func (suite *UserRepositoryTestSuite) SetupTest() {
   userRepository := user.NewRepository(DB, logger)
   suite.db = DB
 
-  auth := authentication.New("localhost", "secret_key_for_refresh", "secret_key", 5, &FakeAuthorizationService{})
   //authentication.New("localhost", "secret_key_for_refresh", "secret_key", 5, )
 
-  userService := user.NewService(auth, userRepository, logger)
+  userService := user.NewService(userRepository, logger)
 
   router := gin.New()
   user.RegisterHandlers(router.Group(""), cfg, userService, logger)
