@@ -6,6 +6,7 @@ import (
   "encoding/json"
 //  "strconv"
   "context"
+  "errors"
 )
 
 
@@ -39,6 +40,9 @@ type service struct {
 
 
 func (s service) Get(ctx context.Context, userId string) (profile, error) {
+  if "" == userId {
+    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
+  }
   dummyProfile := profile{
     Bio: "test", 
     Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 

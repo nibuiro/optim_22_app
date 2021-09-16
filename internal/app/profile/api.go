@@ -40,7 +40,7 @@ func (rc resource) get() gin.HandlerFunc {
     userProfile, err := rc.service.Get(c.Request.Context(), userId)
     if err != nil {
       rc.logger.Error(err)
-      c.Status(http.StatusBadRequest)
+      c.Status(http.StatusNotFound)
       return 
     } else {
       if userProfileText, err := json.Marshal(userProfile); err != nil {

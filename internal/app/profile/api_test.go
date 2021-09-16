@@ -59,7 +59,16 @@ func TestGetProfile(t *testing.T) {
   
   tests := []test.APITestCase{
     {
-      Name: "Dynamic URL and Json Marshal Test", 
+      Name: "dynamic url error", 
+      Method: "GET", 
+      URL: "/api/profile/", 
+      Header: nil, 
+      Body: "",
+      WantStatus: http.StatusNotFound, 
+      WantResponse: "",
+    }, 
+    {
+      Name: "No Json Marshal error", 
       Method: "GET", 
       URL: "/api/profile/test", 
       Header: nil, 
