@@ -67,6 +67,25 @@ func (rc resource) post() gin.HandlerFunc {
 
 func (rc resource) patch() gin.HandlerFunc {
   return func(c *gin.Context) {
+    var input profile
+  
+    //BodyからJSONをパースして読み取る
+    if err := c.BindJSON(&input); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    }
+    
+    //プロフィールを登録
+    err := rc.service.Post(c.Request.Context(), input)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      c.Status(http.StatusCreated)
+      return 
+    }
   }
 }
 
