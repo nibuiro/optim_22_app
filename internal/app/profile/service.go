@@ -38,6 +38,11 @@ type service struct {
   logger log.Logger
 }
 
+//新たなプロフィール操作サービスを作成
+func NewService(repo Repository, logger log.Logger) Service {
+  return service{repo, logger}
+}
+
 
 func (s service) Get(ctx context.Context, userId string) (profile, error) {
   if "" == userId {
