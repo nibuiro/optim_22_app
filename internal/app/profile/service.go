@@ -45,7 +45,7 @@ func NewService(repo Repository, logger log.Logger) Service {
 
 
 func (s service) Get(ctx context.Context, userId string) (profile, error) {
-  //該当useriDのエントリを削除
+  //該当ユーザのプロフィールを取得
   if userProfile, err := s.repo.get(ctx, userId); err != nil {
     return profile{}, err
   } else {
