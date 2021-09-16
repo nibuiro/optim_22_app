@@ -39,7 +39,7 @@ func (rc resource) get() gin.HandlerFunc {
 }
 
 
-func (rc resource) create() gin.HandlerFunc {
+func (rc resource) post() gin.HandlerFunc {
   return func(c *gin.Context) {
   }
 }
