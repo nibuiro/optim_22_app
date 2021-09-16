@@ -4,7 +4,7 @@ import (
   "context"
   "gorm.io/gorm"
   "optim_22_app/pkg/log"
-  "optim_22_app/typefile"
+//  "optim_22_app/typefile"
 )
 
 
@@ -23,18 +23,22 @@ type repository struct {
 
 
 func (s repository) Get(ctx context.Context, userId int) (profile, error) {
+  return profile{}, nil
 }
 
 
 func (s repository) Create(ctx context.Context, userProfile *profile) error {
+  return nil
 }
 
 
 func (s repository) Modify(ctx context.Context, userProfile *profile) error {
+  return nil
 }
 
 
 func (s repository) Delete(ctx context.Context, userId int) error {
+  return nil
 }
 
 

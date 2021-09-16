@@ -2,7 +2,7 @@ package profile
 
 import (
   "optim_22_app/pkg/log"
-  "optim_22_app/typefile"
+//  "optim_22_app/typefile"
   "encoding/json"
   "context"
 )
@@ -38,18 +38,22 @@ type service struct {
 
 
 func (s service) Get(ctx context.Context, userId int) (profile, error) {
+  return profile{}, nil
 }
 
 
 func (s service) Post(ctx context.Context, userProfile profile) error {
+  return nil
 }
 
 
 func (s service) Patch(ctx context.Context, userProfile profile) error {
+  return nil
 }
 
 
 func (s service) Delete(ctx context.Context, userId int) error {
+  return nil
 }
 
 

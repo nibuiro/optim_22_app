@@ -2,10 +2,10 @@ package profile
 
 import (
   "github.com/gin-gonic/gin"
-  "net/http"
+  //"net/http"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
-  "optim_22_app/internal/pkg/utils"
+  //"optim_22_app/internal/pkg/utils"
 
 )
 
