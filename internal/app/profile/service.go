@@ -45,21 +45,17 @@ func NewService(repo Repository, logger log.Logger) Service {
 
 
 func (s service) Get(ctx context.Context, userId string) (profile, error) {
-  if "" == userId {
-    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
+  //該当useriDのエントリを削除
+  if userProfile, err := s.repo.get(ctx, userId); err != nil {
+    return profile{}, err
+  } else {
+    return userProfile, nil
   }
-  dummyProfile := profile{
-    Bio: "test", 
-    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
-    Submission: "test", 
-    Request: "test", 
-    Icon: "test",
-  }
-  return dummyProfile, nil
 }
 
 
 func (s service) Post(ctx context.Context, userProfile profile) error {
+
   return nil
 }
 
