@@ -3,6 +3,7 @@ package profile
 import (
   "github.com/gin-gonic/gin"
   "net/http"
+  "encoding/json"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/pkg/utils"
@@ -22,7 +23,7 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
   rc := resource{config, service, logger}
 
   //取得
-  r.GET("/api/profile", rc.get())
+  r.GET("/api/profile/:userID", rc.get())
   //登録
   r.POST("/api/profile", rc.post())
   //修正
@@ -35,7 +36,23 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
 
 func (rc resource) get() gin.HandlerFunc {
   return func(c *gin.Context) {
-
+    userId := c.Param("userID")
+    userProfile, err := rc.service.Get(c.Request.Context(), userId)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      if userProfileText, err := json.Marshal(userProfile); err != nil {
+        rc.logger.Error(err)
+        c.Status(http.StatusBadRequest)
+        return
+      } else {
+        //c.Header("Content-Type", "application/json")
+        c.JSON(http.StatusOK, userProfileText)
+        return
+      }
+    }
   }
 }
 
@@ -92,7 +109,7 @@ func (rc resource) patch() gin.HandlerFunc {
 
 func (rc resource) delete() gin.HandlerFunc {
   return func(c *gin.Context) {
-    userId := utils.GetUserIdFromHeaderAsInt(c)
+    userId := utils.GetUserIdFromHeaderAsString(c)
     err := rc.service.Delete(c.Request.Context(), userId)
     if err != nil {
       rc.logger.Error(err)
