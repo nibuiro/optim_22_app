@@ -31,6 +31,12 @@ type Service interface {
 }
 
 
+type service struct {
+  repo   Repository
+  logger log.Logger
+}
+
+
 func (s service) Get(ctx context.Context, userId int) (profile, error) {
 }
 
