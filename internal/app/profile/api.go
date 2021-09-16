@@ -5,7 +5,7 @@ import (
   "net/http"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
-  //"optim_22_app/internal/pkg/utils"
+  "optim_22_app/internal/pkg/utils"
 
 )
 
@@ -92,6 +92,16 @@ func (rc resource) patch() gin.HandlerFunc {
 
 func (rc resource) delete() gin.HandlerFunc {
   return func(c *gin.Context) {
+    userId := utils.GetUserIdFromHeaderAsInt(c)
+    err := rc.service.Delete(c.Request.Context(), userId)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      c.Status(http.StatusOK)
+      return 
+    }
   }
 }
 
