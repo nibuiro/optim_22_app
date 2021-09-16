@@ -20,7 +20,7 @@ func TestPostProfile(t *testing.T) {
   cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), cfg, StubNewService(repo), logger)
+  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {
@@ -55,7 +55,7 @@ func TestGetProfile(t *testing.T) {
   cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), cfg, StubNewService(repo), logger)
+  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {

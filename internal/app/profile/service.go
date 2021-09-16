@@ -69,4 +69,54 @@ func (s service) Delete(ctx context.Context, userId string) error {
 }
 
 
-func StubNewService(args ...interface{}) Service { return service{nil, nil}}
+
+//#region スタブ
+type ServiceStub interface {
+  Get(ctx context.Context, userId string) (profile, error)
+  Post(ctx context.Context, userProfile profile) error
+  Patch(ctx context.Context, userProfile profile) error
+  Delete(ctx context.Context, userId string) error
+}
+
+
+type serviceStub struct {
+  repo   Repository
+  logger log.Logger
+}
+
+
+func (s serviceStub) Get(ctx context.Context, userId string) (profile, error) {
+  if "" == userId {
+    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
+  }
+  dummyProfile := profile{
+    Bio: "test", 
+    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
+    Submission: "test", 
+    Request: "test", 
+    Icon: "test",
+  }
+  return dummyProfile, nil
+}
+
+
+func (s serviceStub) Post(ctx context.Context, userProfile profile) error {
+  return nil
+}
+
+
+func (s serviceStub) Patch(ctx context.Context, userProfile profile) error {
+  return nil
+}
+
+
+func (s serviceStub) Delete(ctx context.Context, userId string) error {
+  return nil
+}
+
+
+func NewServiceStub(args ...interface{}) ServiceStub { 
+  return serviceStub{nil, nil}
+}
+
+//#endregion
