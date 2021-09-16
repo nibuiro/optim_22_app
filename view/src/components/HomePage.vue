@@ -11,9 +11,7 @@
     <section class="mb-3">
       <div class="is-flex is-justify-content-space-between">
         <div class="control is-flex">
-          <b-switch v-model="isAccepting" :disabled="!isAccepting"
-            >受付中のみ</b-switch
-          >
+          <b-switch v-model="onlyAccepting">受付中のみ</b-switch>
         </div>
         <b-field grouped group-multiline>
           <b-select v-model="perPage" :disabled="!isPaginated">
@@ -27,68 +25,98 @@
 
       <b-table
         :data="data"
-        :accepting="isAccepting"
+        :accepting="onlyAccepting"
         :paginated="isPaginated"
         :per-page="perPage"
         :current-page.sync="currentPage"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
-        default-sort="user.first_name"
-        aria-next-label="Next page"
-        aria-previous-label="Previous page"
-        aria-page-label="Page"
-        aria-current-label="Current page"
+        :row-class="
+          row => onlyAccepting && row.accepting === false && 'is-hidden'
+        "
+        :default-sort="defaultSort"
       >
         <b-table-column
-          field="id"
-          label="ID"
-          width="40"
-          sortable
-          numeric
+          field="state"
+          label="状態"
+          width="10%"
+          centered
           v-slot="props"
         >
-          {{ props.row.id }}
-        </b-table-column>
-
-        <b-table-column
-          field="user.first_name"
-          label="First Name"
-          sortable
-          v-slot="props"
-        >
-          {{ props.row.user.first_name }}
-        </b-table-column>
-
-        <b-table-column
-          field="user.last_name"
-          label="Last Name"
-          sortable
-          v-slot="props"
-        >
-          {{ props.row.user.last_name }}
+          <b-tag
+            :type="props.row.accepting === true ? 'is-success' : 'is-danger'"
+          >
+            {{ props.row.accepting === true ? "受付中" : "終了" }}
+          </b-tag>
         </b-table-column>
 
         <b-table-column
           field="date"
-          label="Date"
+          label="依頼日時"
+          width="10%"
           sortable
           centered
           v-slot="props"
         >
-          <span class="tag is-success">
-            {{ new Date(props.row.date).toLocaleDateString() }}
-          </span>
+          {{ new Date(props.row.date).toLocaleDateString() }}
+          <br />
+          {{ new Date(props.row.date).toLocaleTimeString() }}
         </b-table-column>
 
-        <b-table-column label="Gender" v-slot="props">
-          <span>
-            <b-icon
-              pack="fas"
-              :icon="props.row.gender === 'Male' ? 'mars' : 'venus'"
-            >
-            </b-icon>
-            {{ props.row.gender }}
-          </span>
+        <b-table-column
+          field="client"
+          label="依頼者"
+          width="10%"
+          sortable
+          centered
+          v-slot="props"
+        >
+          <a href="">
+            <b-tooltip :label="props.row.client.username">
+              <b-image
+                class="image is-64x64 is-inline-block is-centered"
+                :src="props.row.client.icon"
+                rounded
+              />
+            </b-tooltip>
+          </a>
+        </b-table-column>
+
+        <b-table-column
+          field="request"
+          label="依頼名"
+          width="20%"
+          sortable
+          v-slot="props"
+        >
+          <a href="">
+            {{ props.row.request }}
+          </a>
+        </b-table-column>
+
+        <b-table-column field="detail" label="詳細" width="30%" v-slot="props">
+          {{ props.row.detail }}
+        </b-table-column>
+
+        <b-table-column
+          field="engineer"
+          label="参加者"
+          width="20%"
+          v-slot="props"
+        >
+          <a
+            href=""
+            v-for="engineer in props.row.engineers"
+            :key="engineer.username"
+          >
+            <b-tooltip :label="engineer.username">
+              <b-image
+                class="image is-48x48 is-inline-block is-centered has-border"
+                :src="engineer.icon"
+                rounded
+              />
+            </b-tooltip>
+          </a>
         </b-table-column>
       </b-table>
     </section>
@@ -102,12 +130,13 @@ export default {
   data() {
     return {
       data,
-      isAccepting: false,
+      onlyAccepting: false,
       isPaginated: true,
+      defaultSort: ["date", "desc"],
       sortIcon: "chevron-up",
       sortIconSize: "",
       currentPage: 1,
-      perPage: 5
+      perPage: 10
     };
   }
 };
