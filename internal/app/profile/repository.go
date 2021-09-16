@@ -37,3 +37,5 @@ func (s repository) Modify(ctx context.Context, userProfile *profile) error {
 func (s repository) Delete(ctx context.Context, userId int) error {
 }
 
+
+func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
