@@ -4,12 +4,13 @@ import (
   "optim_22_app/pkg/log"
 //  "optim_22_app/typefile"
   "encoding/json"
+//  "strconv"
   "context"
 )
 
 
 type Sns struct {
-  Twitter        string          `json:"twitter"`
+  Twitter         string          `json:"twitter"`
   Facebook        string          `json:"facebook"`
 }
 
@@ -24,10 +25,10 @@ type profile struct {
 
 
 type Service interface {
-  Get(ctx context.Context, userId int) (profile, error)
+  Get(ctx context.Context, userId string) (profile, error)
   Post(ctx context.Context, userProfile profile) error
   Patch(ctx context.Context, userProfile profile) error
-  Delete(ctx context.Context, userId int) error
+  Delete(ctx context.Context, userId string) error
 }
 
 
@@ -37,8 +38,15 @@ type service struct {
 }
 
 
-func (s service) Get(ctx context.Context, userId int) (profile, error) {
-  return profile{}, nil
+func (s service) Get(ctx context.Context, userId string) (profile, error) {
+  dummyProfile := profile{
+    Bio: "test", 
+    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
+    Submission: "test", 
+    Request: "test", 
+    Icon: "test",
+  }
+  return dummyProfile, nil
 }
 
 
@@ -52,7 +60,7 @@ func (s service) Patch(ctx context.Context, userProfile profile) error {
 }
 
 
-func (s service) Delete(ctx context.Context, userId int) error {
+func (s service) Delete(ctx context.Context, userId string) error {
   return nil
 }
 

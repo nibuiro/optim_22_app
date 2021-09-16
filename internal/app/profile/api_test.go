@@ -13,7 +13,6 @@ import (
  * エンドポイントとして機能するか？
  */
 
-//望ましい利用手順でテスト
 func TestPostProfile(t *testing.T) {
 
   logger := log.New()
@@ -30,7 +29,7 @@ func TestPostProfile(t *testing.T) {
       URL: "/api/profile", 
       Header: nil, 
       Body: `{"bio":"test", "sns":{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}, "submission":"test", "request":"test", "icon":"test"}`,
-      WantStatus: http.StatusOK, 
+      WantStatus: http.StatusCreated, 
       WantResponse: "",
     }, 
     {

@@ -2,7 +2,7 @@ package profile
 
 import (
   "github.com/gin-gonic/gin"
-  //"net/http"
+  "net/http"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
   //"optim_22_app/internal/pkg/utils"
@@ -35,12 +35,32 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
 
 func (rc resource) get() gin.HandlerFunc {
   return func(c *gin.Context) {
+
   }
 }
 
 
 func (rc resource) post() gin.HandlerFunc {
   return func(c *gin.Context) {
+    var input profile
+  
+    //BodyからJSONをパースして読み取る
+    if err := c.BindJSON(&input); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    }
+    
+    //プロフィールを登録
+    err := rc.service.Post(c.Request.Context(), input)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      c.Status(http.StatusCreated)
+      return 
+    }
   }
 }
 

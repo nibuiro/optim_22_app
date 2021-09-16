@@ -12,9 +12,18 @@ func GetUserIdFromHeaderAsInt(c *gin.Context) int {
   return stubGetUserIdAsInt(c)
 }
 
+func GetUserIdFromHeaderAsString(c *gin.Context) string {
+  return stubGetUserIdAsString(c)
+}
+
 //ユーザIDを整数型として取得
 func stubGetUserIdAsInt(c *gin.Context) int {
   return 0
+}
+
+//ユーザIDを文字列型として取得
+func stubGetUserIdAsString(c *gin.Context) string {
+  return "0"
 }
 
 //ユーザIDを整数型として取得
