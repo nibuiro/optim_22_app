@@ -51,3 +51,6 @@ func (s service) Patch(ctx context.Context, userProfile profile) error {
 
 func (s service) Delete(ctx context.Context, userId int) error {
 }
+
+
+func StubNewService(args ...interface{}) Service { return service{nil, nil}}
