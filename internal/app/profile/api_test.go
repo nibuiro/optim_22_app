@@ -48,3 +48,28 @@ func TestPostProfile(t *testing.T) {
 }
 
 
+func TestGetProfile(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
+
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), cfg, StubNewService(repo), logger)
+  
+  tests := []test.APITestCase{
+    {
+      Name: "Dynamic URL and Json Marshal Test", 
+      Method: "GET", 
+      URL: "/api/profile/test", 
+      Header: nil, 
+      Body: "",
+      WantStatus: http.StatusOK, 
+      WantResponse: "",
+    }, 
+  }
+  for _, tc := range tests {
+    test.Endpoint(t, router, tc)
+  }
+}
+
