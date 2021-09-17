@@ -44,7 +44,13 @@ func NewService(repo Repository, logger log.Logger) Service {
 }
 
 
-func (s service) Get(ctx context.Context, userId string) (profile, error) {
+func (s service) Get(ctx context.Context, req string) (profile, error) {
+  //リクエスト文字列を数値型ユーザIDに変換
+  var userId 
+  userId, err := strconv.Atoi(req)
+  if err != nil {
+    return profile{}, err
+  }
   //該当ユーザのプロフィールを取得
   if userProfile, err := s.repo.get(ctx, userId); err != nil {
     return profile{}, err
@@ -52,7 +58,6 @@ func (s service) Get(ctx context.Context, userId string) (profile, error) {
     return userProfile, nil
   }
 }
-
 
 
 func (s service) Post(ctx context.Context, req profile) error {
@@ -101,13 +106,18 @@ type serviceStub struct {
 }
 
 
-func (s service) Get(ctx context.Context, req string) (profile, error) {
-  //該当ユーザのプロフィールを取得
-  if userProfile, err := s.repo.get(ctx, req); err != nil {
-    return profile{}, err
-  } else {
-    return userProfile, nil
+func (s serviceStub) Get(ctx context.Context, req string) (profile, error) {
+  if "" == req {
+    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
   }
+  dummyProfile := profile{
+    Bio: "test", 
+    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
+    Submission: "test", 
+    Request: "test", 
+    Icon: "test",
+  }
+  return dummyProfile, nil
 }
 
 
