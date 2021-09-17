@@ -4,7 +4,7 @@ import (
   "optim_22_app/pkg/log"
 //  "optim_22_app/typefile"
   "encoding/json"
-//  "strconv"
+  "strconv"
   "context"
   "errors"
 )
@@ -26,10 +26,10 @@ type profile struct {
 
 
 type Service interface {
-  Get(ctx context.Context, userId string) (profile, error)
-  Post(ctx context.Context, userProfile profile) error
-  Patch(ctx context.Context, userProfile profile) error
-  Delete(ctx context.Context, userId string) error
+  Get(ctx context.Context, req string) (profile, error)
+  Post(ctx context.Context, req profile) error
+  Patch(ctx context.Context, req profile) error
+  Delete(ctx context.Context, req string) error
 }
 
 
@@ -54,18 +54,33 @@ func (s service) Get(ctx context.Context, userId string) (profile, error) {
 }
 
 
-func (s service) Post(ctx context.Context, userProfile profile) error {
 
+func (s service) Post(ctx context.Context, req profile) error {
+  //リクエストの値を検証
+  if err := req.Validate(); err != nil {
+    return 0, err
+  }
+  //クエリの値を定義
+  insertValues := typefile.Profile{
+    Name:      req.Name,
+    Email:     req.Email,
+    Password:  req.Password,
+  }
+  //INSERT
+  if err := s.repo.Create(ctx, &insertValues); err != nil {
+    return err
+  } else {
+    return nil
+  }
+}
+
+
+func (s service) Patch(ctx context.Context, req profile) error {
   return nil
 }
 
 
-func (s service) Patch(ctx context.Context, userProfile profile) error {
-  return nil
-}
-
-
-func (s service) Delete(ctx context.Context, userId string) error {
+func (s service) Delete(ctx context.Context, req string) error {
   return nil
 }
 
@@ -73,10 +88,10 @@ func (s service) Delete(ctx context.Context, userId string) error {
 
 //#region スタブ
 type ServiceStub interface {
-  Get(ctx context.Context, userId string) (profile, error)
-  Post(ctx context.Context, userProfile profile) error
-  Patch(ctx context.Context, userProfile profile) error
-  Delete(ctx context.Context, userId string) error
+  Get(ctx context.Context, req string) (profile, error)
+  Post(ctx context.Context, req profile) error
+  Patch(ctx context.Context, req profile) error
+  Delete(ctx context.Context, req string) error
 }
 
 
@@ -86,32 +101,27 @@ type serviceStub struct {
 }
 
 
-func (s serviceStub) Get(ctx context.Context, userId string) (profile, error) {
-  if "" == userId {
-    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
+func (s service) Get(ctx context.Context, req string) (profile, error) {
+  //該当ユーザのプロフィールを取得
+  if userProfile, err := s.repo.get(ctx, req); err != nil {
+    return profile{}, err
+  } else {
+    return userProfile, nil
   }
-  dummyProfile := profile{
-    Bio: "test", 
-    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
-    Submission: "test", 
-    Request: "test", 
-    Icon: "test",
-  }
-  return dummyProfile, nil
 }
 
 
-func (s serviceStub) Post(ctx context.Context, userProfile profile) error {
+func (s serviceStub) Post(ctx context.Context, req profile) error {
   return nil
 }
 
 
-func (s serviceStub) Patch(ctx context.Context, userProfile profile) error {
+func (s serviceStub) Patch(ctx context.Context, req profile) error {
   return nil
 }
 
 
-func (s serviceStub) Delete(ctx context.Context, userId string) error {
+func (s serviceStub) Delete(ctx context.Context, req string) error {
   return nil
 }
 
