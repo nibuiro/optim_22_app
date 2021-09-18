@@ -1,6 +1,8 @@
 package profile
 
 import (
+  "regexp"
+  "github.com/go-ozzo/ozzo-validation/v4"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
   "encoding/json"
@@ -23,6 +25,18 @@ type profile struct {
   Submission json.RawMessage `json:"submission"`
   Request    json.RawMessage `json:"request"`
   Icon       string          `json:"icon"`
+}
+
+
+func (m profile) Validate() error {
+  return validation.ValidateStruct(&m,
+    validation.Field(&m.Id, validation.Required, validation.Length(3, 128)),
+    //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
+    validation.Field(&m.Bio, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
+    //is SHA256
+    validation.Field(&m.Sns, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+    validation.Field(&m.Icon, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+  )
 }
 
 
@@ -62,6 +76,13 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 
 
 func (s service) Post(ctx context.Context, req profile) error {
+  //SNS登録情報を読み込み
+  sns := Sns{}
+  json.Unmarshal(req.Sns, &sns)
+  //SNS登録情報を検証
+  if err := sns.Validate(); err != nil {
+    return err
+  }
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     return err
@@ -83,6 +104,13 @@ func (s service) Post(ctx context.Context, req profile) error {
 
 
 func (s service) Patch(ctx context.Context, req profile) error {
+  //SNS登録情報を読み込み
+  sns := Sns{}
+  json.Unmarshal(req.Sns, &sns)
+  //SNS登録情報を検証
+  if err := sns.Validate(); err != nil {
+    return err
+  }
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     return err
