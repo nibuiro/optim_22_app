@@ -17,10 +17,11 @@ type Sns struct {
 
 
 type profile struct {
+  Id         string          `json:"userID"`
   Bio        string          `json:"bio"`
   Sns        json.RawMessage `json:"sns"`
-  Submission string          `json:"submission"`
-  Request    string          `json:"request"`
+  Submission json.RawMessage `json:"submission"`
+  Request    json.RawMessage `json:"request"`
   Icon       string          `json:"icon"`
 }
 
