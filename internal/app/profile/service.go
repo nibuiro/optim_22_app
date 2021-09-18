@@ -2,7 +2,7 @@ package profile
 
 import (
   "optim_22_app/pkg/log"
-//  "optim_22_app/typefile"
+  "optim_22_app/typefile"
   "encoding/json"
   "strconv"
   "context"
@@ -64,13 +64,14 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 func (s service) Post(ctx context.Context, req profile) error {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
-    return 0, err
+    return err
   }
   //クエリの値を定義
   insertValues := typefile.Profile{
-    Name:      req.Name,
-    Email:     req.Email,
-    Password:  req.Password,
+    ID:      req.Id,
+    Bio:     req.Bio,
+    Sns:     req.Sns,
+    Icon:    req.Icon,
   }
   //INSERT
   if err := s.repo.Create(ctx, &insertValues); err != nil {
