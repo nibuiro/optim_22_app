@@ -83,7 +83,23 @@ func (s service) Post(ctx context.Context, req profile) error {
 
 
 func (s service) Patch(ctx context.Context, req profile) error {
-  return nil
+  //リクエストの値を検証
+  if err := req.Validate(); err != nil {
+    return err
+  }
+  //クエリの値を定義
+  insertValues := typefile.Profile{
+    ID:      req.Id,
+    Bio:     req.Bio,
+    Sns:     req.Sns,
+    Icon:    req.Icon,
+  }
+  //UPDATE
+  if err := s.repo.Update(ctx, &insertValues); err != nil {
+    return err
+  } else {
+    return nil
+  }
 }
 
 
