@@ -47,7 +47,7 @@ func NewService(repo Repository, logger log.Logger) Service {
 
 func (s service) Get(ctx context.Context, req string) (profile, error) {
   //リクエスト文字列を数値型ユーザIDに変換
-  var userId 
+  //var userId int
   userId, err := strconv.Atoi(req)
   if err != nil {
     return profile{}, err
@@ -104,7 +104,18 @@ func (s service) Patch(ctx context.Context, req profile) error {
 
 
 func (s service) Delete(ctx context.Context, req string) error {
-  return nil
+  //リクエスト文字列を数値型ユーザIDに変換
+  //var userId int
+  userId, err := strconv.Atoi(req)
+  if err != nil {
+    return err
+  }
+  //該当ユーザのプロフィールを削除
+  if err := s.repo.delete(ctx, userId); err != nil {
+    return err
+  } else {
+    return　nil
+  }
 }
 
 
