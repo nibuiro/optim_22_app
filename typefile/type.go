@@ -8,6 +8,14 @@ type User struct{
 	Name           string         `gorm:"not null"`
 }
 
+
+type Profile struct{
+	ID             int            `gorm:"primaryKey"`
+	Bio            string        
+	Sns            []byte   
+	Icon           string
+}
+
 type Client struct{
 	User           User           `gorm:"embedded"`
 }
