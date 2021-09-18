@@ -33,6 +33,7 @@ type Request struct{
 	RequestName    string         `gorm:"not null"`
 	Content        string         `gorm:"not null"`
 	Winner         Winner
+	Finish         bool           `gorm:"not null"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

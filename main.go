@@ -13,7 +13,7 @@ import (
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
-  "optim_22_app/internal/hello"
+  "optim_22_app/internal/home"
   "optim_22_app/internal/client"
   "optim_22_app/internal/request"
   "optim_22_app/internal/engineer"
@@ -93,11 +93,8 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   // 事前にテンプレートをロード
   e.LoadHTMLGlob("views/*/*.html")
 
-  // ハンドラの指定
-  e.GET("/hello", hello.Hello)
-
-  // ハンドラの指定
-  e.GET("/newhello", hello.NewHello)
+  // homepageを標示するハンドラ
+  e.GET("/", home.ShowHomepage)
 
   client_e := e.Group("/client")
   {
@@ -125,8 +122,6 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
 
   engineer_e := e.Group("/engineer")
   {
-    // 特定リクエストに参加するためのページを表示するハンドラ
-    engineer_e.GET("/join_request/:request_id", engineer.JoinRequest)
     // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
     engineer_e.POST("/create_engineer_join",engineer.CreateEngineerJoin)
     // submissionを提出するためのページを標示するハンドラ

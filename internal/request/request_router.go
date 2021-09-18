@@ -15,6 +15,8 @@ func ShowRequest(c *gin.Context) {
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)
 
+	engineer_id := 3
+
 	// Request構造体を格納するための型を宣言
 	request := typefile.Request{}
 	// Winner構造体を格納するための型を宣言
@@ -31,8 +33,7 @@ func ShowRequest(c *gin.Context) {
 	model.Db.Find(&winner,"request_id = ?",request_id)
 	// SELECT * FROM `winners` WHERE request_id = ?
 	// 特定のidを持つclientを抽出する。
-	//model.Db.Find(&client,"id = ?",request.ClientID)
-	client = request.Client
+	model.Db.Find(&client,"id = ?",request.ClientID)
 	// SELECT * FROM `clients` WHERE id = ?
 
 	// winnerがいたか確認するための変数。初期値はfalseとする。
@@ -53,5 +54,6 @@ func ShowRequest(c *gin.Context) {
     	"winner_engineer": winner_engineer,
     	"client": client,
     	"request": request,
+    	"engineer_id": engineer_id,
     })
 }

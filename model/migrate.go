@@ -63,9 +63,9 @@ func CreateTestData() {
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
-		{ClientID: 1,RequestName: "request1 from clientID 1",Content: "request1 content"},
-		{ClientID: 1,RequestName: "request2 from clientID 1",Content: "request2 content"},
-		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content"}}
+		{ClientID: 1,RequestName: "request1 from clientID 1",Content: "request1 content",Finish: false},
+		{ClientID: 1,RequestName: "request2 from clientID 1",Content: "request2 content",Finish: false},
+		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content",Finish: false}}
 	Db.Create(&requests)
 	
 	var winners = []typefile.Winner{

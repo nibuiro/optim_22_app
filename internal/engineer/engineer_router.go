@@ -8,21 +8,6 @@ import (
 	"strconv"
 )
 
-// エンジニアが特定リクエストに参加するためのページを表示する
-func JoinRequest(c *gin.Context) {
-	// urlの引数で受け取ったrequest_idをrequest_id_stringという変数に格納している。
-	request_id_string := c.Param("request_id")
-	// 文字列をintに変換
-	request_id, _ := strconv.Atoi(request_id_string)
-
-	engineer_id := 3
-
-    c.HTML(http.StatusOK, "join_request.html", gin.H{
-    	"request_id": request_id,
-    	"engineer_id": engineer_id,
-    })
-}
-
 // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録する。
 func CreateEngineerJoin(c *gin.Context) {
 	// formから送られた値を得る
@@ -44,7 +29,7 @@ func CreateEngineerJoin(c *gin.Context) {
 	model.Db.Model(&engineer).Association("Requests").Append(&request)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/hello")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }
 
 // エンジニアがsubmissionを提出するためのページを表示する
@@ -78,7 +63,7 @@ func CreateSubmission(c *gin.Context) {
     model.Db.Create(&submission)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/hello")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }
 
 // エンジニアが参加しているリクエストを表示する
@@ -123,23 +108,21 @@ func EditSubmission(c *gin.Context) {
 func UpdateSubmission(c *gin.Context) {
 	// formから送られた値を得る
 	submission_id_string := c.PostForm("submission_id")
-    request_id_string := c.PostForm("request_id")
-    engineer_id_string := c.PostForm("engineer_id")
     content := c.PostForm("Content")
 
 	// 文字列をintに変換
 	submission_id, _ := strconv.Atoi(submission_id_string)
-	request_id, _ := strconv.Atoi(request_id_string)
-	engineer_id, _ := strconv.Atoi(engineer_id_string)
 
 	// Submission構造体データを格納するためのインスタンスを生成
 	submission := typefile.Submission{}
 
-	// EngineerIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
-    var update_submission = typefile.Submission{RequestID: request_id,EngineerID: engineer_id,Content: content}
+	// 該当するsubmissionを抽出している。
+	model.Db.Find(&submission,"id = ?",submission_id)
 
-    model.Db.Find(&submission,"id = ?",submission_id).Updates(&update_submission)
+	// contentを更新する。
+	submission.Content = content
+	model.Db.Save(&submission)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/hello")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }

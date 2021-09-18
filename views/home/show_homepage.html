@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang=ja>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="サンプルアプリケーション">
+        <title>SampleApp</title>
+    </head>
+    <body>
+        ホームページ
+    	<ul>
+    		{{range .requests}}
+    		<p>依頼名：{{.RequestName}}クリックしたら詳細ページに飛ぶようにする。</p>
+    		{{end}}
+    	</ul>
+        <p>クリックしたら詳細ページへ飛ぶ。</p>
+    </body>
+</html>

@@ -7,6 +7,7 @@
     </head>
     <body>
         依頼詳細ページ
+        {{.client}}
         {{if .winner_is_empty}}
         <p>依頼者：{{.client.User.Name}}</p>
         <p>依頼名：{{.request.RequestName}}</p>
@@ -15,6 +16,11 @@
         <p>依頼内容：{{.request.Content}}</p>
         <p>依頼日時：{{.request.CreatedAt}}</p>
         <p>更新日時：{{.request.UpdatedAt}}</p>
+        <form class="join-engineer-form" action="//localhost:8080/engineer/create_engineer_join" method="post">
+            <input type="hidden" name="request_id" value={{.request_id}}>
+            <input type="hidden" name="engineer_id" value={{.engineer_id}}>
+            <input type="submit" value="リクエストに参加する">
+        </form>
         {{else}}
         <p>依頼者：{{.client.User.Name}}</p>
         <p>依頼名：{{.request.RequestName}}</p>
