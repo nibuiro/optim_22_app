@@ -3,6 +3,7 @@ package profile
 import (
   "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
+  "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
   "encoding/json"
@@ -12,7 +13,7 @@ import (
 )
 
 
-type Sns struct {
+type sns struct {
   Twitter         string          `json:"twitter"`
   Facebook        string          `json:"facebook"`
 }
@@ -21,21 +22,24 @@ type Sns struct {
 type profile struct {
   Id         string          `json:"userID"`
   Bio        string          `json:"bio"`
-  Sns        json.RawMessage `json:"sns"`
+  sns        json.RawMessage `json:"sns"`
   Submission json.RawMessage `json:"submission"`
   Request    json.RawMessage `json:"request"`
   Icon       string          `json:"icon"`
 }
 
 
+
+
+
 func (m profile) Validate() error {
   return validation.ValidateStruct(&m,
-    validation.Field(&m.Id, validation.Required, validation.Length(3, 128)),
-    //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
-    validation.Field(&m.Bio, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
-    //is SHA256
-    validation.Field(&m.Sns, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
-    validation.Field(&m.Icon, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+    //is unsigned integer
+    validation.Field(&m.Id, validation.Match(regexp.MustCompile("\d+"))),
+    //is BIO
+    validation.Field(&m.Bio, validation.Length(0, 4000)),
+    //is BASE64 encoded image, limited to 2MB ([MB] 2 * 1.33 ~ 2.67) 
+    validation.Field(&m.Icon, validation.Length(0, uint(2.67e+6)), is.Base64),
   )
 }
 
@@ -77,8 +81,8 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 
 func (s service) Post(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
-  sns := Sns{}
-  json.Unmarshal(req.Sns, &sns)
+  sns := sns{}
+  json.Unmarshal(req.sns, &sns)
   //SNS登録情報を検証
   if err := sns.Validate(); err != nil {
     return err
@@ -91,7 +95,7 @@ func (s service) Post(ctx context.Context, req profile) error {
   insertValues := typefile.Profile{
     ID:      req.Id,
     Bio:     req.Bio,
-    Sns:     req.Sns,
+    sns:     req.sns,
     Icon:    req.Icon,
   }
   //INSERT
@@ -105,10 +109,10 @@ func (s service) Post(ctx context.Context, req profile) error {
 
 func (s service) Patch(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
-  sns := Sns{}
-  json.Unmarshal(req.Sns, &sns)
+  snsUrl := sns{}
+  json.Unmarshal(req.sns, &snsUrl)
   //SNS登録情報を検証
-  if err := sns.Validate(); err != nil {
+  if err := snsUrl.Validate(); err != nil {
     return err
   }
   //リクエストの値を検証
@@ -119,7 +123,7 @@ func (s service) Patch(ctx context.Context, req profile) error {
   insertValues := typefile.Profile{
     ID:      req.Id,
     Bio:     req.Bio,
-    Sns:     req.Sns,
+    sns:     req.sns,
     Icon:    req.Icon,
   }
   //UPDATE
@@ -169,7 +173,7 @@ func (s serviceStub) Get(ctx context.Context, req string) (profile, error) {
   }
   dummyProfile := profile{
     Bio: "test", 
-    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
+    sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
     Submission: "test", 
     Request: "test", 
     Icon: "test",
