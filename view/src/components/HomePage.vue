@@ -124,7 +124,7 @@
 </template>
 
 <script>
-const data = require("../../src/assets/sample.json");
+const data = require("../../src/assets/sampleRequests.json");
 
 export default {
   data() {
