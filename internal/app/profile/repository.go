@@ -46,6 +46,7 @@ func (s repository) Update(ctx context.Context, userProfile *typefile.Profile) e
    */
   result := r.db.WithContext(ctx).Create(userProfile)
   return result.Error
+}
 
 
 func (s repository) Delete(ctx context.Context, userId int) error {
