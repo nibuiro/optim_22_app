@@ -39,8 +39,13 @@ func (s repository) Create(ctx context.Context, userProfile *typefile.Profile) e
 
 
 func (s repository) Update(ctx context.Context, userProfile *typefile.Profile) error {
-  return nil
-}
+  /*
+   * idがユニークであることによりupdateと等しい操作になることを期待
+   * [MySQL ：： MySQL 5.6 リファレンスマニュアル ：： 13.2.5.3 INSERT ... ON DUPLICATE KEY UPDATE 構文]
+   * (https://dev.mysql.com/doc/refman/5.6/ja/insert-on-duplicate.html)
+   */
+  result := r.db.WithContext(ctx).Create(userProfile)
+  return result.Error
 
 
 func (s repository) Delete(ctx context.Context, userId int) error {
