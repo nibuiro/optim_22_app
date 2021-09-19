@@ -4,14 +4,14 @@ import (
   "context"
   "gorm.io/gorm"
   "optim_22_app/pkg/log"
-//  "optim_22_app/typefile"
+  "optim_22_app/typefile"
 )
 
 
 type Repository interface {
-  Get(ctx context.Context, userId int) (profile, error)
-  Create(ctx context.Context, userProfile *profile) error
-  Modify(ctx context.Context, userProfile *profile) error
+  Get(ctx context.Context, userId int) (typefile.Profile, error)
+  Create(ctx context.Context, userProfile *typefile.Profile) error
+  Update(ctx context.Context, userProfile *typefile.Profile) error
   Delete(ctx context.Context, userId int) error
 }
 
@@ -22,23 +22,30 @@ type repository struct {
 }
 
 
-func (s repository) Get(ctx context.Context, userId int) (profile, error) {
-  return profile{}, nil
+func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, error) {
+  var userProfile typefile.Profile
+  result := r.db.WithContext(ctx).Find("ID = ?", userId, &userProfile)
+  if result.Error != nil {
+    return typefile.Profile{}, result.Error
+  } else {
+    return userProfile, nil
+  }
+}
+
+func (s repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
+  result := r.db.WithContext(ctx).Create(userProfile)
+  return result.Error
 }
 
 
-func (s repository) Create(ctx context.Context, userProfile *profile) error {
-  return nil
-}
-
-
-func (s repository) Modify(ctx context.Context, userProfile *profile) error {
+func (s repository) Update(ctx context.Context, userProfile *typefile.Profile) error {
   return nil
 }
 
 
 func (s repository) Delete(ctx context.Context, userId int) error {
-  return nil
+  result := r.db.WithContext(ctx).Delete(&typefile.Profile{}, userId)
+  return result.Error
 }
 
 
