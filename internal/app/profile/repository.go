@@ -54,5 +54,26 @@ func (s repository) Delete(ctx context.Context, userId int) error {
   return result.Error
 }
 
+//#region 実績を取得
+func (r requestRepository) GetRequested(ctx context.Context, userId int) ([]typefile.Request, error) {
+  var requesteds []typefile.Request
+  result := r.db.WithContext(ctx).Find(&requesteds, "ClientID = ?", userId)
+  return requesteds, result.Error
+}
+
+
+func (r requestRepository) GetParticipated(ctx context.Context, userId int) ([]typefile.Request, error) {
+  //エンジニアIDがuserIdに一致するsubmissionのリクエストIDとリクエストのIDでサブミッションをリクエストに表結合して所望の値のリストを得る
+  var participateds []typefile.Request //Submission  Request
+  result := r.db.WithContext(ctx).
+    Model(&typefile.Submission{}).
+    Select("request.Finish, submission.UpdatedAt, request.ClientID, request.RequestName, request.Content, submissionID").
+    Joins("INNER JOIN \"request\" ON submission.RequestID = request.ID").
+    Where("submission.EngineerID = ?", userId).
+    Scan(&participateds)
+
+  return participateds, result.Error
+}
+//#endregion
 
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
