@@ -13,6 +13,9 @@ type Repository interface {
   Create(ctx context.Context, userProfile *typefile.Profile) error
   Update(ctx context.Context, userProfile *typefile.Profile) error
   Delete(ctx context.Context, userId int) error
+
+  GetRequested(ctx context.Context, userId int) ([]typefile.Request, error)
+  GetParticipated(ctx context.Context, userId int) ([]typefile.Request, error)
 }
 
 
@@ -32,13 +35,13 @@ func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, erro
   }
 }
 
-func (s repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
+func (r repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
   result := r.db.WithContext(ctx).Create(userProfile)
   return result.Error
 }
 
 
-func (s repository) Update(ctx context.Context, userProfile *typefile.Profile) error {
+func (r repository) Update(ctx context.Context, userProfile *typefile.Profile) error {
   /*
    * idがユニークであることによりupdateと等しい操作になることを期待
    * [MySQL ：： MySQL 5.6 リファレンスマニュアル ：： 13.2.5.3 INSERT ... ON DUPLICATE KEY UPDATE 構文]
@@ -49,20 +52,20 @@ func (s repository) Update(ctx context.Context, userProfile *typefile.Profile) e
 }
 
 
-func (s repository) Delete(ctx context.Context, userId int) error {
+func (r repository) Delete(ctx context.Context, userId int) error {
   result := r.db.WithContext(ctx).Delete(&typefile.Profile{}, userId)
   return result.Error
 }
 
 //#region 実績を取得
-func (r requestRepository) GetRequested(ctx context.Context, userId int) ([]typefile.Request, error) {
+func (r repository) GetRequested(ctx context.Context, userId int) ([]typefile.Request, error) {
   var requesteds []typefile.Request
   result := r.db.WithContext(ctx).Find(&requesteds, "ClientID = ?", userId)
   return requesteds, result.Error
 }
 
 
-func (r requestRepository) GetParticipated(ctx context.Context, userId int) ([]typefile.Request, error) {
+func (r repository) GetParticipated(ctx context.Context, userId int) ([]typefile.Request, error) {
   //エンジニアIDがuserIdに一致するsubmissionのリクエストIDとリクエストのIDでサブミッションをリクエストに表結合して所望の値のリストを得る
   var participateds []typefile.Request //Submission  Request
   result := r.db.WithContext(ctx).

@@ -20,9 +20,9 @@ type sns struct {
 
 
 type profile struct {
-  Id         string          `json:"userID"`
+  Id         int             `json:"userID"`
   Bio        string          `json:"bio"`
-  sns        json.RawMessage `json:"sns"`
+  Sns        json.RawMessage `json:"sns"`
   Submission json.RawMessage `json:"submission"`
   Request    json.RawMessage `json:"request"`
   Icon       string          `json:"icon"`
@@ -77,10 +77,36 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
     return profile{}, err
   }
   //該当ユーザのプロフィールを取得
-  if userProfile, err := s.repo.get(ctx, userId); err != nil {
+  var userProfileWithRecords profile
+
+  if userProfile, err := s.repo.Get(ctx, userId); err != nil {
     return profile{}, err
   } else {
-    return userProfile, nil
+    if requesteds, err := s.repo.GetRequested(ctx, userId); err != nil {
+      return profile{}, err
+    } else {
+      if requestedsText, err := json.Marshal(requesteds); err != nil {
+        return profile{}, err
+      } else {
+        if participateds, err := s.repo.GetParticipated(ctx, userId); err != nil {
+          return profile{}, err
+        } else {
+          if participatedsText, err := json.Marshal(participateds); err != nil {
+            return profile{}, err
+          } else {
+            userProfileWithRecords = profile{
+              Id: userId,
+              Bio: userProfile.Bio,
+              Sns: userProfile.Sns,
+              Submission: participatedsText,
+              Request: requestedsText,
+              Icon: userProfile.Icon,
+            }
+            return userProfileWithRecords, nil
+          }
+        }
+      }
+    }
   }
 }
 
@@ -88,7 +114,7 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 func (s service) Post(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   sns := sns{}
-  json.Unmarshal(req.sns, &sns)
+  json.Unmarshal(req.Sns, &sns)
   //SNS登録情報を検証
   if err := sns.Validate(); err != nil {
     return err
@@ -101,7 +127,7 @@ func (s service) Post(ctx context.Context, req profile) error {
   insertValues := typefile.Profile{
     ID:      req.Id,
     Bio:     req.Bio,
-    sns:     req.sns,
+    Sns:     req.Sns,
     Icon:    req.Icon,
   }
   //INSERT
@@ -116,7 +142,7 @@ func (s service) Post(ctx context.Context, req profile) error {
 func (s service) Patch(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   snsUrl := sns{}
-  json.Unmarshal(req.sns, &snsUrl)
+  json.Unmarshal(req.Sns, &snsUrl)
   //SNS登録情報を検証
   if err := snsUrl.Validate(); err != nil {
     return err
@@ -129,7 +155,7 @@ func (s service) Patch(ctx context.Context, req profile) error {
   insertValues := typefile.Profile{
     ID:      req.Id,
     Bio:     req.Bio,
-    sns:     req.sns,
+    Sns:     req.Sns,
     Icon:    req.Icon,
   }
   //UPDATE
@@ -149,10 +175,10 @@ func (s service) Delete(ctx context.Context, req string) error {
     return err
   }
   //該当ユーザのプロフィールを削除
-  if err := s.repo.delete(ctx, userId); err != nil {
+  if err := s.repo.Delete(ctx, userId); err != nil {
     return err
   } else {
-    return　nil
+    return nil
   }
 }
 
@@ -179,9 +205,9 @@ func (s serviceStub) Get(ctx context.Context, req string) (profile, error) {
   }
   dummyProfile := profile{
     Bio: "test", 
-    sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
-    Submission: "test", 
-    Request: "test", 
+    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
+    Submission: []byte(`{}`), 
+    Request: []byte(`{}`), 
     Icon: "test",
   }
   return dummyProfile, nil
