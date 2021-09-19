@@ -14,6 +14,7 @@ import (
 
 
 type sns struct {
+  Github         string          `json:"github"`
   Twitter         string          `json:"twitter"`
   Facebook        string          `json:"facebook"`
 }
@@ -29,9 +30,9 @@ type profile struct {
 }
 
 
-
 func (m sns) Validate() error {
   return validation.ValidateStruct(&m,
+    validation.Field(&m.Github, is.URL, validation.Match(regexp.MustCompile("https://github\\.com/.*"))),
     validation.Field(&m.Twitter, is.URL, validation.Match(regexp.MustCompile("https://twitter\\.com/.*"))),
     validation.Field(&m.Facebook, is.URL, validation.Match(regexp.MustCompile("https://.*\\.facebook\\.com/.*"))),
   )
