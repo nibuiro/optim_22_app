@@ -14,7 +14,7 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ profile.username }}
         </p>
-        <b-button class="is-light ml-auto mt-5" label="編集" outlined />
+        <profile-form class="is-light ml-auto mt-5" />
       </div>
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
@@ -213,6 +213,8 @@
 </template>
 
 <script>
+import ProfileForm from "@/components/ProfileForm";
+
 const profile = require("../../src/assets/sampleProfile.json");
 
 export default {
@@ -233,6 +235,9 @@ export default {
         borderRadius: "100%"
       };
     }
+  },
+  components: {
+    "profile-form": ProfileForm
   }
 };
 </script>
