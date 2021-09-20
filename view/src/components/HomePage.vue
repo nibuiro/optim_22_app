@@ -37,6 +37,7 @@
         :default-sort="defaultSort"
       >
         <b-table-column
+          cell-class="is-vcentered"
           field="state"
           label="状態"
           width="10%"
@@ -49,8 +50,8 @@
             {{ props.row.accepting === true ? "受付中" : "終了" }}
           </b-tag>
         </b-table-column>
-
         <b-table-column
+          cell-class="is-vcentered"
           field="date"
           label="依頼日時"
           width="10%"
@@ -62,8 +63,8 @@
           <br />
           {{ new Date(props.row.date).toLocaleTimeString() }}
         </b-table-column>
-
         <b-table-column
+          cell-class="is-vcentered"
           field="client"
           label="依頼者"
           width="10%"
@@ -73,16 +74,12 @@
         >
           <a href="">
             <b-tooltip :label="props.row.client.username">
-              <b-image
-                class="image is-64x64 is-inline-block is-centered"
-                :src="props.row.client.icon"
-                rounded
-              />
+              <div :style="iconStyle(64, props.row.client.icon)" />
             </b-tooltip>
           </a>
         </b-table-column>
-
         <b-table-column
+          cell-class="is-vcentered"
           field="request"
           label="依頼名"
           width="20%"
@@ -93,12 +90,17 @@
             {{ props.row.request }}
           </a>
         </b-table-column>
-
-        <b-table-column field="detail" label="詳細" width="30%" v-slot="props">
+        <b-table-column
+          cell-class="is-vcentered"
+          field="detail"
+          label="詳細"
+          width="30%"
+          v-slot="props"
+        >
           {{ props.row.detail }}
         </b-table-column>
-
         <b-table-column
+          cell-class="is-vcentered"
           field="engineer"
           label="参加者"
           width="20%"
@@ -110,11 +112,7 @@
             :key="engineer.username"
           >
             <b-tooltip :label="engineer.username">
-              <b-image
-                class="image is-48x48 is-inline-block is-centered has-border"
-                :src="engineer.icon"
-                rounded
-              />
+              <div :style="iconStyle(48, engineer.icon)" />
             </b-tooltip>
           </a>
         </b-table-column>
@@ -138,6 +136,19 @@ export default {
       currentPage: 1,
       perPage: 10
     };
+  },
+  methods: {
+    iconStyle(size, image) {
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${image}")`,
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        borderRadius: "100%"
+      };
+    }
   }
 };
 </script>
