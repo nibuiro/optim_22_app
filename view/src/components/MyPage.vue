@@ -8,7 +8,7 @@
         position="is-right"
         always
       >
-        <div class="ml-3 mt-3 mb-6" :style="iconStyle" />
+        <div class="ml-3 mt-3 mb-6" :style="iconStyle(64, profile.icon)" />
       </b-tooltip>
       <div class="hero-body is-flex pt-0 pb-5">
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
@@ -55,6 +55,7 @@
           </template>
           <b-table :data="profile.requests" :default-sort="['date', 'desc']">
             <b-table-column
+              cell-class="is-vcentered"
               field="state"
               label="状態"
               width="10%"
@@ -69,8 +70,8 @@
                 {{ props.row.accepting === true ? "受付中" : "終了" }}
               </b-tag>
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="date"
               label="依頼日時"
               width="10%"
@@ -82,8 +83,8 @@
               <br />
               {{ new Date(props.row.date).toLocaleTimeString() }}
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="request"
               label="依頼名"
               width="20%"
@@ -94,8 +95,8 @@
                 {{ props.row.request }}
               </a>
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="detail"
               label="詳細"
               width="35%"
@@ -103,8 +104,8 @@
             >
               {{ props.row.detail }}
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="engineer"
               label="参加者"
               width="25%"
@@ -116,11 +117,7 @@
                 :key="engineer.username"
               >
                 <b-tooltip :label="engineer.username">
-                  <b-image
-                    class="image is-48x48 is-inline-block is-centered has-border"
-                    :src="engineer.icon"
-                    rounded
-                  />
+                  <div :style="iconStyle(48, engineer.icon)" />
                 </b-tooltip>
               </a>
             </b-table-column>
@@ -136,6 +133,7 @@
           </template>
           <b-table :data="profile.submissions" :default-sort="['date', 'desc']">
             <b-table-column
+              cell-class="is-vcentered"
               field="state"
               label="状態"
               width="10%"
@@ -150,8 +148,8 @@
                 {{ props.row.accepting === true ? "受付中" : "終了" }}
               </b-tag>
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="date"
               label="依頼日時"
               width="10%"
@@ -163,8 +161,8 @@
               <br />
               {{ new Date(props.row.date).toLocaleTimeString() }}
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="client"
               label="依頼者"
               width="10%"
@@ -173,16 +171,12 @@
             >
               <a href="">
                 <b-tooltip :label="props.row.client.username">
-                  <b-image
-                    class="image is-64x64 is-inline-block is-centered"
-                    :src="props.row.client.icon"
-                    rounded
-                  />
+                  <div :style="iconStyle(64, props.row.client.icon)" />
                 </b-tooltip>
               </a>
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="request"
               label="依頼名"
               width="20%"
@@ -193,8 +187,8 @@
                 {{ props.row.request }}
               </a>
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="detail"
               label="詳細"
               width="30%"
@@ -202,8 +196,8 @@
             >
               {{ props.row.detail }}
             </b-table-column>
-
             <b-table-column
+              cell-class="is-vcentered"
               field="engineer"
               label="提出物"
               width="20%"
@@ -224,17 +218,21 @@ const profile = require("../../src/assets/sampleProfile.json");
 export default {
   data() {
     return {
-      profile,
-      iconStyle: {
-        width: "64px",
-        height: "64px",
-        backgroundImage: `url("${profile.icon}")`,
+      profile
+    };
+  },
+  methods: {
+    iconStyle(size, image) {
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${image}")`,
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
         borderRadius: "100%"
-      }
-    };
+      };
+    }
   }
 };
 </script>
