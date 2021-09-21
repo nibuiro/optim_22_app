@@ -16,6 +16,7 @@ import (
   "optim_22_app/internal/home"
   "optim_22_app/internal/client"
   "optim_22_app/internal/request"
+  "optim_22_app/internal/submission"
   "optim_22_app/internal/engineer"
 )
 
@@ -116,15 +117,21 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
 
   request_e := e.Group("/request")
   {
-    // request_idをparamにして特定リクエストの詳細を標示する。
+    // request_idをparamにして特定リクエストの詳細を表示する。
     request_e.GET("/show_request/:request_id",request.ShowRequest)
+  }
+
+  submission_e := e.Group("/submission")
+  {
+    // request_idをparamにして特定リクエストの詳細を表示する。
+    submission_e.GET("/show_submission/:submission_id",submission.ShowSubmission)
   }
 
   engineer_e := e.Group("/engineer")
   {
     // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
     engineer_e.POST("/create_engineer_join",engineer.CreateEngineerJoin)
-    // submissionを提出するためのページを標示するハンドラ
+    // submissionを提出するためのページを表示するハンドラ
     engineer_e.GET("/new_submission/:request_id",engineer.NewSubmission)
     // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
     engineer_e.POST("/create_submission",engineer.CreateSubmission)

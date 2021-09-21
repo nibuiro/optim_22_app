@@ -78,4 +78,60 @@ func CreateTestData() {
 		{RequestID: 3,EngineerID: 2,Content: "submission1 of engineerID 2"},
 		{RequestID: 3,EngineerID: 3,Content: "submission1 of engineerID 3"}}
 	Db.Create(&submissions)
+
+	// id=1のClient構造体データを格納するためのインスタンスを生成
+	client1 := typefile.Client{}
+	// id=1を持つclientを抽出する。
+	Db.Find(&client1,"id = ?",1)
+	// SELECT * FROM `clients` WHERE id = 1
+
+	// id=2のClient構造体データを格納するためのインスタンスを生成
+	client2 := typefile.Client{}
+	// id=2を持つclientを抽出する。
+	Db.Find(&client2,"id = ?",2)
+	// SELECT * FROM `clients` WHERE id = 2
+
+	var clients_association = []typefile.Client{
+		client1,
+		client1,
+		client2}
+	Db.Model(&requests).Association("Client").Append(&clients_association)
+
+	// id=3のRequest構造体データを格納するためのインスタンスを生成
+	request3 := typefile.Request{}
+	// id=3を持つrequestを抽出する。
+	Db.Find(&request3,"id = ?",3)
+	// SELECT * FROM `requests` WHERE id = 3
+
+	var requests_association = []typefile.Request{
+		request3,
+		request3,
+		request3}
+
+	Db.Model(&submissions).Association("Request").Append(&requests_association)
+
+	// id=1のEngineer構造体データを格納するためのインスタンスを生成
+	engineer1 := typefile.Engineer{}
+	// id=1を持つengineerを抽出する。
+	Db.Find(&engineer1,"id = ?",1)
+	// SELECT * FROM `engineers` WHERE id = 1
+
+	// id=2のEngineer構造体データを格納するためのインスタンスを生成
+	engineer2 := typefile.Engineer{}
+	// id=2を持つengineerを抽出する。
+	Db.Find(&engineer2,"id = ?",2)
+	// SELECT * FROM `engineers` WHERE id = 2
+
+	// id=3のEngineer構造体データを格納するためのインスタンスを生成
+	engineer3 := typefile.Engineer{}
+	// id=3を持つengineerを抽出する。
+	Db.Find(&engineer3,"id = ?",3)
+	// SELECT * FROM `engineers` WHERE id = 3
+
+	var engineers_association = []typefile.Engineer{
+		engineer1,
+		engineer2,
+		engineer3}
+
+	Db.Model(&engineers).Association("Engineer").Append(&engineers_association)
 }

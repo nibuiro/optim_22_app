@@ -58,9 +58,17 @@ func CreateSubmission(c *gin.Context) {
 	request_id, _ := strconv.Atoi(request_id_string)
 	engineer_id, _ := strconv.Atoi(engineer_id_string)
 
+	// Request構造体データを格納するためのインスタンスを生成
+	request := typefile.Request{}
+	//　提出するsubmissionに対応するリクエストを格納する。
+	model.Db.Find(&request,"id = ?",request_id)
+
 	// EngineerIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
     var submission = typefile.Submission{RequestID: request_id,EngineerID: engineer_id,Content: content}
     model.Db.Create(&submission)
+
+    // Associationによって、外部キーを考えずにrequestデータを取り出せるようにする。
+	model.Db.Model(&submission).Association("Request").Append(&request)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, "//localhost:8080/")
@@ -79,6 +87,7 @@ func ShowJoinRequest(c *gin.Context) {
 	requests := []typefile.Request{}
 
 	model.Db.Find(&engineer,"id = ?",engineer_id)
+	// Associationによって、requestデータを取り出す。
 	model.Db.Model(&engineer).Association("Requests").Find(&requests)
 
     c.HTML(http.StatusOK, "show_join_request.html", gin.H{
@@ -89,7 +98,7 @@ func ShowJoinRequest(c *gin.Context) {
 
 // エンジニアが提出済みのsubmissionを編集する。
 func EditSubmission(c *gin.Context) {
-	// urlの引数で受け取ったrequest_idをrequest_idという変数に格納している。
+	// urlの引数で受け取ったsubmission_idをsubmission_id_stringという変数に格納している。
 	submission_id_string := c.Param("submission_id")
 	// 文字列をintに変換
 	submission_id, _ := strconv.Atoi(submission_id_string)
@@ -124,5 +133,5 @@ func UpdateSubmission(c *gin.Context) {
 	model.Db.Save(&submission)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/submission/show_submission/:submission_id")
 }

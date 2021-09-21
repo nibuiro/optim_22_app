@@ -18,9 +18,21 @@ func CreateRequest(c *gin.Context) {
 	// formで入力された値を得る
     requestname := c.PostForm("RequestName")
     content := c.PostForm("Content")
+
+    // Client構造体データを格納するためのインスタンスを生成
+    client := typefile.Client{}
+    // Request構造体データを格納するためのインスタンスを生成
+    // request := typefile.Request{}
+    //　特定idを持つクライアントを格納する。ClientIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
+    model.Db.Find(&client,"id = ?",3)
+    // SELECT * FROM `client` WHERE id = ?
+
     // ClientIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
     var request = typefile.Request{ClientID: 3,RequestName: requestname,Content: content,Finish: false}
     model.Db.Create(&request)
+
+    // Associationによって、外部キーを考えずにclientデータを取り出せるようにする。
+    model.Db.Model(&request).Association("Client").Append(&client)
 
     // 依頼作成者とログインユーザーが一致していることを確かめている。
     // if request.ClientID == user_id{
@@ -67,8 +79,14 @@ func EditRequest(c *gin.Context) {
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)
 
+    // Request構造体を格納するためのインスタンスを生成
+    request := typefile.Request{}
+
+    // 該当するリクエストを抽出している。
+    model.Db.Find(&request,"id = ?",request_id)
+
 	c.HTML(http.StatusOK, "edit_request.html", gin.H{
-		"request_id": request_id,
+        "request": request,
 	})
 }
 
@@ -94,11 +112,9 @@ func UpdateRequest(c *gin.Context) {
 	model.Db.Save(&request)
 
     // リクエストが終了していないことを確かめる。
-    request_finish_confirmation := typefile.Request{}
-    model.Db.Find(&request_finish_confirmation,"id = ?",request_id)
-    if request_finish_confirmation.Finish == false{
+    if request.Finish == false{
     	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    	c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    	c.Redirect(http.StatusSeeOther, "//localhost:8080/show_request/:request_id")
     }
 
     // 依頼者と依頼更新者が一致していることを確かめている。
@@ -138,8 +154,6 @@ func ShowSubmission(c *gin.Context) {
     	"submissions": submissions,
     	"request_id": request_id,
     })
-
-    // winnerがいない場合はwinnerがいないと表示し、winnerがいる場合は～さんがwinnerですと表示する。
 }
 
 // 勝者を決定するための関数
