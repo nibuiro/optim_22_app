@@ -74,3 +74,29 @@ func TestGetComments(t *testing.T) {
   }
 }
 
+
+
+func TestPostComment(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
+
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
+  
+  tests := []test.APITestCase{
+    {
+      Name: "Bad json parsing test", 
+      Method: "POST", 
+      URL: "/api/discussion/1", 
+      Header: nil, 
+      Body: `{"userID":1, requestID":1, "date":"2009-11-12 21:00:57", "title":"test", "body":"test", "replyID":1}`,
+      WantStatus: http.StatusBadRequest, 
+      WantResponse: "",
+    },
+  }
+  for _, tc := range tests {
+    test.Endpoint(t, router, tc)
+  }
+}
