@@ -5,6 +5,7 @@ import (
   "context"
   "github.com/go-ozzo/ozzo-validation/v4"
   "github.com/go-ozzo/ozzo-validation/v4/is"
+  "optim_22_app/pkg/log"
 )
 
 //#region コメント
@@ -34,6 +35,7 @@ func (m Comment) Validate() error {
 }
 //#endregion
 
+
 type Service interface {
   Get(ctx context.Context, req string) (Comment, error)
   Post(ctx context.Context, req Comment) error
@@ -41,4 +43,9 @@ type Service interface {
   Delete(ctx context.Context, req string) error
 }
 
+
+type service struct {
+  repo   Repository
+  logger log.Logger
+}
 
