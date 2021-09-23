@@ -1,5 +1,11 @@
 package comment
 
+import (
+  "time"
+  "github.com/go-ozzo/ozzo-validation/v4"
+  "github.com/go-ozzo/ozzo-validation/v4/is"
+)
+
 //#region コメント
 type Comment struct {
   Id         int       `json:"id"`
