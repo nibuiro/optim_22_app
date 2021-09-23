@@ -20,7 +20,7 @@ import (
 
 
 // テストスイートの構造体
-type UserRepositoryTestSuite struct {
+type CommentFuncIntegrationTestSuite struct {
   suite.Suite
   db *gorm.DB
   mock           sqlmock.Sqlmock
@@ -30,7 +30,7 @@ type UserRepositoryTestSuite struct {
 
 // テストのセットアップ
 // (sqlmockをNew、Gormで発行されるクエリがモックに送られるように)
-func (suite *UserRepositoryTestSuite) SetupTest() {
+func (suite *CommentFuncIntegrationTestSuite) SetupTest() {
 
   logger := log.New()
   suite.logger = logger
@@ -48,31 +48,31 @@ func (suite *UserRepositoryTestSuite) SetupTest() {
     postgres.New(postgres.Config{Conn: db,}), 
     &gorm.Config{},
   )
-  userRepository := comment.NewRepository(DB, logger)
+  commentRepository := comment.StubNewRepository(DB, logger)
   suite.db = DB
 
   //authentication.New("localhost", "secret_key_for_refresh", "secret_key", 5, )
 
-  userService := comment.NewServiceStub(userRepository, logger)
+  commentService := comment.NewServiceStub(commentRepository, logger)
 
   router := gin.New()
-  comment.RegisterHandlers(router.Group(""), cfg, userService, logger)
+  comment.RegisterHandlers(router.Group(""), cfg, commentService, logger)
   suite.router = router
 }
 
 // テスト終了時の処理（データベース接続のクローズ）
-func (suite *UserRepositoryTestSuite) TearDownTest() {
+func (suite *CommentFuncIntegrationTestSuite) TearDownTest() {
   db, _ := suite.db.DB()
   db.Close()
 }
 
 // テストスイートの実行
-func TestUserRepositoryTestSuite(t *testing.T) {
-  suite.Run(t, new(UserRepositoryTestSuite))
+func TestCommentFuncIntegrationTestSuite(t *testing.T) {
+  suite.Run(t, new(CommentFuncIntegrationTestSuite))
 }
 
 //コメントの投稿、取得テスト
-func (suite *UserRepositoryTestSuite) TestCreate() {
+func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
   suite.Run("post a comment", func() {
       newId := 1
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
