@@ -5,6 +5,7 @@ type Comment struct {
   Id         int       `json:"id"`
   RequestID  int       `json:"requestID"`
   UserID     int       `json:"userID"`
+  UserName   string    `json:"userName"`
   Date       time.Time `json:"date"`
   Title      string    `json:"title"`
   Body       string    `json:"body"`
