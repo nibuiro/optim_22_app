@@ -2,6 +2,7 @@ package comment
 
 import (
   "time"
+  "context"
   "github.com/go-ozzo/ozzo-validation/v4"
   "github.com/go-ozzo/ozzo-validation/v4/is"
 )
@@ -33,6 +34,11 @@ func (m Comment) Validate() error {
 }
 //#endregion
 
-
+type Service interface {
+  Get(ctx context.Context, req string) (Comment, error)
+  Post(ctx context.Context, req Comment) error
+  Patch(ctx context.Context, req Comment) error
+  Delete(ctx context.Context, req string) error
+}
 
 
