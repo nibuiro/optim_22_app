@@ -100,3 +100,38 @@ func TestPostComment(t *testing.T) {
     test.Endpoint(t, router, tc)
   }
 }
+
+
+func TestDeleteComment(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
+
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
+  
+  tests := []test.APITestCase{
+    {
+      Name: "double check test (/<invalid>/#m)", 
+      Method: "POST", 
+      URL: "/api/discussion/test/1", 
+      Header: nil, 
+      Body: ``,
+      WantStatus: http.StatusBadRequest, 
+      WantResponse: "",
+    },
+    {
+      Name: "double check test (/#n/#m)", 
+      Method: "POST", 
+      URL: "/api/discussion/test/1", 
+      Header: nil, 
+      Body: ``,
+      WantStatus: http.StatusOK, 
+      WantResponse: "",
+    },
+  }
+  for _, tc := range tests {
+    test.Endpoint(t, router, tc)
+  }
+}
