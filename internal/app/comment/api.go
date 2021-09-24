@@ -29,6 +29,8 @@ func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service
   r.GET("/api/discussion/:requestID", rc.get())
   //ディスカッション ID(:requestID) にコメントを投稿
   r.POST("/api/discussion/:requestID", rc.post())
+  //ディスカッション ID(:requestID) のコメントを修正
+  r.PATCH("/api/discussion/:requestID", rc.patch())
   //ディスカッション ID(:requestID) に投稿されている
   //コメント ID(:commentID) を削除
   r.DELETE("/api/discussion/:requestID/:commentID", rc.delete())
@@ -68,6 +70,33 @@ func (rc resource) get() gin.HandlerFunc {
 
 
 func (rc resource) post() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    var input comment
+
+    requestID := c.Param("requestID")
+  
+    //BodyからJSONをパースして読み取る
+    if err := c.BindJSON(&input); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    }
+    
+    //コメントを登録
+    err := rc.service.Post(c.Request.Context(), input, requestID)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return 
+    } else {
+      c.Status(http.StatusCreated)
+      return 
+    }
+  }
+}
+
+
+func (rc resource) patch() gin.HandlerFunc {
   return func(c *gin.Context) {
     var input comment
 

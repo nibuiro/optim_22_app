@@ -73,7 +73,7 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
 }
 
 
-func (s service) Patch(ctx context.Context, req comment) error {
+func (s service) Patch(ctx context.Context, req comment, requestID string) error {
   return nil
 }
 
