@@ -78,6 +78,6 @@ func (s service) Patch(ctx context.Context, req comment) error {
 }
 
 
-func (s service) Delete(ctx context.Context, req string) error{
+func (s service) Delete(ctx context.Context, requestID string, commentID string) error{
   return nil
 }

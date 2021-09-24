@@ -114,7 +114,7 @@ func TestDeleteComment(t *testing.T) {
   tests := []test.APITestCase{
     {
       Name: "double check test (/<invalid>/#m)", 
-      Method: "POST", 
+      Method: "DELETE", 
       URL: "/api/discussion/test/1", 
       Header: nil, 
       Body: ``,
@@ -123,8 +123,8 @@ func TestDeleteComment(t *testing.T) {
     },
     {
       Name: "double check test (/#n/#m)", 
-      Method: "POST", 
-      URL: "/api/discussion/test/1", 
+      Method: "DELETE", 
+      URL: "/api/discussion/1/1", 
       Header: nil, 
       Body: ``,
       WantStatus: http.StatusOK, 
