@@ -48,3 +48,9 @@ func (r repository) Update(ctx context.Context, comment *typefile.Comment) error
   result := r.db.WithContext(ctx).Create(comment)
   return result.Error
 }
+
+
+func (r repository) Delete(ctx context.Context, commentID int) error {
+  result := r.db.WithContext(ctx).Delete(&typefile.Comment{}, commentID)
+  return result.Error
+}
