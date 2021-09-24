@@ -56,12 +56,12 @@ type service struct {
 func (s service) Get(ctx context.Context, req string) ([]comment, error) {
   //リクエスト文字列を数値型ユーザIDに変換
   //var userId int
-  requestID, err := strconv.Atoi(req)
+  requestIDAsInt, err := strconv.Atoi(req)
   if err != nil {
     return make([]comment, 1), err
   }
   //該当リクエストのコメントを取得
-  if pastComments, err := s.repo.Get(ctx, requestID); err != nil {
+  if pastComments, err := s.repo.Get(ctx, requestIDAsInt); err != nil {
     return make([]comment, 1), err
   } else {
     comments := pastComments
@@ -112,3 +112,45 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
 }
 
 
+func (s service) Patch(ctx context.Context, req comment, requestID string) error {
+  //コメント登録情報を検証
+  if err := req.Validate(); err != nil {
+    return err
+  }
+  //リクエストID文字列を整数型に変換
+  requestIDAsInt, err := strconv.Atoi(requestID)
+  if err != nil {
+    return err
+  }
+  //クエリの値を定義
+  insertValues := typefile.Comment{
+    RequestID: requestIDAsInt,
+    UserID:    req.UserID,
+    Date:      req.Date,
+    Title:     req.Title,
+    Body:      req.Body,
+    ReplyID:   req.ReplyID,
+  }
+
+  if err := s.repo.Update(ctx, &insertValues); err != nil {
+    return err
+  } else {
+    return nil
+  }
+}
+
+
+func (s service) Delete(ctx context.Context, requestID string, commentID string) error{
+  //コメントID文字列を整数型に変換
+  commentIDAsInt, err := strconv.Atoi(commentID)
+  if err != nil {
+    return err
+  } else {
+    //コメント削除
+    if err := s.repo.Delete(ctx, commentIDAsInt); err != nil {
+      return err
+    } else {
+      return nil
+    }
+  }
+}
