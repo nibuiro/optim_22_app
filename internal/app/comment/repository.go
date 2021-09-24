@@ -42,3 +42,9 @@ func (r repository) Create(ctx context.Context, comment *typefile.Comment) error
   result := r.db.WithContext(ctx).Create(comment)
   return result.Error
 }
+
+
+func (r repository) Update(ctx context.Context, comment *typefile.Comment) error {
+  result := r.db.WithContext(ctx).Create(comment)
+  return result.Error
+}
