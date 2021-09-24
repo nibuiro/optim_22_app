@@ -83,3 +83,32 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
   }
 }
 
+
+func (s service) Post(ctx context.Context, req comment, requestID string) error {
+  //コメント登録情報を検証
+  if err := req.Validate(); err != nil {
+    return err
+  }
+  //リクエストID文字列をintに変換
+  requestIDAsInt, err := strconv.Atoi(requestID)
+  if err != nil {
+    return err
+  }
+  //クエリの値を定義
+  insertValues := typefile.Comment{
+    RequestID: requestIDAsInt,
+    UserID:    req.UserID,
+    Date:      req.Date,
+    Title:     req.Title,
+    Body:      req.Body,
+    ReplyID:   req.ReplyID,
+  }
+
+  if err := s.repo.Create(ctx, &insertValues); err != nil {
+    return err
+  } else {
+    return nil
+  }
+}
+
+
