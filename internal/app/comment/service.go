@@ -9,7 +9,7 @@ import (
 )
 
 //#region コメント
-type Comment struct {
+type comment struct {
   Id         int       `json:"id"`
   RequestID  int       `json:"requestID"`
   UserID     int       `json:"userID"`
@@ -22,7 +22,7 @@ type Comment struct {
 }
 
 
-func (m Comment) Validate() error {
+func (m comment) Validate() error {
   return validation.ValidateStruct(&m,
     validation.Field(&m.UserID, validation.Required, is.Int),
     validation.Field(&m.RequestID, validation.Required, is.Int),
@@ -37,9 +37,9 @@ func (m Comment) Validate() error {
 
 
 type Service interface {
-  Get(ctx context.Context, req string) (Comment, error)
-  Post(ctx context.Context, req Comment) error
-  Patch(ctx context.Context, req Comment) error
+  Get(ctx context.Context, req string) ([]comment, error)
+  Post(ctx context.Context, req comment, requestID string) error
+  Patch(ctx context.Context, req comment) error
   Delete(ctx context.Context, req string) error
 }
 

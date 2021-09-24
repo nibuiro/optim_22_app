@@ -68,7 +68,7 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
 }
 
 
-func (s service) Post(ctx context.Context, req comment) error {
+func (s service) Post(ctx context.Context, req comment, requestID string) error {
   return nil
 }
 
