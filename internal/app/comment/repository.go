@@ -39,6 +39,6 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
 
 
 func (r repository) Create(ctx context.Context, comment *typefile.Comment) error {
-//  result := r.db.WithContext(ctx).Create(comment)
-  return nil
+  result := r.db.WithContext(ctx).Create(comment)
+  return result.Error
 }

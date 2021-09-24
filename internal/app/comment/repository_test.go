@@ -55,7 +55,7 @@ func (suite *CommentRepositoryTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
       suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`INSERT INTO "comment" ("requestID","userID","date","title","body","replyID") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
+        regexp.QuoteMeta(`INSERT INTO "comments" ("request_id","user_id","date","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
