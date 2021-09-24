@@ -25,3 +25,20 @@ type repository struct {
 }
 
 
+func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
+  var comments []comment
+  result := r.db.WithContext(ctx).
+    Model(&typefile.Comment{}).
+    Select("comment.ID, comment.RequestID, comment.UserID, user.Name, comment.Date, comment.Title, comment.Body, comment.ReplyID").
+    Joins("INNER JOIN \"user\" ON comment.userID = user.ID").
+    Where("comment.RequestID = ?", requestID).
+    Scan(&comments)
+
+  return comments, result.Error
+}
+
+
+func (r repository) Create(ctx context.Context, comment *typefile.Comment) error {
+//  result := r.db.WithContext(ctx).Create(comment)
+  return nil
+}
