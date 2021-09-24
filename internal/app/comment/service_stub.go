@@ -20,7 +20,7 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
 
   if "1" == req {
     res := make([]comment, 1)    
-    t1, _ := time.Parse(time.RFC3339, "2009-11-12 21:00:57")
+    t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
     res[0] = comment{
       Id: 1,
       RequestID: 1,
@@ -36,8 +36,8 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
 
   if "3" == req {
     res := make([]comment, 2)
-    t1, _ := time.Parse(time.RFC3339, "2009-11-12 21:00:57")
-    t2, _ := time.Parse(time.RFC3339, "2009-11-12 23:00:57")
+    t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
+    t2, _ := time.Parse(time.RFC3339, "2017-04-13T14:12:53.4242+05:30")
     res[0] = comment{
       Id: 1,
       RequestID: 1,

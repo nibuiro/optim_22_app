@@ -25,6 +25,3 @@ type repository struct {
 }
 
 
-func NewRepository(db *gorm.DB, logger log.Logger) Repository {
-  return repository{db, logger}
-}

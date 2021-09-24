@@ -19,7 +19,7 @@ func TestTypeCommentValidate(t *testing.T) {
    *  
    */
   logger := log.New()
-  t1, _ := time.Parse(time.RFC3339, "2009-11-12 21:00:57")
+  t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
   tests := []struct {
     name      string
     model     comment

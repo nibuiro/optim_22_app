@@ -57,7 +57,7 @@ func TestGetComments(t *testing.T) {
       Header: nil, 
       Body: "",
       WantStatus: http.StatusOK, 
-      WantResponse: `[{"id":1,"requestID":1,"userID":1,"userName":"テスト一郎","date":"0001-01-01T00:00:00Z","title":"test","body":"test","replyID":0,"attachment":null}]`,
+      WantResponse: `[{"id":1,"requestID":1,"userID":1,"userName":"テスト一郎","date":"2016-04-13T14:12:53.4242+05:30","title":"test","body":"test","replyID":0,"attachment":null}]`,
     },
     {
       Name: "Json Marshal read 2 comments", 
@@ -66,7 +66,7 @@ func TestGetComments(t *testing.T) {
       Header: nil, 
       Body: "",
       WantStatus: http.StatusOK, 
-      WantResponse: `[{"id":1,"requestID":1,"userID":1,"userName":"テスト一郎","date":"0001-01-01T00:00:00Z","title":"test","body":"test","replyID":0,"attachment":null},{"id":2,"requestID":1,"userID":3,"userName":"テスト三郎","date":"0001-01-01T00:00:00Z","title":"test","body":"test","replyID":0,"attachment":null}]`,
+      WantResponse: `[{"id":1,"requestID":1,"userID":1,"userName":"テスト一郎","date":"2016-04-13T14:12:53.4242+05:30","title":"test","body":"test","replyID":0,"attachment":null},{"id":2,"requestID":1,"userID":3,"userName":"テスト三郎","date":"2017-04-13T14:12:53.4242+05:30","title":"test","body":"test","replyID":0,"attachment":null}]`,
     },
   }
   for _, tc := range tests {
@@ -91,7 +91,7 @@ func TestPostComment(t *testing.T) {
       Method: "POST", 
       URL: "/api/discussion/1", 
       Header: nil, 
-      Body: `{"userID":1, requestID":1, "date":"2009-11-12 21:00:57", "title":"test", "body":"test", "replyID":1}`,
+      Body: `{"userID":1, requestID":1, "date":"2016-04-13T14:12:53.4242+05:30", "title":"test", "body":"test", "replyID":1}`,
       WantStatus: http.StatusBadRequest, 
       WantResponse: "",
     },
