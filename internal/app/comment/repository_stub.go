@@ -10,8 +10,8 @@ import (
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
 
 
-func (r repository) Get(ctx context.Context, requestID int) (typefile.Comment, error) {
-  return typefile.Comment{}, nil
+func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
+  return make([]comment, 1), nil
 }
 
 

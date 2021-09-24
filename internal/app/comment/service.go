@@ -2,10 +2,12 @@ package comment
 
 import (
   "time"
+  "strconv"
   "context"
   "github.com/go-ozzo/ozzo-validation/v4"
   "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/log"
+  "optim_22_app/typefile"
 )
 
 //#region コメント
@@ -47,5 +49,37 @@ type Service interface {
 type service struct {
   repo   Repository
   logger log.Logger
+}
+
+
+
+func (s service) Get(ctx context.Context, req string) ([]comment, error) {
+  //リクエスト文字列を数値型ユーザIDに変換
+  //var userId int
+  requestID, err := strconv.Atoi(req)
+  if err != nil {
+    return make([]comment, 1), err
+  }
+  //該当リクエストのコメントを取得
+  if pastComments, err := s.repo.Get(ctx, requestID); err != nil {
+    return make([]comment, 1), err
+  } else {
+    comments := pastComments
+    //nCommens := len(pastComments)
+    //comments := make([]comment, pastComments)
+    //for i := 0; i < nCommens; i++ {
+    //  comments[i] = comment{
+    //    Id: pastComments[i].ID
+    //    RequestID: pastComments[i].RequestID
+    //    UserID: pastComments[i].UserID
+    //    UserName: pastComments[i].UserName
+    //    Date: pastComments[i].Date
+    //    Title: pastComments[i].Title
+    //    Body: pastComments[i].Body
+    //    ReplyID: pastComments[i].ReplyID
+    //  }
+    //}
+    return comments, nil
+  }
 }
 

@@ -10,7 +10,7 @@ import (
 
 
 type Repository interface {
-  Get(ctx context.Context, requestID int) (typefile.Comment, error)
+  Get(ctx context.Context, requestID int) ([]comment, error)
   Create(ctx context.Context, comment *typefile.Comment) error
   Update(ctx context.Context, comment *typefile.Comment) error
   Delete(ctx context.Context, commentID int) error

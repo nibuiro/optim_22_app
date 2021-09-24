@@ -4,13 +4,20 @@ import (
   "context"
   "errors"
   "time"
+  "optim_22_app/pkg/log"
 )
 
 
-func NewServiceStub(args ...interface{}) Service { return service{nil, nil}}
+func NewServiceStub(args ...interface{}) Service { return serviceStub{nil, nil}}
 
 
-func (s service) Get(ctx context.Context, req string) ([]comment, error) {
+type serviceStub struct {
+  repo   Repository
+  logger log.Logger
+}
+
+
+func (s serviceStub) Get(ctx context.Context, req string) ([]comment, error) {
 
   if "0" == req {
     res := make([]comment, 1)
@@ -68,16 +75,16 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
 }
 
 
-func (s service) Post(ctx context.Context, req comment, requestID string) error {
+func (s serviceStub) Post(ctx context.Context, req comment, requestID string) error {
   return nil
 }
 
 
-func (s service) Patch(ctx context.Context, req comment, requestID string) error {
+func (s serviceStub) Patch(ctx context.Context, req comment, requestID string) error {
   return nil
 }
 
 
-func (s service) Delete(ctx context.Context, requestID string, commentID string) error{
+func (s serviceStub) Delete(ctx context.Context, requestID string, commentID string) error{
   return nil
 }
