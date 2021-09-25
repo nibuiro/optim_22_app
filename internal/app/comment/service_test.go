@@ -16,7 +16,7 @@ import (
 func TestTypeCommentValidate(t *testing.T) {
   /*
    *  主にutf8のカウント検証テスト
-   *  
+   *  utf8では日本語文字は3バイト
    */
   logger := log.New()
   t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
@@ -31,11 +31,11 @@ func TestTypeCommentValidate(t *testing.T) {
       UserID: 1,
       RequestID: 1,
       Date: t1,
-      Title: strings.Repeat("あ", 64),
-      Body: strings.Repeat("あ", 128),
+      Title: strings.Repeat("あ", 210),
+      Body: strings.Repeat("あ", 400),
       ReplyID: 0,
       }, 
-      true,
+      false,
     },
     {
       "long title", 
@@ -43,8 +43,8 @@ func TestTypeCommentValidate(t *testing.T) {
       UserID: 1,
       RequestID: 1,
       Date: t1,
-      Title: strings.Repeat("あ", 65),
-      Body: strings.Repeat("あ", 128),
+      Title: strings.Repeat("あ", 220),
+      Body: strings.Repeat("あ", 400),
       ReplyID: 0,
       }, 
       true,
@@ -55,8 +55,8 @@ func TestTypeCommentValidate(t *testing.T) {
       UserID: 1,
       RequestID: 1,
       Date: t1,
-      Title: strings.Repeat("あ", 64),
-      Body: strings.Repeat("あ", 129),
+      Title: strings.Repeat("あ", 210),
+      Body: strings.Repeat("あ", 440),
       ReplyID: 0,
       }, 
       true,
