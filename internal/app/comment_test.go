@@ -48,12 +48,12 @@ func (suite *CommentFuncIntegrationTestSuite) SetupTest() {
     postgres.New(postgres.Config{Conn: db,}), 
     &gorm.Config{},
   )
-  commentRepository := comment.StubNewRepository(DB, logger)
+  commentRepository := comment.NewRepository(DB, logger)
   suite.db = DB
 
   //authentication.New("localhost", "secret_key_for_refresh", "secret_key", 5, )
 
-  commentService := comment.NewServiceStub(commentRepository, logger)
+  commentService := comment.NewService(commentRepository, logger)
 
   router := gin.New()
   comment.RegisterHandlers(router.Group(""), cfg, commentService, logger)
@@ -78,7 +78,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
       suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`INSERT INTO "comment" ("userID","requestID","date","title","body","replyID") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
+        regexp.QuoteMeta(`INSERT INTO "comments" ("request_id","user_id","date","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
@@ -90,7 +90,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
         Method: "POST", 
         URL: "/api/discussion/1", //requestID
         Header: nil, 
-        Body: `{"userID":1, "requestID":1, "date":"2009-11-12 21:00:57", "title":"test", "body":"test", "replyID":1}`,
+        Body: `{"userID":1, "requestID":1, "date":"2016-04-13T14:12:53.4242+05:30", "title":"test", "body":"test", "replyID":1}`,
         WantStatus: http.StatusCreated, 
         WantResponse: "",
       }
@@ -104,9 +104,9 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
   suite.Run("get comments", func() {
       newId := 1
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
-      suite.mock.ExpectBegin()
+     // suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`SELECT comment.userID, user.name, comment.date, comment.title, comment.body, comment.replyID FROM "comment" INNER JOIN "user" ON comment.userID = user.ID WHERE comment.requestID = $1`),
+        regexp.QuoteMeta(`SELECT comments.ID, comments.RequestID, comments.UserID, user.Name, comments.Date, comments.Title, comments.Body, comments.ReplyID FROM "comments" INNER JOIN "user" ON comments.userID = user.ID WHERE comments.RequestID = $1`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
