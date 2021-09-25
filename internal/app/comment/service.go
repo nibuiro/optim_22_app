@@ -5,9 +5,10 @@ import (
   "strconv"
   "context"
   "github.com/go-ozzo/ozzo-validation/v4"
-  "github.com/go-ozzo/ozzo-validation/v4/is"
+//  "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
+//  "reflect"
 )
 
 //#region コメント
@@ -25,13 +26,14 @@ type comment struct {
 
 
 func (m comment) Validate() error {
+  //is.Int  validation.Date などozzo-validationの評価関数が受け取るのは文字列のみ
   return validation.ValidateStruct(&m,
-    validation.Field(&m.UserID, validation.Required, is.Int),
-    validation.Field(&m.RequestID, validation.Required, is.Int),
-    validation.Field(&m.Date, validation.Required, validation.Date("2006-01-02")),
-    validation.Field(&m.Title, validation.Required, validation.Length(3, 64)),
-    validation.Field(&m.Body, validation.Required, validation.Length(3, 128)),
-    validation.Field(&m.ReplyID, validation.Required, is.Int),
+    //validation.Field(&m.UserID, validation.Required, is.Int),
+    //validation.Field(&m.RequestID, validation.Required, is.Int),
+    //validation.Field(&m.Date, validation.Required, validation.Date("2006-01-02")),
+    validation.Field(&m.Title, validation.Required, validation.Length(3, 640)),
+    validation.Field(&m.Body, validation.Required, validation.Length(3, 1280)),
+    //validation.Field(&m.ReplyID, validation.Required, is.Int),
     //validation.Field(&m.Attachment, validation.Length(3, 128)),
   )
 }
@@ -51,6 +53,10 @@ type service struct {
   logger log.Logger
 }
 
+
+func NewService(repo Repository, logger log.Logger) Service {
+  return service{repo, logger}
+}
 
 
 func (s service) Get(ctx context.Context, req string) ([]comment, error) {
