@@ -112,6 +112,41 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
   }
 }
 
+
+func (rc resource) GetRefreshTokenAndAccessToken() gin.HandlerFunc {
+  return func(c *gin.Context) {
+
+    var input credential
+  
+    //BodyからJSONをパースして読み取る
+    if err := c.BindJSON(&input); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return
+    }  
+    
+    userID, err := rc.service.ValidateCredential(c.Request.Context(), input)
+    if err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusUnauthorized)
+      return 
+    } else {
+      //資格情報確認及び認証情報取得
+      refreshToken, accessToken, err := rc.service.GenerateTokens(userID)
+      if err != nil {
+        c.Status(http.StatusInternalServerError)
+        return err
+      }
+      //#region ヘッダに認証情報を付加
+      c.Header("Authorization", accessToken)
+      c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.domain, false, true)
+      c.Status(http.StatusCreated)
+      //#endregion
+      return nil
+    }
+  }
+}
+
 //認証情報を空文字列で上書き
 func (rc *resource) RevokeHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
