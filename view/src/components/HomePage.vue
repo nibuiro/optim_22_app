@@ -72,11 +72,16 @@
           centered
           v-slot="props"
         >
-          <a href="">
+          <router-link
+            :to="{
+              name: 'MyPage',
+              params: { user_id: props.row.client.userid }
+            }"
+          >
             <b-tooltip :label="props.row.client.username">
               <div :style="iconStyle(64, props.row.client.icon)" />
             </b-tooltip>
-          </a>
+          </router-link>
         </b-table-column>
         <b-table-column
           cell-class="is-vcentered"
@@ -106,15 +111,18 @@
           width="20%"
           v-slot="props"
         >
-          <a
-            href=""
+          <router-link
             v-for="engineer in props.row.engineers"
-            :key="engineer.username"
+            :key="engineer.userid"
+            :to="{
+              name: 'MyPage',
+              params: { user_id: engineer.userid }
+            }"
           >
             <b-tooltip :label="engineer.username">
               <div :style="iconStyle(48, engineer.icon)" />
             </b-tooltip>
-          </a>
+          </router-link>
         </b-table-column>
       </b-table>
     </section>
