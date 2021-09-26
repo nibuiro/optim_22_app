@@ -67,9 +67,12 @@ func (s service) GenerateTokens(ctx context.Context, claims map[string]interface
 
   userID := claims["userID"].(int)
 
+  expiration := authentication.calcYears2SecondsConversion(s.config.refreshTokenExpiration)
+  expiration = time.Now().Add(expiration)
+
   claims := map[string]interface{}{
     "userid": userID,
-    "exp": time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+    "exp": expiration.Unix(),
   }
 
   if refreshToken, err := authentication.NewToken(claims, s.config.refreshTokenSecretKey); err != nil {
