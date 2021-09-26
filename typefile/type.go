@@ -1,7 +1,10 @@
 // type.goに利用する構造体をまとめる。
 // 構造体の属性は必ず最初の文字を大文字にする。
-// Winnerが必要になるかもしれない
 package typefile
+
+import (
+	"time"
+)
 
 type User struct{
 	ID             int            `gorm:"primaryKey"`
@@ -20,7 +23,7 @@ type Engineer struct{
 type Winner struct{
 	EngineerID     int            `gorm:"not null"`
 	Engineer       Engineer
-	RequestID      int            `gorm:"not null"`
+	RequestID      int            `gorm:"unique;not null"`
 }
 
 type Request struct{
@@ -31,4 +34,17 @@ type Request struct{
 	Content        string         `gorm:"not null"`
 	Winner         Winner
 	Finish         bool           `gorm:"not null"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+type Submission struct{
+	ID             int            `gorm:"primaryKey"`
+	RequestID      int            `gorm:"not null"`
+	Request        Request
+	EngineerID     int            `gorm:"not null"`
+	Engineer       Engineer
+	Content        string         `gorm:"not null"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
