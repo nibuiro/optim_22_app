@@ -56,7 +56,7 @@ const ModalForm = {
             <p class="control">
               <div class="control has-icons-left">
                 <b-icon icon="image" size="is-small" />
-                <b-input :value="!!file?file.name:''" />
+                <b-input :value="!!file?file.name:''" disabled/>
               </div>
             </p>
             <b-field class="file is-primary">
