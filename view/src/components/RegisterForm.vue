@@ -30,7 +30,7 @@ const ModalForm = {
     <form action="">
       <div class="modal-card" style="width: auto">
         <header class="modal-card-head">
-          <p class="modal-card-title has-text-centered">ログイン</p>
+          <p class="modal-card-title has-text-centered">新規登録</p>
           <button type="button" class="delete" @click="$emit('close')" />
         </header>
         <section class="modal-card-body">
