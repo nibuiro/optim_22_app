@@ -14,7 +14,7 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ profile.username }}
         </p>
-        <profile-form class="is-light ml-auto mt-5" />
+        <profile-form class="is-light ml-auto mt-5" :profile="profile" />
       </div>
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
@@ -111,15 +111,18 @@
               width="25%"
               v-slot="props"
             >
-              <a
-                href=""
+              <router-link
                 v-for="engineer in props.row.engineers"
-                :key="engineer.username"
+                :key="engineer.userid"
+                :to="{
+                  name: 'MyPage',
+                  params: { user_id: engineer.userid }
+                }"
               >
                 <b-tooltip :label="engineer.username">
                   <div :style="iconStyle(48, engineer.icon)" />
                 </b-tooltip>
-              </a>
+              </router-link>
             </b-table-column>
           </b-table>
         </b-tab-item>
@@ -169,11 +172,16 @@
               centered
               v-slot="props"
             >
-              <a href="">
+              <router-link
+                :to="{
+                  name: 'MyPage',
+                  params: { user_id: props.row.client.userid }
+                }"
+              >
                 <b-tooltip :label="props.row.client.username">
                   <div :style="iconStyle(64, props.row.client.icon)" />
                 </b-tooltip>
-              </a>
+              </router-link>
             </b-table-column>
             <b-table-column
               cell-class="is-vcentered"
