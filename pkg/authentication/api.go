@@ -38,7 +38,7 @@ func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
       c.Status(http.StatusBadRequest)
       return
     } else {
-      token, _ := jwt.Parse(refreshToken, rc.refreshTokenSecretSender)
+      token, _ := jwt.Parse(refreshToken, rc.service.RefreshTokenSecretSender)
       _, ok := token.Claims.(jwt.MapClaims)
   
       if ok {
@@ -68,7 +68,7 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
       c.AbortWithStatus(http.StatusBadRequest)
     } else {
 
-      token, _ := jwt.Parse(refreshToken, rc.refreshTokenSecretSender)
+      token, _ := jwt.Parse(refreshToken, rc.service.RefreshTokenSecretSender)
       _, ok := token.Claims.(jwt.MapClaims)
 
       if ok {
@@ -80,7 +80,7 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
           //Authorizationヘッダーからstring型のトークンを取得
           tokenString := c.GetHeader("Authorization")
           //トークンの改竄と期限を検証
-          token, _ := jwt.Parse(tokenString, rc.accessTokenSecretSender)
+          token, _ := jwt.Parse(tokenString, rc.service.AccessTokenSecretSender)
           //claimsを辞書型として取得
           claims, ok := token.Claims.(jwt.MapClaims)
       
@@ -118,14 +118,4 @@ func (rc *resource) RevokeHandler() gin.HandlerFunc {
     c.SetCookie("refresh_token", "", 0, "/", "", false, true)
     c.Header("Authorization", "")
   }
-}
-
-//パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
-func (rc *resource) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return rc.refreshTokenSecret, nil
-}
-
-//パース関数にアクセストークン用秘密鍵を渡すコールバック
-func (rc *resource) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return rc.accessTokenSecret, nil
 }

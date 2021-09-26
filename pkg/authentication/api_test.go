@@ -37,7 +37,7 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5, &FakeAuthorizationService{})
+  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
@@ -73,7 +73,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5, &FakeAuthorizationService{})
+  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -131,7 +131,7 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5, nil)
+  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -165,7 +165,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5, nil)
+  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -248,32 +248,4 @@ func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
   }
   return header
 }
-
-
-type FakeAuthorizationService struct {
-  repository interface{}
-}
-
-func (as *FakeAuthorizationService) New(args ...interface{}) (string, string) { 
-  return "", ""
-}
-
-func (as *FakeAuthorizationService) Refresh(refreshToken string) string {
-    sender :=  func (token *jwt.Token) (interface{}, error) {
-      return "secret_key_for_refresh", nil
-    }
-    token, _ := jwt.Parse(refreshToken, sender)
-    claims, _ := token.Claims.(jwt.MapClaims)
-
-    expiration := time.Now()
-    expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)
-
-    claims["exp"] = expiration.Unix()
-    newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
-    // Sign and get the complete encoded token as a string using the secret
-    newTokenString, _ := newToken.SignedString([]byte("secret_key_for_refresh"))
-
-    return newTokenString
-}
-
 
