@@ -12,7 +12,7 @@ const (
 )
 
 
-func calcYears2SecondsConversion(nyears int) time.Date {
+func calcYears2SecondsConversion(nyears int) time.Duration {
   return time.Duration(nyears * ndaysPerYear * nhoursPerDay) * time.Hour
 }
 

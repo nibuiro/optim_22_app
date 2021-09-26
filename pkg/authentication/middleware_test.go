@@ -54,7 +54,8 @@ func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
   
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 157680000, nil)
+  jwtExpiration := calcYears2SecondsConversion(5)
+  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   router.Use(auth.ValidateAccessToken())
 
 

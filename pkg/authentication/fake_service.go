@@ -1,6 +1,26 @@
 package authentication
 
 
+/*
+ *
+ *
+ *  これはfake serviceです。
+ *
+ *
+ */
+import (
+  "context"
+  "time"
+  "github.com/golang-jwt/jwt/v4"
+)
+
+
+type credential struct {
+  email    string `json:"email"`
+  password string `json:"password"`
+}
+
+
 type Service interface {
   Refresh(refreshToken string) (string, error)
   RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
@@ -11,13 +31,18 @@ type Service interface {
 
 
 type service struct {
-  repo   Repository
-  logger log.Logger
+  //repo   Repository
+  //logger log.Logger
 }
 
-//新たなauthenticationサービスを作成
-func NewService(repo Repository, logger log.Logger) Service {
-  return service{repo, logger}
+////新たなauthenticationサービスを作成
+//func NewService(repo Repository, logger log.Logger) Service {
+//  return service{repo, logger}
+//}
+
+
+func NewService() Service {
+  return service{}
 }
 
 
@@ -42,13 +67,13 @@ func (s service) Refresh(refreshToken string) (string, error) {
 
 func (s service) ValidateCredential(ctx context.Context, req credential) (int, error) {
   //リクエストの値を検証
-  return 0, err
+  return 0, nil
 }
 
 
 func (s service) GenerateTokens(ctx context.Context, userID int) (string, string, error) {
   //トークンを生成
-  return "", "", err
+  return "", "", nil
 }
 
 //パース関数にリフレッシュトークン用秘密鍵を渡すコールバック

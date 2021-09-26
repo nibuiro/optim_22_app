@@ -7,14 +7,14 @@ import (
   "github.com/golang-jwt/jwt/v4"
 )
 
-func (auth *Authorizer) ValidateAccessToken() gin.HandlerFunc {
+func (rc *resource) ValidateAccessToken() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     //Authorizationヘッダーからstring型のトークンを取得
   	tokenString := c.GetHeader("Authorization")
   	//トークンの改竄と期限を検証
   	//tips: expキーがない場合無期限トークンとして扱われ、token.Validの値はtrue
-    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, rc.service.AccessTokenSecretSender)
     //辞書型に変換
     _, ok := token.Claims.(jwt.MapClaims)
     //claims, ok := token.Claims.(jwt.MapClaims)

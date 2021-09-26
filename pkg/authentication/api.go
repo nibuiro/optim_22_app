@@ -19,9 +19,9 @@ type resource struct {
 }
 
 
-func New(service Service, domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int, authorizationService AuthorizationService) *resource {
+func New(service Service, domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration time.Duration, accessTokenExpiration time.Duration) *resource {
   return &resource{
-    service: service
+    service: service,
     domain: domain,
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
@@ -120,29 +120,66 @@ func (rc resource) GetRefreshTokenAndAccessToken() gin.HandlerFunc {
   
     //BodyからJSONをパースして読み取る
     if err := c.BindJSON(&input); err != nil {
-      rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
       return
     }  
     
     userID, err := rc.service.ValidateCredential(c.Request.Context(), input)
     if err != nil {
-      rc.logger.Error(err)
       c.Status(http.StatusUnauthorized)
       return 
     } else {
       //資格情報確認及び認証情報取得
-      refreshToken, accessToken, err := rc.service.GenerateTokens(userID)
+      refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), userID)
       if err != nil {
         c.Status(http.StatusInternalServerError)
-        return err
+        return 
       }
       //#region ヘッダに認証情報を付加
       c.Header("Authorization", accessToken)
       c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.domain, false, true)
       c.Status(http.StatusCreated)
       //#endregion
-      return nil
+      return 
+    }
+  }
+}
+
+
+func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
+  return func(c *gin.Context) {
+
+    refreshToken, err := c.Cookie("refresh_token")
+
+    if err != nil {
+      c.Status(http.StatusBadRequest)
+      return
+    } else {
+
+      token, _ := jwt.Parse(refreshToken, rc.service.RefreshTokenSecretSender)
+      claims, ok := token.Claims.(jwt.MapClaims)
+  
+      if ok {
+        if token.Valid {
+          //資格情報確認及び認証情報取得
+          refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), claims["userID"].(int))
+          if err != nil {
+            return 
+          }
+          //#region ヘッダに認証情報を付加
+          c.Header("Authorization", accessToken)
+          c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.domain, false, true)
+          c.Status(http.StatusCreated)
+          //#endregion
+          return 
+        } else {
+          c.Status(http.StatusUnauthorized)
+          return
+        }
+      } else {
+        c.Status(http.StatusBadRequest)
+        return
+      }
     }
   }
 }

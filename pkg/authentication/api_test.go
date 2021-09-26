@@ -4,7 +4,6 @@ import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
-  "time"
   "github.com/golang-jwt/jwt/v4"
   "optim_22_app/internal/pkg/test"
   "net/http/httptest"
@@ -37,7 +36,8 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
+  jwtExpiration := calcYears2SecondsConversion(5)
+  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
@@ -73,7 +73,8 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
+  jwtExpiration := calcYears2SecondsConversion(5)
+  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -116,7 +117,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
     cookie, _  := onlyCookiePacket.Cookie("refresh_token") //("access_token", _) :=
     tokenString := cookie.Value
 
-    token, _ := jwt.Parse(tokenString, auth.refreshTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, auth.service.RefreshTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -131,7 +132,8 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
+  jwtExpiration := calcYears2SecondsConversion(5)
+  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -165,7 +167,8 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, 5)
+  jwtExpiration := calcYears2SecondsConversion(5)
+  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -205,7 +208,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
     //#region BodyからJWTをパースし有効期限内であることを検証
     tokenString := res.HeaderMap["Authorization"][0]
 
-    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, auth.service.AccessTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
