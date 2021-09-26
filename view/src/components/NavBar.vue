@@ -9,7 +9,7 @@
       </b-navbar-item>
     </template>
     <template #start>
-      <b-navbar-item href="#">
+      <b-navbar-item href="/">
         Home
       </b-navbar-item>
       <b-navbar-dropdown label="Info">
