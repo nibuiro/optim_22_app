@@ -27,17 +27,19 @@ type authInterface struct {
   domain string
   refreshTokenSecret []byte
   accessTokenSecret []byte
-  validityPeriod time.Duration
+  refreshTokenExpiration time.Duration
+  accessTokenExpiration time.Duration
   authorizationService AuthorizationService
 }
 
 
-func New(domain string, refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService AuthorizationService) *authInterface {
+func New(domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int, authorizationService AuthorizationService) *authInterface {
   return &authInterface{
     domain: domain,
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
-    validityPeriod: time.Duration(validityPeriod * ndaysPerYear * nhoursPerDay) * time.Hour,
+    refreshTokenExpiration: time.Duration(refreshTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
+    accessTokenExpiration: time.Duration(accessTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
     authorizationService: authorizationService,
   }
 }
@@ -101,7 +103,7 @@ func (auth *authInterface) AccessTokenRefreshHandler() gin.HandlerFunc {
       
           if ok {
             expiration := time.Now()
-            expiration = expiration.Add(auth.validityPeriod)
+            expiration = expiration.Add(auth.accessTokenExpiration)
 
             claims["exp"] = expiration.Unix()
             newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
