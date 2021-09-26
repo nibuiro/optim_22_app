@@ -49,7 +49,8 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
     refreshToken, err := c.Cookie("refresh_token")
 
     if err != nil {
-      c.AbortWithStatus(http.StatusBadRequest)
+      c.Status(http.StatusBadRequest)
+      return
     } else {
 
       token, _ := jwt.Parse(refreshToken, auth.refreshTokenSecretSender)
@@ -60,12 +61,13 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
           newRefreshToken := auth.authorizationService.Refresh(refreshToken)
           c.SetCookie("refresh_token", newRefreshToken, 1, "/", auth.domain, false, true)
             //func (c *Context) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
-
         } else {
-          c.AbortWithStatus(http.StatusUnauthorized)
+          c.Status(http.StatusUnauthorized)
+          return
         }
       } else {
-        c.AbortWithStatus(http.StatusBadRequest)
+        c.Status(http.StatusBadRequest)
+        return
       }
     }
   }
@@ -109,16 +111,17 @@ func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
 
             c.Status(http.StatusOK)
           } else {
-            c.AbortWithStatus(http.StatusBadRequest)
+            c.Status(http.StatusBadRequest)
+            return
           }
-
           //#endregion
         } else {
-          
-          c.AbortWithStatus(http.StatusUnauthorized)
+          c.Status(http.StatusUnauthorized)
+          return
         }
       } else {
-        c.AbortWithStatus(http.StatusBadRequest)
+        c.Status(http.StatusBadRequest)
+        return
       }
     }
   }
