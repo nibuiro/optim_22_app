@@ -23,7 +23,7 @@ type AuthorizationService interface {
 }
 
 
-type Authorizer struct {
+type authInterface struct {
   domain string
   refreshTokenSecret []byte
   accessTokenSecret []byte
@@ -32,8 +32,8 @@ type Authorizer struct {
 }
 
 
-func New(domain string, refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService AuthorizationService) *Authorizer {
-  return &Authorizer{
+func New(domain string, refreshTokenSecret string, accessTokenSecret string, validityPeriod int, authorizationService AuthorizationService) *authInterface {
+  return &authInterface{
     domain: domain,
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
@@ -43,7 +43,7 @@ func New(domain string, refreshTokenSecret string, accessTokenSecret string, val
 }
 
 
-func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
+func (auth *authInterface) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     refreshToken, err := c.Cookie("refresh_token")
@@ -74,7 +74,7 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
 }
 
 //リフレッシュトークンが有効期限内のとき任意のアクセストークンの有効期限を延長
-func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
+func (auth *authInterface) AccessTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     refreshToken, err := c.Cookie("refresh_token")
@@ -128,7 +128,7 @@ func (auth *Authorizer) AccessTokenRefreshHandler() gin.HandlerFunc {
 }
 
 //認証情報を空文字列で上書き
-func (auth *Authorizer) RevokeHandler() gin.HandlerFunc {
+func (auth *authInterface) RevokeHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
     c.SetCookie("refresh_token", "", 0, "/", "", false, true)
     c.Header("Authorization", "")
@@ -136,11 +136,11 @@ func (auth *Authorizer) RevokeHandler() gin.HandlerFunc {
 }
 
 //パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
-func (auth *Authorizer) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
+func (auth *authInterface) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
   return auth.refreshTokenSecret, nil
 }
 
 //パース関数にアクセストークン用秘密鍵を渡すコールバック
-func (auth *Authorizer) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
+func (auth *authInterface) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
   return auth.accessTokenSecret, nil
 }
