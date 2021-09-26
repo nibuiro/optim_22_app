@@ -25,8 +25,8 @@ type Service interface {
   Refresh(refreshToken string) (string, error)
   RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
   AccessTokenSecretSender(token *jwt.Token) (interface{}, error)
-  ValidateCredential(ctx context.Context, req credential) (int, error)
-  GenerateTokens(ctx context.Context, userID int) (string, string, error)
+  ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error)
+  GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error)
 }
 
 
@@ -65,13 +65,16 @@ func (s service) Refresh(refreshToken string) (string, error) {
 }
 
 
-func (s service) ValidateCredential(ctx context.Context, req credential) (int, error) {
+func (s service) ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error) {
   //リクエストの値を検証
-  return 0, nil
+  claims := map[string]interface{}{
+    "userID": 0,
+  }
+  return claims, nil
 }
 
 
-func (s service) GenerateTokens(ctx context.Context, userID int) (string, string, error) {
+func (s service) GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error) {
   //トークンを生成
   return "", "", nil
 }

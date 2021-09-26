@@ -28,7 +28,7 @@ func (m credential) Validate() error {
 
 type Service interface {
   ValidateCredential(ctx context.Context, req credential) (int, error)
-  GenerateTokens(ctx context.Context, userID int) (string, string, error)
+  GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error)
 }
 
 
@@ -38,7 +38,7 @@ type service struct {
 }
 
 
-func (s service) ValidateCredential(ctx context.Context, req credential) (int, error) {
+func (s service) ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     s.logger.Error(err)
@@ -56,11 +56,16 @@ func (s service) ValidateCredential(ctx context.Context, req credential) (int, e
   if userId, err := s.repo.GetUserIdByCredential(ctx, filter); err != nil {
     return 0, err
   } else {
-    return userId, nil
+    claims := map[string]interface{}{
+      "userID": userId,
+    }
+    return claims, nil
   }
 }
 
-func (s service) GenerateTokens(ctx context.Context, userID int) (string, string, error) {
+func (s service) GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error) {
+
+  userID := claims["userID"].(int)
 
   claims := map[string]interface{}{
     "userid": userID,

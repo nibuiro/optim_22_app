@@ -124,13 +124,14 @@ func (rc resource) GetRefreshTokenAndAccessToken() gin.HandlerFunc {
       return
     }  
     
-    userID, err := rc.service.ValidateCredential(c.Request.Context(), input)
+    //資格情報の確認後、トークン生成に必要な情報を返す
+    res, err := rc.service.ValidateCredential(c.Request.Context(), input)
     if err != nil {
       c.Status(http.StatusUnauthorized)
       return 
     } else {
       //資格情報確認及び認証情報取得
-      refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), userID)
+      refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), res)
       if err != nil {
         c.Status(http.StatusInternalServerError)
         return 
@@ -162,7 +163,7 @@ func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
       if ok {
         if token.Valid {
           //資格情報確認及び認証情報取得
-          refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), claims["userID"].(int))
+          refreshToken, accessToken, err := rc.service.GenerateTokens(c.Request.Context(), claims)
           if err != nil {
             return 
           }
