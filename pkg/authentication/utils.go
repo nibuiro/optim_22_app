@@ -1,9 +1,21 @@
 package authentication
 
 import (
+  "time"
   "github.com/golang-jwt/jwt/v4"
-//  "fmt"
 )
+
+
+const (
+  ndaysPerYear = 365
+  nhoursPerDay = 24
+)
+
+
+func calcYears2SecondsConversion(nyears int) time.Date {
+  return time.Duration(nyears * ndaysPerYear * nhoursPerDay) * time.Hour
+}
+
 
 func NewToken(claims map[string]interface{}, secret string) (string, error) {
   var jwtClaims jwt.MapClaims
