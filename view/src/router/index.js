@@ -13,7 +13,7 @@ export default new Router({
             component: HomePage
         },
         {
-            path: '/users/:userid',
+            path: '/user/:user_id',
             name: 'MyPage',
             component: MyPage
         }
