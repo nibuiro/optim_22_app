@@ -15,21 +15,13 @@ const (
 )
 
 
-type AuthorizationService interface {
-  //リフレッシュトークンとアクセストークンを返す
-  New(args ...interface{}) (string, string)
-  //リフレッシュトークンのリフレッシュ
-  Refresh(refreshToken string) string
-}
-
-
 type authInterface struct {
   domain string
   refreshTokenSecret []byte
   accessTokenSecret []byte
   refreshTokenExpiration time.Duration
   accessTokenExpiration time.Duration
-  authorizationService AuthorizationService
+  service Service
 }
 
 
@@ -40,7 +32,6 @@ func New(domain string, refreshTokenSecret string, accessTokenSecret string, ref
     accessTokenSecret: []byte(accessTokenSecret), 
     refreshTokenExpiration: time.Duration(refreshTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
     accessTokenExpiration: time.Duration(accessTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
-    authorizationService: authorizationService,
   }
 }
 
@@ -48,19 +39,16 @@ func New(domain string, refreshTokenSecret string, accessTokenSecret string, ref
 func (auth *authInterface) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    refreshToken, err := c.Cookie("refresh_token")
-
-    if err != nil {
+    if refreshToken, err := c.Cookie("refresh_token"); err != nil {
       c.Status(http.StatusBadRequest)
       return
     } else {
-
       token, _ := jwt.Parse(refreshToken, auth.refreshTokenSecretSender)
       _, ok := token.Claims.(jwt.MapClaims)
   
       if ok {
         if token.Valid {
-          newRefreshToken := auth.authorizationService.Refresh(refreshToken)
+          newRefreshToken, _ := auth.service.Refresh(refreshToken)
           c.SetCookie("refresh_token", newRefreshToken, 1, "/", auth.domain, false, true)
             //func (c *Context) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
         } else {
