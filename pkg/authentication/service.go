@@ -6,6 +6,7 @@ type Service interface {
   RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
   AccessTokenSecretSender(token *jwt.Token) (interface{}, error)
   ValidateCredential(ctx context.Context, req credential) (int, error)
+  GenerateTokens(ctx context.Context, userID int) (string, string, error)
 }
 
 
@@ -42,6 +43,12 @@ func (s service) Refresh(refreshToken string) (string, error) {
 func (s service) ValidateCredential(ctx context.Context, req credential) (int, error) {
   //リクエストの値を検証
   return 0, err
+}
+
+
+func (s service) GenerateTokens(ctx context.Context, userID int) (string, string, error) {
+  //トークンを生成
+  return "", "", err
 }
 
 //パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
