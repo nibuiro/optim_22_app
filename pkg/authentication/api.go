@@ -9,29 +9,24 @@ import (
 )
 
 
-const (
-  ndaysPerYear = 365
-  nhoursPerDay = 24
-)
-
-
 type authInterface struct {
+  service Service
   domain string
   refreshTokenSecret []byte
   accessTokenSecret []byte
   refreshTokenExpiration time.Duration
   accessTokenExpiration time.Duration
-  service Service
 }
 
 
-func New(domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int, authorizationService AuthorizationService) *authInterface {
+func New(service Service, domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int, authorizationService AuthorizationService) *authInterface {
   return &authInterface{
+    service: service
     domain: domain,
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
-    refreshTokenExpiration: time.Duration(refreshTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
-    accessTokenExpiration: time.Duration(accessTokenExpiration * ndaysPerYear * nhoursPerDay) * time.Hour,
+    refreshTokenExpiration: refreshTokenExpiration,
+    accessTokenExpiration: accessTokenExpiration,
   }
 }
 
