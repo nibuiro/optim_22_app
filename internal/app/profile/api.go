@@ -5,22 +5,20 @@ import (
   "net/http"
   "encoding/json"
   "optim_22_app/pkg/log"
-  "optim_22_app/internal/pkg/config"
  // "optim_22_app/internal/pkg/utils"
 
 )
 
 //プロフィール操作の依存関係
 type resource struct {
-  config *config.Config
   service Service
   logger  log.Logger
 }
 
 //プロフィール操作についてエンドポイントを登録
-func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service, logger log.Logger) {
+func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
 
-  rc := resource{config, service, logger}
+  rc := resource{service, logger}
 
   //取得
   r.GET("/api/profile/:userID", rc.get())
