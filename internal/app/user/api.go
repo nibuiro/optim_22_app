@@ -20,14 +20,14 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   rc := resource{service, logger}
 
   //登録する
-  r.POST("/api/user", rc.create())
+  r.POST("/api/user", rc.post())
   //退会する
   r.DELETE("/api/user", rc.delete())
 
 }
 
 
-func (rc resource) create() gin.HandlerFunc {
+func (rc resource) post() gin.HandlerFunc {
   return func(c *gin.Context) {
     var input RegistrationInformation
   
