@@ -91,9 +91,14 @@
           sortable
           v-slot="props"
         >
-          <a href="">
+          <router-link
+            :to="{
+              name: 'RequestPage',
+              params: { request_id: props.row.requestid }
+            }"
+          >
             {{ props.row.request }}
-          </a>
+          </router-link>
         </b-table-column>
         <b-table-column
           cell-class="is-vcentered"
