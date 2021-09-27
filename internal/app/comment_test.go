@@ -3,7 +3,7 @@ package comment
 import (
 //  "context"
   "net/http"
-  "os"
+  //"os"
   "testing"
   "regexp"
   "github.com/gin-gonic/gin"
@@ -14,7 +14,6 @@ import (
   "optim_22_app/pkg/log"
  // "optim_22_app/typefile"
   "optim_22_app/internal/app/comment"
-  "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/pkg/test/v2"
 )
 
@@ -34,13 +33,6 @@ func (suite *CommentFuncIntegrationTestSuite) SetupTest() {
 
   logger := log.New()
   suite.logger = logger
-  
-  // load application configurations
-  cfg, err := config.Load("/go/src/configs/app.yaml", logger)
-  if err != nil {
-    logger.Errorf("failed to load application configuration: %s", err)
-    os.Exit(-1)
-  }
 
   db, mock, _ := sqlmock.New()
   suite.mock = mock
@@ -56,7 +48,7 @@ func (suite *CommentFuncIntegrationTestSuite) SetupTest() {
   commentService := comment.NewService(commentRepository, logger)
 
   router := gin.New()
-  comment.RegisterHandlers(router.Group(""), cfg, commentService, logger)
+  comment.RegisterHandlers(router.Group(""), commentService, logger)
   suite.router = router
 }
 

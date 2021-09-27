@@ -9,6 +9,8 @@ import (
 
 //Configは、アプリケーションの設定を表す
 type Config struct {
+  //サーバのドメイン
+  Domain string `yaml:"domain"`
   //サーバーのポート
   ServerPort int `yaml:"server_port"`
   // データベースに接続するためのデータソース名(DSN)

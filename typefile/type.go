@@ -3,9 +3,15 @@
 // Winnerが必要になるかもしれない
 package typefile
 
+import (
+	"time"
+)
+
 type User struct{
-	ID             int            `gorm:"primaryKey"`
+  ID        int           `gorm:"primaryKey"`
 	Name           string         `gorm:"not null"`
+	Email       string         `gorm:"not null"`  
+	Password       string         `gorm:"not null"`     
 }
 
 type Client struct{
@@ -30,4 +36,14 @@ type Request struct{
 	Content        string         `gorm:"not null"`
 	Winner         Winner
 	Finish         bool           `gorm:"not null"`
+}
+
+type Comment struct {
+  Id         int                 `gorm:"primaryKey"`
+  RequestID  int                 `gorm:"not null"`
+  UserID     int                 `gorm:"not null"`
+  Date       time.Time           `gorm:"not null"`
+  Title      string    
+  Body       string    
+  ReplyID    int       
 }
