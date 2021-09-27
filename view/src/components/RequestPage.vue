@@ -5,7 +5,7 @@
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute;"
-        :label="request.detail"
+        :label="`${request.client.username}からの依頼です！`"
         type="is-light"
         position="is-right"
         always
@@ -23,7 +23,96 @@
       </div>
     </section>
     <section class="mb-3">
-      a
+      <b-tabs type="is-boxed">
+        <b-tab-item>
+          <template #header>
+            <b-icon icon="account-question-outline"></b-icon>
+            <span>
+              依頼内容
+            </span>
+          </template>
+          <div class="content">
+            <ul :request="request">
+              <li>
+                依頼日時：
+                {{
+                  `${new Date(request.date).toLocaleDateString()}
+                   ${new Date(request.date).toLocaleTimeString()}`
+                }}
+                <b-tag
+                  :type="
+                    request.accepting === true ? 'is-success' : 'is-danger'
+                  "
+                >
+                  {{ request.accepting === true ? "受付中" : "終了" }}
+                </b-tag>
+              </li>
+              <li>
+                <div class="is-flex is-align-items-center">
+                  依頼者　：
+                  <router-link
+                    class="is-flex is-align-items-center"
+                    :to="{
+                      name: 'MyPage',
+                      params: { user_id: request.client.userid }
+                    }"
+                  >
+                    <b-tooltip :label="request.client.username">
+                      <div :style="iconStyle(32, request.client.icon)" />
+                    </b-tooltip>
+                    {{ request.client.username }}
+                  </router-link>
+                </div>
+              </li>
+              <li>
+                <div class="is-flex is-align-items-center">
+                  参加者　：
+                  <router-link
+                    class="is-flex is-align-items-center mr-3"
+                    v-for="engineer in request.engineers"
+                    :key="engineer.userid"
+                    :to="{
+                      name: 'MyPage',
+                      params: { user_id: engineer.userid }
+                    }"
+                  >
+                    <b-tooltip :label="engineer.username">
+                      <div :style="iconStyle(32, engineer.icon)" />
+                    </b-tooltip>
+                    {{ engineer.username }}
+                  </router-link>
+                </div>
+              </li>
+              <li>依頼内容：{{ request.detail }}</li>
+              <li>
+                提出物　：
+                <router-link
+                  class="mr-3"
+                  v-for="submission in request.submissions"
+                  :key="submission.submissionid"
+                  :to="{
+                    name: 'MyPage',
+                    params: { user_id: submission.submissionid }
+                  }"
+                >
+                  {{ submission.engineer.username }}による提出
+                </router-link>
+              </li>
+            </ul>
+          </div>
+        </b-tab-item>
+        <b-tab-item>
+          <template #header>
+            <b-icon icon="forum-outline"></b-icon>
+            <span>
+              ディスカッション
+            </span>
+          </template>
+          <div class="content">
+            ここにディスカッションが表示されます。
+          </div>
+        </b-tab-item>
+      </b-tabs>
     </section>
   </div>
 </template>
