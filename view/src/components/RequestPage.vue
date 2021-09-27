@@ -47,6 +47,8 @@
                   {{ request.accepting === true ? "受付中" : "終了" }}
                 </b-tag>
               </li>
+              <li>依頼名　：{{ request.request }}</li>
+              <li>依頼内容：{{ request.detail }}</li>
               <li>
                 <div class="is-flex is-align-items-center">
                   依頼者　：
@@ -83,7 +85,6 @@
                   </router-link>
                 </div>
               </li>
-              <li>依頼内容：{{ request.detail }}</li>
               <li>
                 提出物　：
                 <router-link
