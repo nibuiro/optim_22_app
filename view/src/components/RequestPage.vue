@@ -5,7 +5,7 @@
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute;"
-        :label="`${request.client.username}からの依頼です！`"
+        :label="request.request"
         type="is-light"
         position="is-right"
         always
@@ -17,9 +17,9 @@
       </b-tooltip>
       <div class="hero-body is-flex pt-0 pb-5">
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
-          {{ request.request }}
+          {{ request.client.username }}さんの依頼
         </p>
-        <request-form class="is-light ml-auto mt-5" :profile="request" />
+        <request-form class="is-light ml-auto mt-5" :request="request" />
       </div>
     </section>
     <section class="mb-3">
