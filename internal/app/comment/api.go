@@ -6,7 +6,6 @@ import (
   "encoding/json"
   "github.com/gin-gonic/gin"
   "optim_22_app/pkg/log"
-  "optim_22_app/internal/pkg/config"
   "errors"
  // b64 "encoding/base64"
 //  "optim_22_app/internal/pkg/utils"
@@ -15,15 +14,14 @@ import (
 
 //コメント操作の依存関係
 type resource struct {
-  config *config.Config
   service Service
   logger  log.Logger
 }
 
 //コメント操作についてエンドポイントを登録
-func RegisterHandlers(r *gin.RouterGroup, config *config.Config, service Service, logger log.Logger) {
+func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
 
-  rc := resource{config, service, logger}
+  rc := resource{service, logger}
 
   //ディスカッション ID(:requestID) のコメント一覧を取得
   r.GET("/api/discussion/:requestID", rc.get())

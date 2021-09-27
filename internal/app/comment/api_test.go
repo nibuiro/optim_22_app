@@ -6,7 +6,6 @@ import (
   "github.com/gin-gonic/gin"
   "optim_22_app/internal/pkg/test"
   "optim_22_app/pkg/log"
-  "optim_22_app/internal/pkg/config"
 )
   
 /* 
@@ -17,10 +16,9 @@ func TestGetComments(t *testing.T) {
 
   logger := log.New()
   router := gin.New()
-  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
+  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {
@@ -80,10 +78,9 @@ func TestPostComment(t *testing.T) {
 
   logger := log.New()
   router := gin.New()
-  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
+  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {
@@ -106,10 +103,9 @@ func TestDeleteComment(t *testing.T) {
 
   logger := log.New()
   router := gin.New()
-  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), cfg, NewServiceStub(repo), logger)
+  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {
