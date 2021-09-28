@@ -67,7 +67,7 @@ func (s service) GenerateTokens(ctx context.Context, claims map[string]interface
 
   userID := claims["userID"].(int)
 
-  expiration := authentication.calcYears2SecondsConversion(s.config.refreshTokenExpiration)
+  expiration := authentication.CalcYears2SecondsConversion(s.config.refreshTokenExpiration)
   expiration = time.Now().Add(expiration)
 
   claims := map[string]interface{}{

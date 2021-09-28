@@ -36,7 +36,7 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := calcYears2SecondsConversion(5)
+  jwtExpiration := CalcYears2SecondsConversion(5)
   auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
@@ -73,7 +73,7 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := calcYears2SecondsConversion(5)
+  jwtExpiration := CalcYears2SecondsConversion(5)
   auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
@@ -132,7 +132,7 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := calcYears2SecondsConversion(5)
+  jwtExpiration := CalcYears2SecondsConversion(5)
   auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
@@ -167,7 +167,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := calcYears2SecondsConversion(5)
+  jwtExpiration := CalcYears2SecondsConversion(5)
   auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
