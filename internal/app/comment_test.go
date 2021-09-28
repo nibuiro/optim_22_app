@@ -70,7 +70,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
       suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`INSERT INTO "comments" ("request_id","user_id","date","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
+        regexp.QuoteMeta(`INSERT INTO "comments" ("created_at","request_id","user_id","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
@@ -82,7 +82,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
         Method: "POST", 
         URL: "/api/discussion/1", //requestID
         Header: nil, 
-        Body: `{"userID":1, "requestID":1, "date":"2016-04-13T14:12:53.4242+05:30", "title":"test", "body":"test", "replyID":1}`,
+        Body: `{"userID":1, "requestID":1, "title":"test", "body":"test", "replyID":1}`,
         WantStatus: http.StatusCreated, 
         WantResponse: "",
       }
@@ -98,7 +98,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
      // suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`SELECT comments.ID, comments.RequestID, comments.UserID, user.Name, comments.Date, comments.Title, comments.Body, comments.ReplyID FROM "comments" INNER JOIN "user" ON comments.userID = user.ID WHERE comments.RequestID = $1`),
+        regexp.QuoteMeta(`SELECT comments.ID, comments.RequestID, comments.UserID, user.Name, comments.CreatedAt, comments.Title, comments.Body, comments.ReplyID FROM "comments" INNER JOIN "user" ON comments.userID = user.ID WHERE comments.RequestID = $1`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()

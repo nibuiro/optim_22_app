@@ -39,10 +39,10 @@ type Request struct{
 }
 
 type Comment struct {
+  CreatedAt  time.Time
   Id         int                 `gorm:"primaryKey"`
   RequestID  int                 `gorm:"not null"`
   UserID     int                 `gorm:"not null"`
-  Date       time.Time           `gorm:"not null"`
   Title      string    
   Body       string    
   ReplyID    int       

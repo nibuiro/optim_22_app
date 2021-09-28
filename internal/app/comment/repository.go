@@ -34,7 +34,7 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
   var comments []comment
   result := r.db.WithContext(ctx).
     Model(&typefile.Comment{}).
-    Select("comments.ID, comments.RequestID, comments.UserID, user.Name, comments.Date, comments.Title, comments.Body, comments.ReplyID").
+    Select("comments.ID, comments.RequestID, comments.UserID, user.Name, comments.CreatedAt, comments.Title, comments.Body, comments.ReplyID").
     Joins("INNER JOIN \"user\" ON comments.userID = user.ID").
     Where("comments.RequestID = ?", requestID).
     Scan(&comments)

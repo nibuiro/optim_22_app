@@ -3,7 +3,6 @@ package comment
 import (
   "context"
   "errors"
-  "time"
   "optim_22_app/pkg/log"
 )
 
@@ -27,13 +26,11 @@ func (s serviceStub) Get(ctx context.Context, req string) ([]comment, error) {
 
   if "1" == req {
     res := make([]comment, 1)    
-    t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
     res[0] = comment{
       Id: 1,
       RequestID: 1,
       UserID: 1,
       UserName: "テスト一郎",
-      Date: t1,
       Title: "test",
       Body: "test",
       ReplyID: 0,
@@ -43,14 +40,11 @@ func (s serviceStub) Get(ctx context.Context, req string) ([]comment, error) {
 
   if "3" == req {
     res := make([]comment, 2)
-    t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
-    t2, _ := time.Parse(time.RFC3339, "2017-04-13T14:12:53.4242+05:30")
     res[0] = comment{
       Id: 1,
       RequestID: 1,
       UserID: 1,
       UserName: "テスト一郎",
-      Date: t1,
       Title: "test",
       Body: "test",
       ReplyID: 0,
@@ -60,7 +54,6 @@ func (s serviceStub) Get(ctx context.Context, req string) ([]comment, error) {
       RequestID: 1,
       UserID: 3,
       UserName: "テスト三郎",
-      Date: t2,
       Title: "test",
       Body: "test",
       ReplyID: 0,

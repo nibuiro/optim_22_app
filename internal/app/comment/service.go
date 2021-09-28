@@ -104,7 +104,6 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
   insertValues := typefile.Comment{
     RequestID: requestIDAsInt,
     UserID:    req.UserID,
-    Date:      req.Date,
     Title:     req.Title,
     Body:      req.Body,
     ReplyID:   req.ReplyID,
@@ -132,7 +131,6 @@ func (s service) Patch(ctx context.Context, req comment, requestID string) error
   insertValues := typefile.Comment{
     RequestID: requestIDAsInt,
     UserID:    req.UserID,
-    Date:      req.Date,
     Title:     req.Title,
     Body:      req.Body,
     ReplyID:   req.ReplyID,

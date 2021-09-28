@@ -10,7 +10,6 @@ import (
   "gorm.io/gorm"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
-  "time"
 
 )
 
@@ -55,16 +54,14 @@ func (suite *CommentRepositoryTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(newId)
       suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`INSERT INTO "comments" ("request_id","user_id","date","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
+        regexp.QuoteMeta(`INSERT INTO "comments" ("created_at","request_id","user_id","title","body","reply_id") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "id"`),
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
 
-      t1, _ := time.Parse(time.RFC3339, "2016-04-13T14:12:53.4242+05:30")
       insertValues := &typefile.Comment{
         RequestID: 1,
         UserID: 1,
-        Date: t1,
         Title: "test",
         Body: "test",
         ReplyID: 0,
@@ -83,7 +80,7 @@ func (suite *CommentRepositoryTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(requestID)
       //suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`SELECT comments.ID, comments.RequestID, comments.UserID, user.Name, comments.Date, comments.Title, comments.Body, comments.ReplyID FROM "comments" INNER JOIN "user" ON comments.userID = user.ID WHERE comments.RequestID = $1`),
+        regexp.QuoteMeta(`SELECT comments.ID, comments.RequestID, comments.UserID, user.Name, comments.CreatedAt, comments.Title, comments.Body, comments.ReplyID FROM "comments" INNER JOIN "user" ON comments.userID = user.ID WHERE comments.RequestID = $1`),
       ).
       WillReturnRows(rows)
 
