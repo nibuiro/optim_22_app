@@ -9,7 +9,7 @@ import (
 
 
 type Repository interface {
-  GetUserIdByCredential(ctx context.Context, user *typefile.User) (int, error)
+  GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error)
 }
 
 
@@ -24,7 +24,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 }
 
 
-func (r repository) GetUserIdByCredential(ctx context.Context, credential typefile.User) (int, error) {
+func (r repository) GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error) {
   var userId int
   result := r.db.WithContext(ctx).
     Model(&typefile.User{}).

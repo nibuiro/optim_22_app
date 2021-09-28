@@ -10,11 +10,15 @@ import (
 //Configは、アプリケーションの設定を表す
 type Config struct {
   //サーバーのポート
-  ServerPort int `yaml:"server_port"`
+  ServerPort             int    `yaml:"server_port"`
   // データベースに接続するためのデータソース名(DSN)
-  DSN string `yaml:"dsn"`
+  DSN                    string `yaml:"dsn"`
+  //JWTの有効期限
+  RefreshTokenExpiration int `yaml:"refresh_token_expiration"`
+  AccessTokenExpiration  int `yaml:"access_token_expiration"`
   //JWTの署名キー
-  JWTSigningKey string `yaml:"jwt_signing_key"`
+  RefreshTokenSecretKey  string `yaml:"refresh_token_secret_key"`
+  AccessTokenSecretKey   string `yaml:"access_token_secret_key"`
 }
 
 //アプリケーションの設定を検証
@@ -22,7 +26,10 @@ func (c Config) Validate() error {
   return validation.ValidateStruct(&c,
     validation.Field(&c.ServerPort, validation.Required),
     validation.Field(&c.DSN, validation.Required),
-    validation.Field(&c.JWTSigningKey, validation.Required),
+    validation.Field(&c.RefreshTokenExpiration, validation.Required),
+    validation.Field(&c.AccessTokenExpiration, validation.Required),
+    validation.Field(&c.RefreshTokenSecretKey, validation.Required),
+    validation.Field(&c.AccessTokenSecretKey, validation.Required),
   )
 }
 

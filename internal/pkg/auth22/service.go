@@ -1,11 +1,15 @@
 package auth22
 
 import (
+  "time"
+  "regexp"
+  "github.com/go-ozzo/ozzo-validation/v4"
+  "github.com/golang-jwt/jwt/v4"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
-  "optim_22_app/typefile"
   "context"
   "optim_22_app/pkg/authentication"
+  "optim_22_app/internal/pkg/config"
 )
 
 
@@ -19,9 +23,9 @@ type credential struct {
 func (m credential) Validate() error {
   return validation.ValidateStruct(&m,
     //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
-    validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
+    validation.Field(&m.email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
     //is SHA256
-    validation.Field(&m.Password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+    validation.Field(&m.password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
   )
 }
 
@@ -33,6 +37,7 @@ type Service interface {
 
 
 type service struct {
+  config *config.Config
   repo   Repository
   logger log.Logger
 }
@@ -42,19 +47,18 @@ func (s service) ValidateCredential(ctx context.Context, req credential) (map[st
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     s.logger.Error(err)
-    return 0, err
+    return nil, err
   }
 
   //idを抽出するSQL構文のWhere句の値
-  filter = typefile.User{
-    Email: req.email
-    Password: req.password
+  filter := typefile.User{
+    Email: req.email,
+    Password: req.password,
   }
   
-  //資格情報の検証とユーザIDの取得
-  var userId int
-  if userId, err := s.repo.GetUserIdByCredential(ctx, filter); err != nil {
-    return 0, err
+  //資格情報の検証とユーザIDの取
+  if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
+    return nil, err
   } else {
     claims := map[string]interface{}{
       "userID": userId,
@@ -65,25 +69,26 @@ func (s service) ValidateCredential(ctx context.Context, req credential) (map[st
 
 func (s service) GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error) {
 
-  userID := claims["userID"].(int)
+  //userID := claims["userID"].(int)
 
-  expiration := authentication.CalcYears2SecondsConversion(s.config.refreshTokenExpiration)
-  expiration = time.Now().Add(expiration)
+  expiration := time.Now()
+  expiration = expiration.Add(authentication.CalcYears2SecondsConversion(s.config.RefreshTokenExpiration))
 
-  claims := map[string]interface{}{
-    "userid": userID,
-    "exp": expiration.Unix(),
-  }
+  claims["exp"] = expiration.Unix()
+  //:= map[string]interface{}{
+  //  "userid": userID,
+  //  "exp": expiration.Unix(),
+  //}
 
-  if refreshToken, err := authentication.NewToken(claims, s.config.refreshTokenSecretKey); err != nil {
+  if refreshToken, err := authentication.NewToken(claims, s.config.RefreshTokenSecretKey); err != nil {
     s.logger.Error(err)
     return "", "", err
   } else {
-    if accessToken, err := authentication.NewToken(claims, s.config.accessTokenSecretKey); err != nil {
+    if accessToken, err := authentication.NewToken(claims, s.config.AccessTokenSecretKey); err != nil {
       s.logger.Error(err)
       return "", "", err
     } else {
-      refreshToken, accessToken, nil
+      return refreshToken, accessToken, nil
     }
   }
  
@@ -91,10 +96,10 @@ func (s service) GenerateTokens(ctx context.Context, claims map[string]interface
 
 //パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
 func (s service) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return s.config.refreshTokenSecret, nil
+  return s.config.RefreshTokenSecretKey, nil
 }
 
 //パース関数にアクセストークン用秘密鍵を渡すコールバック
 func (s service) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return s.config.accessTokenSecret, nil
+  return s.config.AccessTokenSecretKey, nil
 }

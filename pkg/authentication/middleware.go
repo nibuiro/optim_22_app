@@ -5,7 +5,6 @@ import (
 //  "fmt"
   "github.com/gin-gonic/gin"
   "github.com/golang-jwt/jwt/v4"
-  "github.com/deckarep/golang-set"
 )
 
 type Ruler func(string, string) bool
@@ -45,10 +44,19 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
 func makeRuler(rule Rule, methodFirst bool) Ruler {
 
   isRestrictedMethodAndRestrictedEndpoint := func (method string, endpoint string) bool {
-    restrictedEndpointSet := rule[method]
-    if restrictedEndpointSet != nil {
-      isRestrictedEndpoint := restrictedEndpointSet.Contains(endpoint)
-      if isRestrictedEndpoint {
+
+    if restrictedEndpointSet := rule["*"]; (restrictedEndpointSet != nil) {
+      if isRestrictedEndpoint := restrictedEndpointSet["*"]; isRestrictedEndpoint {
+        return true
+      } else if isRestrictedEndpoint := restrictedEndpointSet[endpoint]; isRestrictedEndpoint {
+        return true
+      } else {
+        return false
+      }
+    } else if restrictedEndpointSet := rule[method]; (restrictedEndpointSet != nil) {
+      if isRestrictedEndpoint := restrictedEndpointSet["*"]; isRestrictedEndpoint {
+        return true
+      } else if isRestrictedEndpoint := restrictedEndpointSet[endpoint]; isRestrictedEndpoint {
         return true
       } else {
         return false
@@ -59,17 +67,25 @@ func makeRuler(rule Rule, methodFirst bool) Ruler {
   }
   
   isRestrictedEndpointAndRestrictedMethod := func (method string, endpoint string) bool {
-    restrictedMethodSet := rule[endpoint]
-    if restrictedMethodSet != nil {
-      isRestrictedMethod := restrictedMethodSet.Contains(method)
-      if isRestrictedMethod {
+    if restrictedMethodSet := rule["*"]; (restrictedMethodSet != nil) {
+      if isRestrictedMethod := restrictedMethodSet["*"]; isRestrictedMethod {
+        return true
+      } else if isRestrictedMethod := restrictedMethodSet[endpoint]; isRestrictedMethod {
+        return true
+      } else {
+        return false
+      }
+    } else if restrictedMethodSet := rule[method]; (restrictedMethodSet != nil) {
+      if isRestrictedMethod := restrictedMethodSet["*"]; isRestrictedMethod {
+        return true
+      } else if isRestrictedMethod := restrictedMethodSet[endpoint]; isRestrictedMethod {
         return true
       } else {
         return false
       }
     } else {
       return false
-    }  
+    }
   }
   
   if methodFirst {

@@ -9,7 +9,7 @@ import (
 )
 
 
-type Rule map[string][]*mapset.threadSafeSet
+type Rule map[string]map[string]bool
 
 
 type resource struct {
