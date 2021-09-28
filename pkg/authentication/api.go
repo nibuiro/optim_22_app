@@ -9,6 +9,9 @@ import (
 )
 
 
+type Rule map[string][]*mapset.threadSafeSet
+
+
 type resource struct {
   service Service
   domain string
