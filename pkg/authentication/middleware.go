@@ -15,12 +15,14 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
 
   return func(c *gin.Context) {
 
+    s := rc.service.WithContext(c.Request.Context())
+
     if IsRestricted(c.Request.Method, c.FullPath()) {
       //Authorizationヘッダーからstring型のトークンを取得
       tokenString := c.GetHeader("Authorization")
       //トークンの改竄と期限を検証
       //tips: expキーがない場合無期限トークンとして扱われ、token.Validの値はtrue
-      token, _ := jwt.Parse(tokenString, rc.service.AccessTokenSecretSender)
+      token, _ := jwt.Parse(tokenString, s.AccessTokenSecretSender)
       //辞書型に変換
       _, ok := token.Claims.(jwt.MapClaims)
       //claims, ok := token.Claims.(jwt.MapClaims)
@@ -44,7 +46,6 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
 func makeRuler(rule Rule, methodFirst bool) Ruler {
 
   isRestrictedMethodAndRestrictedEndpoint := func (method string, endpoint string) bool {
-
     if restrictedEndpointSet := rule["*"]; (restrictedEndpointSet != nil) {
       if isRestrictedEndpoint := restrictedEndpointSet["*"]; isRestrictedEndpoint {
         return true

@@ -56,7 +56,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
   
   jwtExpiration := CalcYears2SecondsConversion(5)
   auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
-  router.Use(auth.ValidateAccessToken())
+  router.Use(auth.ValidateAccessToken(GetRule(), false))
 
 
   router.POST("/test", func(c *gin.Context) {
@@ -85,5 +85,14 @@ func TestAccessTokenAuthentication(t *testing.T) {
   }
   for _, tc := range tests {
     test.Endpoint(t, router, tc)
+  }
+}
+
+
+func GetRule() Rule {
+  return Rule{
+    "*": map[string]bool{
+      "*": true,
+    },
   }
 }
