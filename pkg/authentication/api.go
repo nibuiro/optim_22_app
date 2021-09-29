@@ -118,10 +118,9 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
 
 func (rc resource) GetRefreshTokenAndAccessToken() gin.HandlerFunc {
   return func(c *gin.Context) {
-
-    var input credential
   
     //BodyからJSONをパースして読み取る
+    body, err := io.ReadAll(c.Request.Body)
     if err := c.BindJSON(&input); err != nil {
       c.Status(http.StatusBadRequest)
       return

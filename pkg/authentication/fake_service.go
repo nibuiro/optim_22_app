@@ -15,22 +15,32 @@ import (
 )
 
 
-type credential struct {
+type Credential struct {
   email    string `json:"email"`
   password string `json:"password"`
 }
 
 
 type Service interface {
-  Refresh(refreshToken string) (string, error)
-  RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
-  AccessTokenSecretSender(token *jwt.Token) (interface{}, error)
-  ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error)
-  GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error)
+  WithContext(ctx context.Context) service
+  ReadRefreshToken(tokenString string) error
+  ReadAccessToken(tokenString string) error
+  
+  ReadCredential(data []byte) error
+  ValidateCredential() error
+  RefreshAccessToken() (string, error)
+  RefreshRefreshToken() (string, error)
+  GenerateAccessToken() (string, error)
+  GenerateRefreshToken() (string, error)
+  RefreshTokenSecretSender() (interface{}, error)
+  AccessTokenSecretSender() (interface{}, error)
 }
 
 
 type service struct {
+  ctx context.Context
+  claims jwt.MapClaims
+  credential Credential
   //repo   Repository
   //logger log.Logger
 }
@@ -46,45 +56,86 @@ func NewService() Service {
 }
 
 
-func (s service) Refresh(refreshToken string) (string, error) {
-    sender :=  func (token *jwt.Token) (interface{}, error) {
-      return "secret_key_for_refresh", nil
+func (s service) WithContext(ctx context.Context) service {
+  newServie := s
+  s.ctx = ctx
+  return s
+}
+
+
+func (s service) ReadCredential(data []byte) error {
+  err := json.Unmarshal(data, &s.credential)
+  return err
+}
+
+
+func (s service) ReadRefreshToken(tokenString string) error {
+  token, err := jwt.Parse(tokenString, s.RefreshTokenSecretSender)
+  if err != nil {
+    return err
+  } else {
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if ok {
+      s.claims = claims
     }
-    token, _ := jwt.Parse(refreshToken, sender)
-    claims, _ := token.Claims.(jwt.MapClaims)
-
-    expiration := time.Now()
-    expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)
-
-    claims["exp"] = expiration.Unix()
-    newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
-    // Sign and get the complete encoded token as a string using the secret
-    newTokenString, _ := newToken.SignedString([]byte("secret_key_for_refresh"))
-
-    return newTokenString, nil
-}
-
-
-func (s service) ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error) {
-  //リクエストの値を検証
-  claims := map[string]interface{}{
-    "userID": 0,
   }
-  return claims, nil
 }
 
+func (s service) ReadAccessToken(tokenString string) error {
+  token, err := jwt.Parse(tokenString, s.AccessTokenSecretSender)
+  if err != nil {
+    return err
+  } else {
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if ok {
+      s.claims = claims
+    }
+  }
+}
 
-func (s service) GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error) {
+func (s service) ValidateCredential() error {
+  //リクエストの値を検証
+  return nil
+}
+
+func (s service) GenerateAccessToken() (string, error) {
+  //claims := map[string]interface{}{
+  //  "userID": 0,
+  //}
+  //トークンを生成
+  return "", "", nil
+}
+
+func (s service) GenerateRefreshToken() (string, error) {
   //トークンを生成
   return "", "", nil
 }
 
 //パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
-func (s service) RefreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
+func (s service) RefreshTokenSecretSender() (interface{}, error) {
   return []byte("secret_key_for_refresh"), nil
 }
 
 //パース関数にアクセストークン用秘密鍵を渡すコールバック
-func (s service) AccessTokenSecretSender(token *jwt.Token) (interface{}, error) {
+func (s service) AccessTokenSecretSender() (interface{}, error) {
   return []byte("secret_key"), nil
 }
+
+
+//func (s service) Refresh(refreshToken string) (string, error) {
+//    sender :=  func (token *jwt.Token) (interface{}, error) {
+//      return "secret_key_for_refresh", nil
+//    }
+//    token, _ := jwt.Parse(refreshToken, sender)
+//    claims, _ := token.Claims.(jwt.MapClaims)
+//
+//    expiration := time.Now()
+//    expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)
+//
+//    claims["exp"] = expiration.Unix()
+//    newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
+//    // Sign and get the complete encoded token as a string using the secret
+//    newTokenString, _ := newToken.SignedString([]byte("secret_key_for_refresh"))
+//
+//    return newTokenString, nil
+//}
