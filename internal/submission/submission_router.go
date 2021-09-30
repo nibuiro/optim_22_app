@@ -6,7 +6,17 @@ import (
 	"optim_22_app/model"
 	"typefile"
 	"strconv"
+	"time"
 )
+
+//データを送信する際に利用する構造体を定義
+type SubmissionJson struct{
+	ID             int                 `json:"submission_id"`
+	CreatedAt      time.Time           `json:"createdat"`
+	// 要件はエンジニアのプロフィールデータであるが、プロフィール機能は担当外のため、EngineerIDを代用する。
+	EngineerID     int                 `json:"engineer`
+	Content        string              `json:"content"`
+}
 
 // 特定submissionの詳細を表示する
 func ShowSubmission(c *gin.Context) {
@@ -17,18 +27,20 @@ func ShowSubmission(c *gin.Context) {
 
 	// Submission構造体データを格納するためのインスタンスを生成
 	submission := typefile.Submission{}
-	// Request構造体データを格納するためのインスタンスを生成
-	request := typefile.Request{}
+	// SubmissionJson構造体データを格納するためのインスタンスを生成
+	submission_json := SubmissionJson{}
 	
 	// 特定のidを持つsubmissionを抽出する。
 	model.Db.Find(&submission,"id = ?",submission_id)
 	// SELECT * FROM `submissions` WHERE id = ?
-	// 特定のidを持つrequestを抽出する。
-	model.Db.Find(&request,"id = ?",submission.RequestID)
-	// SELECT * FROM `requests` WHERE id = ?
 
-    c.HTML(http.StatusOK, "show_submission_detail.html", gin.H{
-    	"submission": submission,
-    	"request": request,
+	// submissionが持つデータをsubmission_jsonのそれぞれの対応する属性に格納する。
+	submission_json.ID = submission.ID
+	submission_json.CreatedAt = submission.CreatedAt
+	submission_json.EngineerID = submission.EngineerID
+	submission_json.Content = submission.Content
+
+    c.JSON(http.StatusOK, gin.H{
+    	"submission": submission_json,
     })
 }

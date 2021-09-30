@@ -45,57 +45,63 @@ func CreateTestData() {
 	var users = []typefile.User{
 		{Name: "user1"},
 		{Name: "user2"},
-		{Name: "user3"}}
+		{Name: "user3"},
+		{Name: "user4"},
+		{Name: "user5"}}
 	Db.Create(&users)
 
 	// userが作成された直後にengineerも作成する。
 	var engineers = []typefile.Engineer{
 		{User: typefile.User{ID: 1,Name: "user1"}},
 		{User: typefile.User{ID: 2,Name: "user2"}},
-		{User: typefile.User{ID: 3,Name: "user3"}}}
+		{User: typefile.User{ID: 3,Name: "user3"}},
+		{User: typefile.User{ID: 4,Name: "user4"}},
+		{User: typefile.User{ID: 5,Name: "user5"}}}
 	Db.Create(&engineers)
 
 	//userが作成された直後にclientも作成する。
 	var clients = []typefile.Client{
 		{User: typefile.User{ID: 1,Name: "user1"}},
 		{User: typefile.User{ID: 2,Name: "user2"}},
-		{User: typefile.User{ID: 3,Name: "user3"}}}
+		{User: typefile.User{ID: 3,Name: "user3"}},
+		{User: typefile.User{ID: 4,Name: "user4"}},
+		{User: typefile.User{ID: 5,Name: "user5"}}}
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
 		{ClientID: 1,RequestName: "request1 from clientID 1",Content: "request1 content",Finish: false},
 		{ClientID: 1,RequestName: "request2 from clientID 1",Content: "request2 content",Finish: false},
-		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content",Finish: false}}
+		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content",Finish: true},
+		{ClientID: 3,RequestName: "request4 from clientID 1",Content: "request4 content",Finish: false},
+		{ClientID: 3,RequestName: "request5 from clientID 1",Content: "request5 content",Finish: true}}
 	Db.Create(&requests)
 	
 	var winners = []typefile.Winner{
-		{EngineerID: 1,RequestID: 1},
-		{EngineerID: 2,RequestID: 2}}
+		{EngineerID: 1,RequestID: 3},
+		{EngineerID: 4,RequestID: 5}}
 	Db.Create(&winners)
 
 	var submissions = []typefile.Submission{
-		{RequestID: 3,EngineerID: 1,Content: "submission1 of engineerID 1"},
-		{RequestID: 3,EngineerID: 2,Content: "submission1 of engineerID 2"},
-		{RequestID: 3,EngineerID: 3,Content: "submission1 of engineerID 3"}}
+		{RequestID: 1,EngineerID: 1,Content: "submission1 of engineerID 1"},
+		{RequestID: 2,EngineerID: 1,Content: "submission2 of engineerID 1"},
+		{RequestID: 1,EngineerID: 2,Content: "submission3 of engineerID 2"},
+		{RequestID: 4,EngineerID: 2,Content: "submission4 of engineerID 2"},
+		{RequestID: 4,EngineerID: 3,Content: "submission5 of engineerID 3"},
+		{RequestID: 3,EngineerID: 1,Content: "submission6 of engineerID 1"},
+		{RequestID: 5,EngineerID: 4,Content: "submission7 of engineerID 4"}}
 	Db.Create(&submissions)
 
-	// id=1のClient構造体データを格納するためのインスタンスを生成
-	client1 := typefile.Client{}
-	// id=1を持つclientを抽出する。
-	Db.Find(&client1,"id = ?",1)
-	// SELECT * FROM `clients` WHERE id = 1
+	// id=1のRequest構造体データを格納するためのインスタンスを生成
+	request1 := typefile.Request{}
+	// id=1を持つrequestを抽出する。
+	Db.Find(&request1,"id = ?",1)
+	// SELECT * FROM `requests` WHERE id = 1
 
-	// id=2のClient構造体データを格納するためのインスタンスを生成
-	client2 := typefile.Client{}
-	// id=2を持つclientを抽出する。
-	Db.Find(&client2,"id = ?",2)
-	// SELECT * FROM `clients` WHERE id = 2
-
-	var clients_association = []typefile.Client{
-		client1,
-		client1,
-		client2}
-	Db.Model(&requests).Association("Client").Append(&clients_association)
+	// id=2のRequest構造体データを格納するためのインスタンスを生成
+	request2 := typefile.Request{}
+	// id=2を持つrequestを抽出する。
+	Db.Find(&request2,"id = ?",2)
+	// SELECT * FROM `requests` WHERE id = 2
 
 	// id=3のRequest構造体データを格納するためのインスタンスを生成
 	request3 := typefile.Request{}
@@ -103,12 +109,17 @@ func CreateTestData() {
 	Db.Find(&request3,"id = ?",3)
 	// SELECT * FROM `requests` WHERE id = 3
 
-	var requests_association = []typefile.Request{
-		request3,
-		request3,
-		request3}
+	// id=4のRequest構造体データを格納するためのインスタンスを生成
+	request4 := typefile.Request{}
+	// id=4を持つrequestを抽出する。
+	Db.Find(&request4,"id = ?",4)
+	// SELECT * FROM `requests` WHERE id = 4
 
-	Db.Model(&submissions).Association("Request").Append(&requests_association)
+	// id=5のRequest構造体データを格納するためのインスタンスを生成
+	request5 := typefile.Request{}
+	// id=5を持つrequestを抽出する。
+	Db.Find(&request5,"id = ?",5)
+	// SELECT * FROM `requests` WHERE id = 5
 
 	// id=1のEngineer構造体データを格納するためのインスタンスを生成
 	engineer1 := typefile.Engineer{}
@@ -128,10 +139,91 @@ func CreateTestData() {
 	Db.Find(&engineer3,"id = ?",3)
 	// SELECT * FROM `engineers` WHERE id = 3
 
-	var engineers_association = []typefile.Engineer{
-		engineer1,
-		engineer2,
-		engineer3}
+	// id=4のEngineer構造体データを格納するためのインスタンスを生成
+	engineer4 := typefile.Engineer{}
+	// id=4を持つengineerを抽出する。
+	Db.Find(&engineer4,"id = ?",4)
+	// SELECT * FROM `engineers` WHERE id = 4
 
-	Db.Model(&engineers).Association("Engineer").Append(&engineers_association)
+	// id=5のEngineer構造体データを格納するためのインスタンスを生成
+	engineer5 := typefile.Engineer{}
+	// id=5を持つengineerを抽出する。
+	Db.Find(&engineer5,"id = ?",5)
+	// SELECT * FROM `engineers` WHERE id = 5
+
+	var request1_engineers_association = []typefile.Engineer{
+		engineer1,
+		engineer2}
+
+	// リクエスト1に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&request1).Association("Engineers").Append(&request1_engineers_association)
+
+	var request2_engineers_association = []typefile.Engineer{
+		engineer1,
+		engineer2}
+
+	// リクエスト2に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&request2).Association("Engineers").Append(&request2_engineers_association)
+
+	var request3_engineers_association = []typefile.Engineer{
+		engineer1,
+		engineer3,
+		engineer5}
+
+	// リクエスト3に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&request3).Association("Engineers").Append(&request3_engineers_association)
+
+	var request4_engineers_association = []typefile.Engineer{
+		engineer2,
+		engineer3,
+		engineer4,
+		engineer5}
+
+	// リクエスト4に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&request4).Association("Engineers").Append(&request4_engineers_association)
+
+	var request5_engineers_association = []typefile.Engineer{
+		engineer4,
+		engineer5}
+	
+	// リクエスト5に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&request5).Association("Engineers").Append(&request5_engineers_association)
+
+	var engineer1_requests_association = []typefile.Request{
+		request1,
+		request2,
+		request3}
+
+	// エンジニア1が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&engineer1).Association("Requests").Append(&engineer1_requests_association)
+
+	var engineer2_requests_association = []typefile.Request{
+		request1,
+		request2,
+		request4}
+
+	// エンジニア2が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&engineer2).Association("Requests").Append(&engineer2_requests_association)
+
+	var engineer3_requests_association = []typefile.Request{
+		request3,
+		request4}
+
+	// エンジニア3が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&engineer3).Association("Requests").Append(&engineer3_requests_association)
+
+	var engineer4_requests_association = []typefile.Request{
+		request4,
+		request5}
+
+	// エンジニア4が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&engineer4).Association("Requests").Append(&engineer4_requests_association)
+
+	var engineer5_requests_association = []typefile.Request{
+		request3,
+		request4,
+		request5}
+
+	// エンジニア5が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
+	Db.Model(&engineer5).Association("Requests").Append(&engineer5_requests_association)
 }

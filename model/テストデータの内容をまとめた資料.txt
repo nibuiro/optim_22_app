@@ -1,0 +1,41 @@
+User
+id 1,name user1
+id 2,name user2
+id 3,name user3
+id 4,name user4
+id 5,name user5
+
+Engineers
+id 1,name user1,Request_id[1,2,3]
+id 2,name user2,Request_id[1,2,4]
+id 3,name user3,Request_id[3,4]
+id 4,name user4,Request_id[4,5]
+id 5,name user5,Request_id[3,4,5]
+
+Clients
+id 1,name user1
+id 2,name user2
+id 3,name user3
+id 4,name user4
+id 5,name user5
+
+Request(RequestName,Contentは自由)
+id 1,client_id 1,finish false
+id 2,client_id 1,finish false
+id 3,client_id 2,finish true
+id 4,client_id 3,finish false
+id 5,client_id 3,finish true
+
+Winner(RequestIDはRequestデータのfinish=trueに対応)
+EngineerID 1,RequestID 3
+EngineerID 4,RequestID 5
+
+Submissions(Contentは自由)
+id 1,RequestID 1,EngineerID 1 
+id 2,RequestID 2,EngineerID 1 
+id 3,RequestID 1,EngineerID 2
+id 4,RequestID 4,EngineerID 2 
+id 5,RequestID 4,EngineerID 3
+id 6,RequestID 3,EngineerID 1
+id 7,RequestID 5,EngineerID 4
+

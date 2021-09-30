@@ -99,8 +99,6 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
 
   client_e := e.Group("/client")
   {
-    // クライアントが新規リクエストを作成するためのページを表示するハンドラ
-    client_e.GET("/new_request", client.NewRequest)
     // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
     client_e.POST("/create_request",client.CreateRequest)
     // client_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
@@ -109,10 +107,8 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
     client_e.GET("/show_submission/:request_id",client.ShowSubmission)
     // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
     client_e.POST("/decide_winner",client.DecideWinner)
-    // クライアントが依頼済みの特定リクエストを編集できるようにするハンドラ
-    client_e.GET("/edit_request/:request_id",client.EditRequest)
     // クライアントが編集したリクエストを更新できるようにするハンドラ
-    client_e.POST("/update_request/",client.UpdateRequest)
+    client_e.POST("/update_request",client.UpdateRequest)
   }
 
   request_e := e.Group("/request")
@@ -131,14 +127,10 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   {
     // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
     engineer_e.POST("/create_engineer_join",engineer.CreateEngineerJoin)
-    // submissionを提出するためのページを表示するハンドラ
-    engineer_e.GET("/new_submission/:request_id",engineer.NewSubmission)
     // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
     engineer_e.POST("/create_submission",engineer.CreateSubmission)
     // engineer_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
     engineer_e.GET("/show_join_request/:engineer_id", engineer.ShowJoinRequest)
-    // エンジニアが提出済みのsubmissionを編集できるようにするハンドラ
-    engineer_e.GET("/edit_submission/:submission_id",engineer.EditSubmission)
     // エンジニアが編集したsubmissionを更新できるようにするハンドラ
     engineer_e.POST("/update_submission",engineer.UpdateSubmission)
   }
