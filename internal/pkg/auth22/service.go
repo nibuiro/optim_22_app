@@ -60,6 +60,15 @@ func NewService(ctx context.Context, config *config.Config, repo Repository, log
 }
 
 
+func (s service) ReadCredential(data []byte) error {
+  if err := json.Unmarshal(data, &s.credential); err != nil {
+    return err
+  } else {
+    return nil
+  }
+}
+
+
 func (s service) ValidateCredential() (map[string]interface{}, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
