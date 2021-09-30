@@ -69,10 +69,12 @@ type service struct {
 
 
 func NewService(config *config.Config, repo Repository, logger log.Logger) Service {
-  return service{
+  newService := service{
     repo: repo,
     logger: logger,
-  }.SetParams(config.RefreshTokenSecret, config.AccessTokenSecret, config.RefreshTokenExpiration, config.AccessTokenExpiration)
+  }
+  newService.SetParams(config.RefreshTokenSecret, config.AccessTokenSecret, config.RefreshTokenExpiration, config.AccessTokenExpiration)
+  return newService
 }
 
 

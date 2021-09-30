@@ -49,7 +49,9 @@ type service struct {
 }
 
 func NewService(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) Service {
-  return service{}.SetParams(refreshTokenSecret, accessTokenSecret, refreshTokenExpiration, accessTokenExpiration)
+  newService := service{}
+  newService.SetParams(refreshTokenSecret, accessTokenSecret, refreshTokenExpiration, accessTokenExpiration)
+  return newService
 }
 
 
@@ -112,12 +114,11 @@ func (s service) GetSignedAccessToken() (string, error) {
 }
 
 
-func (s service) SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service {
+func (s service) SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) {
   s.refreshTokenSecret = []byte(refreshTokenSecret)
   s.accessTokenSecret = []byte(accessTokenSecret)
   s.refreshTokenExpiration = refreshTokenExpiration
   s.accessTokenExpiration = accessTokenExpiration
-  return &s
 }
 
 
