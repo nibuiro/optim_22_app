@@ -8,7 +8,7 @@ import (
 
 func GetRule() authentication.Rule {
   return authentication.Rule{
-    "POST": map[string]bool{
+    "GET": map[string]bool{
       "*": true,
     },
   }
