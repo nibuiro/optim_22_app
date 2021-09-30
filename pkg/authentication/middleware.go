@@ -11,13 +11,13 @@ type Ruler func(string, string) bool
 
 func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.HandlerFunc {
 
-  IsRestricted := makeRuler(rule, methodFirst)
+  IsAllowed := makeRuler(rule, methodFirst)
 
   return func(c *gin.Context) {
 
     s := rc.service.WithContext(c.Request.Context())
 
-    if IsRestricted(c.Request.Method, c.FullPath()) {
+    if !IsAllowed(c.Request.Method, c.FullPath()) {
       //Authorizationヘッダーからstring型のトークンを取得
       tokenString := c.GetHeader("Authorization")
       //トークンの改竄と期限を検証
@@ -45,19 +45,19 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
 
 func makeRuler(rule Rule, methodFirst bool) Ruler {
 
-  isRestrictedMethodAndRestrictedEndpoint := func (method string, endpoint string) bool {
-    if restrictedEndpointSet := rule["*"]; (restrictedEndpointSet != nil) {
-      if isRestrictedEndpoint := restrictedEndpointSet["*"]; isRestrictedEndpoint {
+  isAllowedMethodAndAllowedEndpoint := func (method string, endpoint string) bool {
+    if allowedEndpointSet := rule["*"]; (allowedEndpointSet != nil) {
+      if isAllowedEndpoint := allowedEndpointSet["*"]; isAllowedEndpoint {
         return true
-      } else if isRestrictedEndpoint := restrictedEndpointSet[endpoint]; isRestrictedEndpoint {
+      } else if isAllowedEndpoint := allowedEndpointSet[endpoint]; isAllowedEndpoint {
         return true
       } else {
         return false
       }
-    } else if restrictedEndpointSet := rule[method]; (restrictedEndpointSet != nil) {
-      if isRestrictedEndpoint := restrictedEndpointSet["*"]; isRestrictedEndpoint {
+    } else if allowedEndpointSet := rule[method]; (allowedEndpointSet != nil) {
+      if isAllowedEndpoint := allowedEndpointSet["*"]; isAllowedEndpoint {
         return true
-      } else if isRestrictedEndpoint := restrictedEndpointSet[endpoint]; isRestrictedEndpoint {
+      } else if isAllowedEndpoint := allowedEndpointSet[endpoint]; isAllowedEndpoint {
         return true
       } else {
         return false
@@ -67,19 +67,19 @@ func makeRuler(rule Rule, methodFirst bool) Ruler {
     }
   }
   
-  isRestrictedEndpointAndRestrictedMethod := func (method string, endpoint string) bool {
-    if restrictedMethodSet := rule["*"]; (restrictedMethodSet != nil) {
-      if isRestrictedMethod := restrictedMethodSet["*"]; isRestrictedMethod {
+  isAllowedEndpointAndAllowedMethod := func (method string, endpoint string) bool {
+    if allowedMethodSet := rule["*"]; (allowedMethodSet != nil) {
+      if isAllowedMethod := allowedMethodSet["*"]; isAllowedMethod {
         return true
-      } else if isRestrictedMethod := restrictedMethodSet[endpoint]; isRestrictedMethod {
+      } else if isAllowedMethod := allowedMethodSet[endpoint]; isAllowedMethod {
         return true
       } else {
         return false
       }
-    } else if restrictedMethodSet := rule[method]; (restrictedMethodSet != nil) {
-      if isRestrictedMethod := restrictedMethodSet["*"]; isRestrictedMethod {
+    } else if allowedMethodSet := rule[method]; (allowedMethodSet != nil) {
+      if isAllowedMethod := allowedMethodSet["*"]; isAllowedMethod {
         return true
-      } else if isRestrictedMethod := restrictedMethodSet[endpoint]; isRestrictedMethod {
+      } else if isAllowedMethod := allowedMethodSet[endpoint]; isAllowedMethod {
         return true
       } else {
         return false
@@ -90,9 +90,9 @@ func makeRuler(rule Rule, methodFirst bool) Ruler {
   }
   
   if methodFirst {
-    return isRestrictedMethodAndRestrictedEndpoint
+    return isAllowedMethodAndAllowedEndpoint
   } else {
-    return isRestrictedEndpointAndRestrictedMethod
+    return isAllowedEndpointAndAllowedMethod
   }
 }
 
