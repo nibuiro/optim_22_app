@@ -50,8 +50,8 @@ func NewService(ctx context.Context, config *config.Config, repo Repository, log
   return service{
     ctx: ctx
     claims: make(jwt.MapClaims)
-    refreshTokenSecret: config.refreshTokenSecret
-    accessTokenSecret: config.accessTokenSecret
+    refreshTokenSecret: []byte(config.refreshTokenSecret)
+    accessTokenSecret: []byte(config.accessTokenSecret)
     refreshTokenExpiration: config.refreshTokenExpiration
     accessTokenExpiration: config.accessTokenExpiration
     repo: repo
@@ -91,30 +91,17 @@ func (s service) ValidateCredential() error {
   }
 }
 
-func (s service) GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error) {
 
-  //userID := claims["userID"].(int)
-
-  expiration := time.Now()
-  expiration = expiration.Add(authentication.CalcYears2SecondsConversion(s.config.RefreshTokenExpiration))
-
-  claims["exp"] = expiration.Unix()
-  //:= map[string]interface{}{
-  //  "userid": userID,
-  //  "exp": expiration.Unix(),
-  //}
-
-  if refreshToken, err := authentication.NewToken(claims, s.config.RefreshTokenSecretKey); err != nil {
+func (s service) GenerateRefreshToken() (string, error) {
+  //リフレッシュトークンの期限を設定
+  s.claims["exp"] = CalcFutureUnixTime(s.refreshTokenExpiration)
+  //リフレッシュトークンを生成
+  refreshToken, err := authentication.NewToken(s.claims["exp"], s.refreshTokenSecret)
+  if err != nil {
     s.logger.Error(err)
-    return "", "", err
+    return "", err
   } else {
-    if accessToken, err := authentication.NewToken(claims, s.config.AccessTokenSecretKey); err != nil {
-      s.logger.Error(err)
-      return "", "", err
-    } else {
-      return refreshToken, accessToken, nil
-    }
+    return refreshToken, nil
   }
- 
 }
 
