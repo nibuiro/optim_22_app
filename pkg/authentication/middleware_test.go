@@ -54,7 +54,6 @@ func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
   s := NewService(
-    nil,
     []byte("secret_key_for_refresh"),
     []byte("secret_key"),
     5 * 365,

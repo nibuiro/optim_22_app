@@ -37,7 +37,6 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   s := NewService(
-    nil,
     []byte("secret_key_for_refresh"),
     []byte("secret_key"),
     5 * 365,
@@ -80,7 +79,6 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   s := NewService(
-    nil,
     []byte("secret_key_for_refresh"),
     []byte("secret_key"),
     5 * 365,
@@ -145,7 +143,6 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   s := NewService(
-    nil,
     []byte("secret_key_for_refresh"),
     []byte("secret_key"),
     5 * 365,
@@ -186,7 +183,6 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
 
   //cfg.JWTExpiration => 5年 => 157680000秒
   s := NewService(
-    nil,
     []byte("secret_key_for_refresh"),
     []byte("secret_key"),
     5 * 365,
