@@ -53,9 +53,15 @@ const (
 func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
-  
-  jwtExpiration := CalcYears2SecondsConversion(5)
-  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
+  s := NewService(
+    nil,
+    []byte("secret_key_for_refresh"),
+    []byte("secret_key"),
+    5 * 365,
+    5 * 365,
+  )
+
+  auth := New(s, "localhost")
   router.Use(auth.ValidateAccessToken(GetRule(), false))
 
 
@@ -91,7 +97,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
 
 func GetRule() Rule {
   return Rule{
-    "*": map[string]bool{
+    "GET": map[string]bool{
       "*": true,
     },
   }

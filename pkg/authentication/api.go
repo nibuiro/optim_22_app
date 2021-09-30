@@ -4,9 +4,8 @@ package authentication
 import (
   "io"
   "net/http"
-  "time"
+ // "time"
   "github.com/gin-gonic/gin"
-  "fmt"
 )
 
 
@@ -16,21 +15,13 @@ type Rule map[string]map[string]bool
 type resource struct {
   service Service
   domain string
-  refreshTokenSecret []byte
-  accessTokenSecret []byte
-  refreshTokenExpiration time.Duration
-  accessTokenExpiration time.Duration
 }
 
 
-func New(service Service, domain string, refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration time.Duration, accessTokenExpiration time.Duration) *resource {
+func New(service Service, domain string) *resource {
   return &resource{
     service: service,
     domain: domain,
-    refreshTokenSecret: []byte(refreshTokenSecret), 
-    accessTokenSecret: []byte(accessTokenSecret), 
-    refreshTokenExpiration: refreshTokenExpiration,
-    accessTokenExpiration: accessTokenExpiration,
   }
 }
 
@@ -39,7 +30,6 @@ func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
     s := rc.service.WithContext(c.Request.Context())
-
 
     if refreshToken, err := c.Cookie("refresh_token"); err != nil {
       c.Status(http.StatusBadRequest)
@@ -101,7 +91,6 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
           // Sign and get the complete encoded token as a string using the secret
           newTokenString, _ := newToken.SignedString([]byte(rc.accessTokenSecret))
 */
-    fmt.Println(">>>>>>>>>>>")
           if newTokenString, err := s.RefreshAccessToken(); err != nil {
             c.Status(http.StatusUnauthorized)
             return

@@ -12,15 +12,19 @@ const (
 )
 
 
-func CalcYears2SecondsConversion(nyears int) time.Duration {
-  return time.Duration(nyears * ndaysPerYear * nhoursPerDay) * time.Hour
+
+func CalcFutureUnixTime(ndays int) int64 {
+    expiration := time.Now()
+    nhours := time.Duration(ndays * nhoursPerDay) //単位は10^-9秒
+    expiration = expiration.Add(nhours * time.Hour)
+    return expiration.Unix()
 }
 
 
-func NewToken(claims map[string]interface{}, secret string) (string, error) {
+func NewToken(claims map[string]interface{}, secret []byte) (string, error) {
   var jwtClaims jwt.MapClaims
   jwtClaims = claims
   token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
-  tokenString, err := token.SignedString([]byte(secret))
+  tokenString, err := token.SignedString(secret)
   return tokenString, err 
 }

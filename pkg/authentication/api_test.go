@@ -36,8 +36,14 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := CalcYears2SecondsConversion(5)
-  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
+  s := NewService(
+    nil,
+    []byte("secret_key_for_refresh"),
+    []byte("secret_key"),
+    5 * 365,
+    5 * 365,
+  )
+  auth := New(s, "localhost")
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
@@ -73,8 +79,14 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := CalcYears2SecondsConversion(5)
-  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
+  s := NewService(
+    nil,
+    []byte("secret_key_for_refresh"),
+    []byte("secret_key"),
+    5 * 365,
+    5 * 365,
+  )
+  auth := New(s, "localhost")
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -132,8 +144,14 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := CalcYears2SecondsConversion(5)
-  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
+  s := NewService(
+    nil,
+    []byte("secret_key_for_refresh"),
+    []byte("secret_key"),
+    5 * 365,
+    5 * 365,
+  )
+  auth := New(s, "localhost")
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
@@ -167,8 +185,14 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  jwtExpiration := CalcYears2SecondsConversion(5)
-  auth := New(NewService(), "localhost", "secret_key_for_refresh", "secret_key", jwtExpiration, jwtExpiration)
+  s := NewService(
+    nil,
+    []byte("secret_key_for_refresh"),
+    []byte("secret_key"),
+    5 * 365,
+    5 * 365,
+  )
+  auth := New(s, "localhost")
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
 
