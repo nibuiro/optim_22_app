@@ -1,9 +1,11 @@
 package auth22
 
 import (
+  "context"
   "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
   "encoding/json"
+  "github.com/golang-jwt/jwt/v4"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/pkg/authentication"
@@ -29,10 +31,32 @@ func (m Credential) Validate() error {
 
 
 type Service interface {  
-  ReadCredential(data []byte) error
-  ValidateCredential() error
-  GenerateAccessToken() (string, error)
-  GenerateRefreshToken() (string, error)
+  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int)
+  //
+  SetContext(ctx context.Context)
+  WithContext(ctx context.Context) *service //オーバーライド必須
+  WhereContext() context.Context
+  //
+  RefreshClaims()
+  SetClaims(key string, value interface{})
+  GetClaims() jwt.MapClaims
+  AddRefreshTokenExpiration()
+  AddAccessTokenExpiration()
+  GetSignedRefreshToken() (string, error)
+  GetSignedAccessToken() (string, error)
+  //
+  ReadRefreshToken(tokenString string) (bool, error)
+  ReadAccessToken(tokenString string) (bool, error)
+  RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
+  AccessTokenSecretSender(token *jwt.Token) (interface{}, error)
+  //
+  RefreshAccessToken() (string, error) //オーバーライド推奨
+  RefreshRefreshToken() (string, error) //オーバーライド推奨
+  //
+  ReadCredential(data []byte) error //オーバーライド必須
+  ValidateCredential() error //オーバーライド必須
+  GenerateAccessToken() (string, error) //オーバーライド必須
+  GenerateRefreshToken() (string, error) //オーバーライド必須
 }
 
 
@@ -49,6 +73,14 @@ func NewService(config *config.Config, repo Repository, logger log.Logger) Servi
     repo: repo,
     logger: logger,
   }.SetParams(config.RefreshTokenSecret, config.AccessTokenSecret, config.RefreshTokenExpiration, config.AccessTokenExpiration)
+}
+
+
+func (s service) WithContext(ctx context.Context) *service {
+  newServie := s
+  newServie.SetContext(ctx)
+  newServie.RefreshClaims()
+  return &newServie
 }
 
 

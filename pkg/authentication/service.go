@@ -8,11 +8,15 @@ import (
 
 
 type Service interface {
-  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service
+//  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service
+//  //
+  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int)
   //
-  WithContext(ctx context.Context) *service
+  SetContext(ctx context.Context)
+  WithContext(ctx context.Context) *service //オーバーライド必須
   WhereContext() context.Context
   //
+  RefreshClaims()
   SetClaims(key string, value interface{})
   GetClaims() jwt.MapClaims
   AddRefreshTokenExpiration()
@@ -24,14 +28,14 @@ type Service interface {
   ReadAccessToken(tokenString string) (bool, error)
   RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
   AccessTokenSecretSender(token *jwt.Token) (interface{}, error)
-  //オーバーライド推奨
-  RefreshAccessToken() (string, error)
-  RefreshRefreshToken() (string, error)
-  //オーバーライド必須
-  ReadCredential(data []byte) error
-  ValidateCredential() error
-  GenerateAccessToken() (string, error)
-  GenerateRefreshToken() (string, error)
+  //
+  RefreshAccessToken() (string, error) //オーバーライド推奨
+  RefreshRefreshToken() (string, error) //オーバーライド推奨
+  //
+  ReadCredential(data []byte) error //オーバーライド必須
+  ValidateCredential() error //オーバーライド必須
+  GenerateAccessToken() (string, error) //オーバーライド必須
+  GenerateRefreshToken() (string, error) //オーバーライド必須
 }
 
 
@@ -51,6 +55,22 @@ func NewService(refreshTokenSecret string, accessTokenSecret string, refreshToke
 
 func (s service) WhereContext() context.Context {
   return s.ctx
+}
+
+func (s service) SetContext(ctx context.Context) {
+  s.ctx = ctx
+}
+
+func (s service) WithContext(ctx context.Context) *service {
+  newServie := s
+  newServie.SetContext(ctx)
+  newServie.RefreshClaims()
+  return &newServie
+}
+
+
+func (s service) RefreshClaims() {
+  s.claims = make(jwt.MapClaims)
 }
 
 
@@ -98,14 +118,6 @@ func (s service) SetParams(refreshTokenSecret string, accessTokenSecret string, 
   s.refreshTokenExpiration = refreshTokenExpiration
   s.accessTokenExpiration = accessTokenExpiration
   return &s
-}
-
-
-func (s service) WithContext(ctx context.Context) *service {
-  newServie := s
-  newServie.ctx = ctx
-  newServie.claims = make(jwt.MapClaims)
-  return &newServie
 }
 
 
