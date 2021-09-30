@@ -17,8 +17,8 @@ type Config struct {
   RefreshTokenExpiration int `yaml:"refresh_token_expiration"`
   AccessTokenExpiration  int `yaml:"access_token_expiration"`
   //JWTの署名キー
-  RefreshTokenSecretKey  string `yaml:"refresh_token_secret_key"`
-  AccessTokenSecretKey   string `yaml:"access_token_secret_key"`
+  RefreshTokenSecret  string `yaml:"refresh_token_secret"`
+  AccessTokenSecret   string `yaml:"access_token_secret"`
 }
 
 //アプリケーションの設定を検証
@@ -28,8 +28,8 @@ func (c Config) Validate() error {
     validation.Field(&c.DSN, validation.Required),
     validation.Field(&c.RefreshTokenExpiration, validation.Required),
     validation.Field(&c.AccessTokenExpiration, validation.Required),
-    validation.Field(&c.RefreshTokenSecretKey, validation.Required),
-    validation.Field(&c.AccessTokenSecretKey, validation.Required),
+    validation.Field(&c.RefreshTokenSecret, validation.Required),
+    validation.Field(&c.AccessTokenSecret, validation.Required),
   )
 }
 
