@@ -14,13 +14,13 @@ import (
 
 
 //`POST /api/auth`が要求する情報
-type credential struct {
+type Credential struct {
   email    string `json:"email"`
   password string `json:"password"`
 }
 
 
-func (m credential) Validate() error {
+func (m Credential) Validate() error {
   return validation.ValidateStruct(&m,
     //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
     validation.Field(&m.email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
@@ -30,20 +30,37 @@ func (m credential) Validate() error {
 }
 
 
-type Service interface {
-  ValidateCredential(ctx context.Context, req credential) (int, error)
-  GenerateTokens(ctx context.Context, claims map[string]interface{}) (string, string, error)
+type Service interface {  
+  ReadCredential(data []byte) error
+  ValidateCredential() error
+  GenerateAccessToken() (string, error)
+  GenerateRefreshToken() (string, error)
 }
 
 
 type service struct {
-  config *config.Config
+  authentication.service
+  credential Credential
   repo   Repository
   logger log.Logger
 }
 
 
-func (s service) ValidateCredential(ctx context.Context, req credential) (map[string]interface{}, error) {
+func NewService(ctx context.Context, config *config.Config, repo Repository, logger log.Logger) Service {
+  return service{
+    ctx: ctx
+    claims: make(jwt.MapClaims)
+    refreshTokenSecret: config.refreshTokenSecret
+    accessTokenSecret: config.accessTokenSecret
+    refreshTokenExpiration: config.refreshTokenExpiration
+    accessTokenExpiration: config.accessTokenExpiration
+    repo: repo
+    logger: logger
+  }
+}
+
+
+func (s service) ValidateCredential() (map[string]interface{}, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     s.logger.Error(err)
@@ -94,12 +111,3 @@ func (s service) GenerateTokens(ctx context.Context, claims map[string]interface
  
 }
 
-//パース関数にリフレッシュトークン用秘密鍵を渡すコールバック
-func (s service) refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return s.config.RefreshTokenSecretKey, nil
-}
-
-//パース関数にアクセストークン用秘密鍵を渡すコールバック
-func (s service) accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
-  return s.config.AccessTokenSecretKey, nil
-}
