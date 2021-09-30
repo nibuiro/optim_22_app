@@ -9,7 +9,17 @@ import (
 
 type Service interface {
   SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service
+  //
   WithContext(ctx context.Context) *service
+  WhereContext() context.Context
+  //
+  SetClaims(key string, value interface{})
+  GetClaims() jwt.MapClaims
+  AddRefreshTokenExpiration()
+  AddAccessTokenExpiration()
+  GetSignedRefreshToken() (string, error)
+  GetSignedAccessToken() (string, error)
+  //
   ReadRefreshToken(tokenString string) (bool, error)
   ReadAccessToken(tokenString string) (bool, error)
   RefreshTokenSecretSender(token *jwt.Token) (interface{}, error)
@@ -36,6 +46,49 @@ type service struct {
 
 func NewService(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) Service {
   return service{}.SetParams(refreshTokenSecret, accessTokenSecret, refreshTokenExpiration, accessTokenExpiration)
+}
+
+
+func (s service) WhereContext() context.Context {
+  return s.ctx
+}
+
+
+func (s service) SetClaims(key string, value interface{}) {
+  s.claims[key] = value
+  return
+}
+
+
+func (s service) GetClaims() jwt.MapClaims {
+  return s.claims
+}
+
+
+func (s service) AddRefreshTokenExpiration() {
+  s.claims["exp"] = CalcFutureUnixTime(s.refreshTokenExpiration)
+}
+
+
+func (s service) AddAccessTokenExpiration() {
+  s.claims["exp"] = CalcFutureUnixTime(s.accessTokenExpiration)
+}
+
+func (s service) GetSignedRefreshToken() (string, error) {
+  if signedToken, err := NewToken(s.GetClaims(), s.refreshTokenSecret); err != nil {
+    return "", err
+  } else {
+    return signedToken, nil
+  }
+}
+
+
+func (s service) GetSignedAccessToken() (string, error) {
+  if signedToken, err := NewToken(s.GetClaims(), s.accessTokenSecret); err != nil {
+    return "", err
+  } else {
+    return signedToken, nil
+  }
 }
 
 

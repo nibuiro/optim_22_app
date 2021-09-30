@@ -1,13 +1,11 @@
 package auth22
 
 import (
-  "time"
   "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
-  "github.com/golang-jwt/jwt/v4"
+  "encoding/json"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
-  "context"
   "optim_22_app/pkg/authentication"
   "optim_22_app/internal/pkg/config"
 )
@@ -39,7 +37,7 @@ type Service interface {
 
 
 type service struct {
-  authentication.service
+  authentication.Service
   credential Credential
   repo   Repository
   logger log.Logger
@@ -48,13 +46,9 @@ type service struct {
 
 func NewService(config *config.Config, repo Repository, logger log.Logger) Service {
   return service{
-    refreshTokenSecret: []byte(config.refreshTokenSecret)
-    accessTokenSecret: []byte(config.accessTokenSecret)
-    refreshTokenExpiration: config.refreshTokenExpiration
-    accessTokenExpiration: config.accessTokenExpiration
-    repo: repo
-    logger: logger
-  }
+    repo: repo,
+    logger: logger,
+  }.SetParams(config.RefreshTokenSecret, config.AccessTokenSecret, config.RefreshTokenExpiration, config.AccessTokenExpiration)
 }
 
 
@@ -82,11 +76,11 @@ func (s service) ValidateCredential() error {
   }
   
   //資格情報の検証とユーザIDの取
-  if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
+  if userId, err := s.repo.GetUserIdByCredential(s.WhereContext(), &filter); err != nil {
     s.logger.Error(err)
     return err
   } else {
-    s.claims["userID"] = userId
+    s.SetClaims("userID", userId)
     return nil
   }
 }
@@ -94,9 +88,9 @@ func (s service) ValidateCredential() error {
 
 func (s service) GenerateRefreshToken() (string, error) {
   //リフレッシュトークンの期限を設定
-  s.claims["exp"] = CalcFutureUnixTime(s.refreshTokenExpiration)
+  s.AddRefreshTokenExpiration()
   //リフレッシュトークンを生成
-  refreshToken, err := authentication.NewToken(s.claims["exp"], s.refreshTokenSecret)
+  refreshToken, err := s.GetSignedRefreshToken()
   if err != nil {
     s.logger.Error(err)
     return "", err
@@ -108,9 +102,9 @@ func (s service) GenerateRefreshToken() (string, error) {
 
 func (s service) GenerateAccessToken() (string, error) {
   //アクセストークンの期限を設定
-  s.claims["exp"] = CalcFutureUnixTime(s.accessTokenExpiration)
+  s.AddAccessTokenExpiration()
   //アクセストークンを生成
-  accessToken, err := authentication.NewToken(s.claims["exp"], s.accessTokenSecret)
+  accessToken, err := s.GetSignedAccessToken()
   if err != nil {
     s.logger.Error(err)
     return "", err
