@@ -69,27 +69,25 @@ func (s service) ReadCredential(data []byte) error {
 }
 
 
-func (s service) ValidateCredential() (map[string]interface{}, error) {
+func (s service) ValidateCredential() error {
   //リクエストの値を検証
-  if err := req.Validate(); err != nil {
+  if err := s.credential.Validate(); err != nil {
     s.logger.Error(err)
-    return nil, err
+    return err
   }
 
   //idを抽出するSQL構文のWhere句の値
   filter := typefile.User{
-    Email: req.email,
-    Password: req.password,
+    Email: s.credential.email,
+    Password: s.credential.password,
   }
   
   //資格情報の検証とユーザIDの取
   if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
-    return nil, err
+    return err
   } else {
-    claims := map[string]interface{}{
-      "userID": userId,
-    }
-    return claims, nil
+    s.claims["userID"] = userId
+    return nil
   }
 }
 
