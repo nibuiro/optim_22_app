@@ -1,25 +1,10 @@
 package authentication
 
 
-/*
- *
- *
- *  これはfake serviceです。
- *
- *
- */
 import (
-  //"time"
   "context"
   "github.com/golang-jwt/jwt/v4"
- // "errors"
 )
-
-
-type Credential struct {
-  email    string `json:"email"`
-  password string `json:"password"`
-}
 
 
 type Service interface {
@@ -46,18 +31,7 @@ type service struct {
   accessTokenSecret []byte
   refreshTokenExpiration int
   accessTokenExpiration int
-
-
-  //credential Credential
-  //repo   Repository
-  //logger log.Logger
 }
-
-////新たなauthenticationサービスを作成
-//func NewService(repo Repository, logger log.Logger) Service {
-//  return service{repo, logger}
-//}
-
 
 func NewService(ctx context.Context, refreshTokenSecret []byte, accessTokenSecret []byte, refreshTokenExpiration int, accessTokenExpiration int) Service {
   return service{
