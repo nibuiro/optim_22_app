@@ -48,7 +48,6 @@ type service struct {
 
 func NewService(config *config.Config, repo Repository, logger log.Logger) Service {
   return service{
-    claims: make(jwt.MapClaims)
     refreshTokenSecret: []byte(config.refreshTokenSecret)
     accessTokenSecret: []byte(config.accessTokenSecret)
     refreshTokenExpiration: config.refreshTokenExpiration
