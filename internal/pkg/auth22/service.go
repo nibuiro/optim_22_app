@@ -105,3 +105,17 @@ func (s service) GenerateRefreshToken() (string, error) {
   }
 }
 
+
+func (s service) GenerateAccessToken() (string, error) {
+  //アクセストークンの期限を設定
+  s.claims["exp"] = CalcFutureUnixTime(s.accessTokenExpiration)
+  //アクセストークンを生成
+  accessToken, err := authentication.NewToken(s.claims["exp"], s.accessTokenSecret)
+  if err != nil {
+    s.logger.Error(err)
+    return "", err
+  } else {
+    return accessToken, nil
+  }
+}
+
