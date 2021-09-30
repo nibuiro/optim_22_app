@@ -4,7 +4,6 @@ import (
   "net/http"
 //  "fmt"
   "github.com/gin-gonic/gin"
-  "github.com/golang-jwt/jwt/v4"
 )
 
 type Ruler func(string, string) bool
@@ -15,26 +14,20 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
 
   return func(c *gin.Context) {
 
-    s := rc.service.WithContext(c.Request.Context())
+    s := rc.service
 
     if !IsAllowed(c.Request.Method, c.FullPath()) {
       //Authorizationヘッダーからstring型のトークンを取得
       tokenString := c.GetHeader("Authorization")
-      //トークンの改竄と期限を検証
-      //tips: expキーがない場合無期限トークンとして扱われ、token.Validの値はtrue
-      token, _ := jwt.Parse(tokenString, s.AccessTokenSecretSender)
-      //辞書型に変換
-      _, ok := token.Claims.(jwt.MapClaims)
-      //claims, ok := token.Claims.(jwt.MapClaims)
-  
-      if ok {
-        if token.Valid {
+
+      if valid, err := s.ReadAccessToken(tokenString); err != nil {
+        c.AbortWithStatus(http.StatusBadRequest)
+      } else {
+        if valid {
           //なにもしない
         } else {
           c.AbortWithStatus(http.StatusUnauthorized)
         }
-      } else {
-        c.AbortWithStatus(http.StatusBadRequest)
       }
     }
 
