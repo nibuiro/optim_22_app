@@ -46,9 +46,8 @@ type service struct {
 }
 
 
-func NewService(ctx context.Context, config *config.Config, repo Repository, logger log.Logger) Service {
+func NewService(config *config.Config, repo Repository, logger log.Logger) Service {
   return service{
-    ctx: ctx
     claims: make(jwt.MapClaims)
     refreshTokenSecret: []byte(config.refreshTokenSecret)
     accessTokenSecret: []byte(config.accessTokenSecret)
