@@ -7,8 +7,11 @@ import (
 )
 
 type User struct{
-	ID             int            `gorm:"primaryKey"`
-	Name           string         `gorm:"not null"`
+	// 「"user_id": ユーザID」はすべてユーザがユーザ登録時に自身で設定したユーザIDのことであり，
+	// サーバ側でデータベースに登録する際にインクリメンタルで付与される識別IDとは異なる。
+	// なので、後で変更する。
+	ID             int            `gorm:"primaryKey",json:"user_id"`
+	Name           string         `gorm:"not null",json:"username"`
 }
 
 type Client struct{
@@ -21,30 +24,31 @@ type Engineer struct{
 }
 
 type Winner struct{
-	EngineerID     int            `gorm:"not null"`
+	EngineerID     int            `gorm:"not null",json:"engineer_id"`
 	Engineer       Engineer
-	RequestID      int            `gorm:"unique;not null"`
+	RequestID      int            `gorm:"unique;not null",json:"request_id"`
 }
 
 type Request struct{
-	ID             int            `gorm:"primaryKey"`
-	ClientID       int            `gorm:"not null"`
+	ID             int            `gorm:"primaryKey",json:"request_id"`
+	ClientID       int            `gorm:"not null",json:"client_id"`
 	Client         Client
-	RequestName    string         `gorm:"not null"`
-	Content        string         `gorm:"not null"`
+	Engineers      []Engineer     `gorm:"many2many:engineer_requests;"`
+	RequestName    string         `gorm:"not null",json:"requestname"`
+	Content        string         `gorm:"not null",json:"content"`
 	Winner         Winner
-	Finish         bool           `gorm:"not null"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	Finish         bool           `gorm:"not null",json:"finish"`
+	CreatedAt      time.Time      `gorm:"not null",json:"createdat"`
+	UpdatedAt      time.Time      `gorm:"not null"`
 }
 
 type Submission struct{
-	ID             int            `gorm:"primaryKey"`
-	RequestID      int            `gorm:"not null"`
+	ID             int            `gorm:"primaryKey",json:"submission_id"`
+	RequestID      int            `gorm:"not null",json:"request_id"`
 	Request        Request
-	EngineerID     int            `gorm:"not null"`
+	EngineerID     int            `gorm:"not null",json:"engineer_id"`
 	Engineer       Engineer
-	Content        string         `gorm:"not null"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	Content        string         `gorm:"not null",json:"content"`
+	CreatedAt      time.Time      `gorm:"not null",json:"createdat"`
+	UpdatedAt      time.Time      `gorm:"not null"`
 }

@@ -8,31 +8,29 @@ import (
 	"strconv"
 )
 
-// クライアントがリクエストを依頼する。(入力画面の表示)
-func NewRequest(c *gin.Context) {
-    c.HTML(http.StatusOK, "new_request.html", gin.H{})
-}
+
 
 // クライアントがリクエストを依頼する。(入力内容をDBに格納)
 func CreateRequest(c *gin.Context) {
-	// formで入力された値を得る
-    requestname := c.PostForm("RequestName")
-    content := c.PostForm("Content")
+	// urlのクエリパラメータで受け取ったclient_idをclient_id_stringという変数に格納している。
+	client_id_string := c.Query("client_id")
+	// 文字列をintに変換
+	client_id, _ := strconv.Atoi(client_id_string)
 
-    // Client構造体データを格納するためのインスタンスを生成
-    client := typefile.Client{}
-    // Request構造体データを格納するためのインスタンスを生成
-    // request := typefile.Request{}
-    //　特定idを持つクライアントを格納する。ClientIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
-    model.Db.Find(&client,"id = ?",3)
-    // SELECT * FROM `client` WHERE id = ?
+	// フロントから送られたrequestのjsonデータをバインドするための構造体を宣言
+	var request typefile.Request
 
-    // ClientIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
-    var request = typefile.Request{ClientID: 3,RequestName: requestname,Content: content,Finish: false}
+	// JSONからrequest構造体へ値をマッピングしている。
+	if err := c.ShouldBindJSON(&request); err != nil {
+		// エラーが生じた場合、内容を出力。ない場合は、何も出力しない。
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// データを追加している。
+	request.ClientID = client_id
+    
     model.Db.Create(&request)
-
-    // Associationによって、外部キーを考えずにclientデータを取り出せるようにする。
-    model.Db.Model(&request).Association("Client").Append(&client)
 
     // 依頼作成者とログインユーザーが一致していることを確かめている。
     // if request.ClientID == user_id{
@@ -49,7 +47,7 @@ func CreateRequest(c *gin.Context) {
 
 // クライアントが依頼したリクエストの一覧を表示する。(すべてのユーザーが特定クライアントのリクエスト一覧を表示できる。)
 func ShowRequest(c *gin.Context) {
-	// urlの引数で受け取ったclient_idをclient_idという変数に格納している。
+	// urlのクエリパラメータで受け取ったclient_idをclient_id_stringという変数に格納している。
 	client_id_string := c.Param("client_id")
 	// 文字列をintに変換
 	client_id, _ := strconv.Atoi(client_id_string)
@@ -73,49 +71,37 @@ func ShowRequest(c *gin.Context) {
 }
 
 // クライアントが依頼済みのリクエストを編集する。
-func EditRequest(c *gin.Context) {
-	// urlの引数で受け取ったrequest_idをrequest_idという変数に格納している。
-	request_id_string := c.Param("request_id")
-	// 文字列をintに変換
-	request_id, _ := strconv.Atoi(request_id_string)
-
-    // Request構造体を格納するためのインスタンスを生成
-    request := typefile.Request{}
-
-    // 該当するリクエストを抽出している。
-    model.Db.Find(&request,"id = ?",request_id)
-
-	c.HTML(http.StatusOK, "edit_request.html", gin.H{
-        "request": request,
-	})
-}
-
-// クライアントが依頼済みのリクエストを編集する。
 func UpdateRequest(c *gin.Context) {
-	// formで入力された値を得る
-    requestname := c.PostForm("RequestName")
-    content := c.PostForm("Content")
-    request_id_string := c.PostForm("request_id")
-
+	// urlのクエリパラメータで受け取ったrequest_idをrequest_idという変数に格納している。
+	request_id_string := c.Query("request_id")
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)
 
-	// Request構造体を格納するためのインスタンスを生成
+	// フロントから送られたrequestのjsonデータをバインドするための構造体を宣言
+	var requestjson typefile.Request
+	// 更新対象のリクエストデータを格納するためのインスタンスを生成。
 	request := typefile.Request{}
+
+	// JSONからrequest構造体へ値をマッピングしている。
+	if err := c.ShouldBindJSON(&requestjson); err != nil {
+		// エラーが生じた場合、内容を出力。ない場合は、何も出力しない。
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	// 該当するリクエストを抽出している。
 	model.Db.Find(&request,"id = ?",request_id)
 
 	// それぞれのcolumeの値を更新する。
-	request.RequestName = requestname
-	request.Content = content
+	request.RequestName = requestjson.RequestName
+	request.Content = requestjson.Content
 	model.Db.Save(&request)
 
     // リクエストが終了していないことを確かめる。
-    if request.Finish == false{
+    // if request.Finish == false{
     	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    	c.Redirect(http.StatusSeeOther, "//localhost:8080/show_request/:request_id")
-    }
+    	//c.Redirect(http.StatusSeeOther, "//localhost:8080/show_request/:request_id")
+    //}
 
     // 依頼者と依頼更新者が一致していることを確かめている。
     // if update_request.ClientID == user_id{
@@ -128,7 +114,7 @@ func UpdateRequest(c *gin.Context) {
     // }
 
     // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/show_request/:request_id")
 }
 
 // 特定リクエストのサブミッションの一覧を標示するための関数
@@ -159,8 +145,8 @@ func ShowSubmission(c *gin.Context) {
 // 勝者を決定するための関数
 func DecideWinner(c *gin.Context) {
 	// formから送られた値を得る
-    request_id_string := c.PostForm("request_id")
-    engineer_id_string := c.PostForm("engineer_id")
+    request_id_string := c.Query("request_id")
+    engineer_id_string := c.Query("engineer_id")
 
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)

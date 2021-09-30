@@ -11,8 +11,8 @@ import (
 // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録する。
 func CreateEngineerJoin(c *gin.Context) {
 	// formから送られた値を得る
-    request_id_string := c.PostForm("request_id")
-    engineer_id_string := c.PostForm("engineer_id")
+    request_id_string := c.Query("request_id")
+    engineer_id_string := c.Query("engineer_id")
 
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)
@@ -25,50 +25,41 @@ func CreateEngineerJoin(c *gin.Context) {
 
 	model.Db.Find(&engineer,"id = ?",engineer_id)
 	model.Db.Find(&request,"id = ?",request_id)
-	// many2manyのtableにデータを格納する
+	// エンジニアが参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
 	model.Db.Model(&engineer).Association("Requests").Append(&request)
+	// リクエストに参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
+	model.Db.Model(&request).Association("Engineers").Append(&engineer)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }
 
-// エンジニアがsubmissionを提出するためのページを表示する
-func NewSubmission(c *gin.Context) {
-	// urlの引数で受け取ったrequest_idをrequest_id_stringという変数に格納している。
-	request_id_string := c.Param("request_id")
-	// 文字列をintに変換
-	request_id, _ := strconv.Atoi(request_id_string)
-
-	engineer_id := 3
-
-    c.HTML(http.StatusOK, "new_submission.html", gin.H{
-    	"engineer_id": engineer_id,
-    	"request_id": request_id,
-    })
-}
-
 // NewSubmissionで得たデータによって、エンジニアが提出した提出物をデータベースに登録する。
 func CreateSubmission(c *gin.Context) {
-	// formから送られた値を得る
-    request_id_string := c.PostForm("request_id")
-    engineer_id_string := c.PostForm("engineer_id")
-    content := c.PostForm("Content")
-
+	// urlのクエリパラメータで受け取ったrequest_idをrequest_id_stringという変数に格納している。
+	request_id_string := c.Query("request_id")
 	// 文字列をintに変換
 	request_id, _ := strconv.Atoi(request_id_string)
+	// urlのクエリパラメータで受け取ったengineer_idをengineer_id_stringという変数に格納している。
+	engineer_id_string := c.Query("engineer_id")
+	// 文字列をintに変換
 	engineer_id, _ := strconv.Atoi(engineer_id_string)
 
-	// Request構造体データを格納するためのインスタンスを生成
-	request := typefile.Request{}
-	//　提出するsubmissionに対応するリクエストを格納する。
-	model.Db.Find(&request,"id = ?",request_id)
+	// フロントから送られたrequestのjsonデータをバインドするための構造体を宣言
+	var submission typefile.Submission
 
-	// EngineerIDはUser機能が作成された後に、IDの取得方法を聞いた後に変更する。
-    var submission = typefile.Submission{RequestID: request_id,EngineerID: engineer_id,Content: content}
+	// JSONからrequest構造体へ値をマッピングしている。
+	if err := c.ShouldBindJSON(&submission); err != nil {
+		// エラーが生じた場合、内容を出力。ない場合は、何も出力しない。
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// データを追加している。
+	submission.EngineerID = engineer_id
+	submission.RequestID = request_id
+
     model.Db.Create(&submission)
-
-    // Associationによって、外部キーを考えずにrequestデータを取り出せるようにする。
-	model.Db.Model(&submission).Association("Request").Append(&request)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, "//localhost:8080/")
@@ -96,40 +87,30 @@ func ShowJoinRequest(c *gin.Context) {
     })
 }
 
-// エンジニアが提出済みのsubmissionを編集する。
-func EditSubmission(c *gin.Context) {
-	// urlの引数で受け取ったsubmission_idをsubmission_id_stringという変数に格納している。
-	submission_id_string := c.Param("submission_id")
-	// 文字列をintに変換
-	submission_id, _ := strconv.Atoi(submission_id_string)
-
-	// Submission構造体データを格納するためのインスタンスを生成
-	submission := typefile.Submission{}
-
-	model.Db.Find(&submission,"id = ?",submission_id)
-
-	c.HTML(http.StatusOK, "edit_submission.html", gin.H{
-		"submission": submission,
-	})
-}
-
 // エンジニアが編集済みのsubmissionを提出する。
 func UpdateSubmission(c *gin.Context) {
-	// formから送られた値を得る
-	submission_id_string := c.PostForm("submission_id")
-    content := c.PostForm("Content")
-
+	// urlの引数で受け取ったsubmission_idをsubmission_id_stringという変数に格納している。
+	submission_id_string := c.Query("submission_id")
 	// 文字列をintに変換
 	submission_id, _ := strconv.Atoi(submission_id_string)
 
+	// フロントから送られたrequestのjsonデータをバインドするための構造体を宣言
+	var submissionjson typefile.Submission
 	// Submission構造体データを格納するためのインスタンスを生成
 	submission := typefile.Submission{}
+
+	// JSONからrequest構造体へ値をマッピングしている。
+	if err := c.ShouldBindJSON(&submissionjson); err != nil {
+		// エラーが生じた場合、内容を出力。ない場合は、何も出力しない。
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	// 該当するsubmissionを抽出している。
 	model.Db.Find(&submission,"id = ?",submission_id)
 
 	// contentを更新する。
-	submission.Content = content
+	submission.Content = submissionjson.Content
 	model.Db.Save(&submission)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
