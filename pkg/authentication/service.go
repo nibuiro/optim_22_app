@@ -8,6 +8,7 @@ import (
 
 
 type Service interface {
+  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service
   WithContext(ctx context.Context) *service
   ReadRefreshToken(tokenString string) (bool, error)
   ReadAccessToken(tokenString string) (bool, error)
@@ -33,13 +34,17 @@ type service struct {
   accessTokenExpiration int
 }
 
-func NewService(refreshTokenSecret []byte, accessTokenSecret []byte, refreshTokenExpiration int, accessTokenExpiration int) Service {
-  return service{
-    refreshTokenSecret: refreshTokenSecret,
-    accessTokenSecret: accessTokenSecret,
-    refreshTokenExpiration: refreshTokenExpiration,
-    accessTokenExpiration: accessTokenExpiration,
-  }
+func NewService(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) Service {
+  return service{}.SetParams(refreshTokenSecret, accessTokenSecret, refreshTokenExpiration, accessTokenExpiration)
+}
+
+
+func (s service) SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service {
+  s.refreshTokenSecret = []byte(refreshTokenSecret)
+  s.accessTokenSecret = []byte(accessTokenSecret)
+  s.refreshTokenExpiration = refreshTokenExpiration
+  s.accessTokenExpiration = accessTokenExpiration
+  return &s
 }
 
 
