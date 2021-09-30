@@ -33,14 +33,12 @@ type service struct {
   accessTokenExpiration int
 }
 
-func NewService(ctx context.Context, refreshTokenSecret []byte, accessTokenSecret []byte, refreshTokenExpiration int, accessTokenExpiration int) Service {
+func NewService(refreshTokenSecret []byte, accessTokenSecret []byte, refreshTokenExpiration int, accessTokenExpiration int) Service {
   return service{
-    ctx,
-    make(jwt.MapClaims),
-    refreshTokenSecret,
-    accessTokenSecret,
-    refreshTokenExpiration,
-    accessTokenExpiration,
+    refreshTokenSecret: refreshTokenSecret,
+    accessTokenSecret: accessTokenSecret,
+    refreshTokenExpiration: refreshTokenExpiration,
+    accessTokenExpiration: accessTokenExpiration,
   }
 }
 
