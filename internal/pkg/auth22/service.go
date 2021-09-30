@@ -62,6 +62,7 @@ func NewService(ctx context.Context, config *config.Config, repo Repository, log
 
 func (s service) ReadCredential(data []byte) error {
   if err := json.Unmarshal(data, &s.credential); err != nil {
+    s.logger.Error(err)
     return err
   } else {
     return nil
@@ -84,6 +85,7 @@ func (s service) ValidateCredential() error {
   
   //資格情報の検証とユーザIDの取
   if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
+    s.logger.Error(err)
     return err
   } else {
     s.claims["userID"] = userId
