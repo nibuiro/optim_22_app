@@ -46,6 +46,7 @@ func NewService(refreshTokenSecret []byte, accessTokenSecret []byte, refreshToke
 func (s service) WithContext(ctx context.Context) *service {
   newServie := s
   newServie.ctx = ctx
+  newServie.claims = make(jwt.MapClaims)
   return &newServie
 }
 
