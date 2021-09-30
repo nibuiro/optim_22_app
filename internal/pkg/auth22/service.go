@@ -31,10 +31,11 @@ func (m Credential) Validate() error {
 
 
 type Service interface {  
+  RefreshService(ctx context.Context)
+//  //
   SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int)
   //
   SetContext(ctx context.Context)
-  WithContext(ctx context.Context) *service //オーバーライド必須
   WhereContext() context.Context
   //
   RefreshClaims()
@@ -75,14 +76,6 @@ func NewService(config *config.Config, repo Repository, logger log.Logger) Servi
   }
   newService.SetParams(config.RefreshTokenSecret, config.AccessTokenSecret, config.RefreshTokenExpiration, config.AccessTokenExpiration)
   return newService
-}
-
-
-func (s service) WithContext(ctx context.Context) *service {
-  newServie := s
-  newServie.SetContext(ctx)
-  newServie.RefreshClaims()
-  return &newServie
 }
 
 

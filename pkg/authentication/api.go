@@ -29,7 +29,8 @@ func New(service Service, domain string) *resource {
 func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    s := rc.service.WithContext(c.Request.Context())
+    s := rc.service
+    s.RefreshService(c.Request.Context())
 
     if refreshToken, err := c.Cookie("refresh_token"); err != nil {
       c.Status(http.StatusBadRequest)
@@ -59,7 +60,8 @@ func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
 func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    s := rc.service.WithContext(c.Request.Context())
+    s := rc.service
+    s.RefreshService(c.Request.Context())
 
     refreshToken, err := c.Cookie("refresh_token")
 
@@ -109,7 +111,8 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
 func (rc resource) Login() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    s := rc.service.WithContext(c.Request.Context())
+    s := rc.service
+    s.RefreshService(c.Request.Context())
   
     //BodyからJSONをパースして読み取る
     if body, err := io.ReadAll(c.Request.Body); err != nil {
@@ -153,7 +156,8 @@ func (rc resource) Login() gin.HandlerFunc {
 func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    s := rc.service.WithContext(c.Request.Context())
+    s := rc.service
+    s.RefreshService(c.Request.Context())
 
     refreshToken, err := c.Cookie("refresh_token")
 

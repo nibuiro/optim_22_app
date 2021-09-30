@@ -9,11 +9,11 @@ import (
 
 type Service interface {
 //  SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int) *service
+  RefreshService(ctx context.Context)
 //  //
   SetParams(refreshTokenSecret string, accessTokenSecret string, refreshTokenExpiration int, accessTokenExpiration int)
   //
   SetContext(ctx context.Context)
-  WithContext(ctx context.Context) *service //オーバーライド必須
   WhereContext() context.Context
   //
   RefreshClaims()
@@ -63,11 +63,9 @@ func (s service) SetContext(ctx context.Context) {
   s.ctx = ctx
 }
 
-func (s service) WithContext(ctx context.Context) *service {
-  newServie := s
-  newServie.SetContext(ctx)
-  newServie.RefreshClaims()
-  return &newServie
+func (s service) RefreshService(ctx context.Context) {
+  s.SetContext(ctx)
+  s.RefreshClaims()
 }
 
 
