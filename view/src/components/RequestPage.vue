@@ -95,7 +95,7 @@
               <li>
                 提出物　：
                 <router-link
-                  class="mr-3"
+                  class="mr-3 is-inline-flex is-align-items-center"
                   v-for="submission in request.submissions"
                   :key="submission.submissionid"
                   :to="{
@@ -103,7 +103,8 @@
                     query: { id: submission.submissionid }
                   }"
                 >
-                  {{ submission.engineer.username }}による提出
+                  <b-icon icon="file-upload-outline" />
+                  {{ submission.engineer.username }}さんの提出
                 </router-link>
               </li>
             </ul>
