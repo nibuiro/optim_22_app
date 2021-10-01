@@ -13,9 +13,9 @@ import (
 // クライアントがリクエストを依頼する。(入力内容をDBに格納)
 func CreateRequest(c *gin.Context) {
 	// urlのクエリパラメータで受け取ったclient_idをclient_id_stringという変数に格納している。
-	client_id_string := c.Query("client_id")
+	// client_id_string := c.Query("client_id")
 	// 文字列をintに変換
-	client_id, _ := strconv.Atoi(client_id_string)
+	// client_id, _ := strconv.Atoi(client_id_string)
 
 	// フロントから送られたrequestのjsonデータをバインドするための構造体を宣言
 	var request typefile.Request
@@ -27,8 +27,12 @@ func CreateRequest(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, gin.H{
+    	"request": request,
+    })
+
 	// データを追加している。
-	request.ClientID = client_id
+	// request.ClientID = client_id
     
     model.Db.Create(&request)
 

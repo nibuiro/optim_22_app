@@ -48,6 +48,7 @@ type Submission struct{
 	Request        Request
 	EngineerID     int            `gorm:"not null",json:"engineer_id"`
 	Engineer       Engineer
+	URL            string         `gorm:"not null",json:"url"`
 	Content        string         `gorm:"not null",json:"content"`
 	CreatedAt      time.Time      `gorm:"not null",json:"createdat"`
 	UpdatedAt      time.Time      `gorm:"not null"`

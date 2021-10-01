@@ -13,11 +13,11 @@ import (
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/config"
-  "optim_22_app/internal/home"
-  "optim_22_app/internal/client"
-  "optim_22_app/internal/request"
-  "optim_22_app/internal/submission"
-  "optim_22_app/internal/engineer"
+  "optim_22_app/internal/app/home"
+  "optim_22_app/internal/app/client"
+  "optim_22_app/internal/app/request"
+  "optim_22_app/internal/app/submission"
+  "optim_22_app/internal/app/engineer"
 )
 
 var (

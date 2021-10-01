@@ -15,6 +15,7 @@ type SubmissionJson struct{
 	CreatedAt      time.Time           `json:"createdat"`
 	// 要件はエンジニアのプロフィールデータであるが、プロフィール機能は担当外のため、EngineerIDを代用する。
 	EngineerID     int                 `json:"engineer`
+	URL            string              `json:url`
 	Content        string              `json:"content"`
 }
 
@@ -38,9 +39,15 @@ func ShowSubmission(c *gin.Context) {
 	submission_json.ID = submission.ID
 	submission_json.CreatedAt = submission.CreatedAt
 	submission_json.EngineerID = submission.EngineerID
+	submission_json.URL = submission.URL
 	submission_json.Content = submission.Content
 
-    c.JSON(http.StatusOK, gin.H{
-    	"submission": submission_json,
-    })
+	if submission.ID == 0{
+		// 400ラーを返したいが指定方法が分からない。なので、存在しないファイルを指定することで、404errorを出させる。
+		c.JSON(http.StatusBadRequest, gin.H{})
+	}else{
+		c.JSON(http.StatusOK, gin.H{
+			"submission": submission_json,
+		})
+	}
 }

@@ -14,6 +14,7 @@ type SubmissionJson struct{
 	CreatedAt      time.Time           `json:"createdat"`
 	// 要件はエンジニアのプロフィールデータであるが、プロフィール機能は担当外のため、EngineerIDを代用する。
 	EngineerID     int                 `json:"engineer`
+	URL            string              `json:url`
 	Content        string              `json:"content"`
 }
 
@@ -77,6 +78,7 @@ func ShowHomepage(c *gin.Context) {
 			submission_json.ID = submission.ID
 			submission_json.CreatedAt = submission.CreatedAt
 			submission_json.EngineerID = submission.EngineerID
+			submission_json.URL = submission.URL
 			submission_json.Content = submission.Content
 			request_json.Submissions = append(request_json.Submissions,submission_json)
 		}
