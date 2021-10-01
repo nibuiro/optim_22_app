@@ -13,6 +13,13 @@ type User struct{
 	Password       string         `gorm:"not null",json:"password"`     
 }
 
+type Profile struct{
+	ID             int            `gorm:"primaryKey"`
+	Bio            string        
+	Sns            []byte   
+	Icon           string
+}
+
 type Client struct{
 	User           User           `gorm:"embedded"`
 }

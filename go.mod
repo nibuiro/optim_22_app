@@ -24,6 +24,6 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/driver/postgres v1.1.1 // indirect
+	gorm.io/driver/postgres v1.1.1
 	gorm.io/gorm v1.21.15
 )
