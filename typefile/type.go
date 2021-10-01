@@ -7,11 +7,10 @@ import (
 )
 
 type User struct{
-	// 「"user_id": ユーザID」はすべてユーザがユーザ登録時に自身で設定したユーザIDのことであり，
-	// サーバ側でデータベースに登録する際にインクリメンタルで付与される識別IDとは異なる。
-	// なので、後で変更する。
 	ID             int            `gorm:"primaryKey",json:"user_id"`
 	Name           string         `gorm:"not null",json:"username"`
+	Email          string         `gorm:"not null",json:"email"`  
+	Password       string         `gorm:"not null",json:"password"`     
 }
 
 type Client struct{

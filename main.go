@@ -18,6 +18,7 @@ import (
   "optim_22_app/internal/app/request"
   "optim_22_app/internal/app/submission"
   "optim_22_app/internal/app/engineer"
+  "optim_22_app/internal/app/user"
 )
 
 var (
