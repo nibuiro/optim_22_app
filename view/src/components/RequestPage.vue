@@ -19,7 +19,7 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ request.client.username }}さんの依頼
         </p>
-        <request-form class="is-light ml-auto mt-5" :request="request" />
+        <request-editor class="is-light ml-auto mt-5" :request="request" />
       </div>
     </section>
     <section class="mb-3">
@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import RequestForm from "@/components/RequestForm";
+import RequestEditor from "@/components/RequestEditor";
 
 const request = require("../../src/assets/sampleRequest.json");
 
@@ -143,7 +143,7 @@ export default {
     }
   },
   components: {
-    "request-form": RequestForm
+    "request-editor": RequestEditor
   }
 };
 </script>
