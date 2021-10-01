@@ -5,7 +5,7 @@
         <p class="title mb-0">
           リクエスト一覧
         </p>
-        <b-button class="is-light" label="新規リクエスト" outlined />
+        <request-form class="is-light" />
       </div>
     </section>
     <section class="mb-3">
@@ -135,6 +135,8 @@
 </template>
 
 <script>
+import RequestForm from "@/components/RequestForm";
+
 const data = require("../../src/assets/sampleRequests.json");
 
 export default {
@@ -162,6 +164,9 @@ export default {
         borderRadius: "100%"
       };
     }
+  },
+  components: {
+    "request-form": RequestForm
   }
 };
 </script>
