@@ -82,13 +82,13 @@ func CreateTestData() {
 	Db.Create(&winners)
 
 	var submissions = []typefile.Submission{
-		{RequestID: 1,EngineerID: 1,Content: "submission1 of engineerID 1"},
-		{RequestID: 2,EngineerID: 1,Content: "submission2 of engineerID 1"},
-		{RequestID: 1,EngineerID: 2,Content: "submission3 of engineerID 2"},
-		{RequestID: 4,EngineerID: 2,Content: "submission4 of engineerID 2"},
-		{RequestID: 4,EngineerID: 3,Content: "submission5 of engineerID 3"},
-		{RequestID: 3,EngineerID: 1,Content: "submission6 of engineerID 1"},
-		{RequestID: 5,EngineerID: 4,Content: "submission7 of engineerID 4"}}
+		{RequestID: 1,EngineerID: 1,URL: "http://example.com/1",Content: "submission1 of engineerID 1"},
+		{RequestID: 2,EngineerID: 1,URL: "http://example.com/2",Content: "submission2 of engineerID 1"},
+		{RequestID: 1,EngineerID: 2,URL: "http://example.com/3",Content: "submission3 of engineerID 2"},
+		{RequestID: 4,EngineerID: 2,URL: "http://example.com/4",Content: "submission4 of engineerID 2"},
+		{RequestID: 4,EngineerID: 3,URL: "http://example.com/5",Content: "submission5 of engineerID 3"},
+		{RequestID: 3,EngineerID: 1,URL: "http://example.com/6",Content: "submission6 of engineerID 1"},
+		{RequestID: 5,EngineerID: 4,URL: "http://example.com/7",Content: "submission7 of engineerID 4"}}
 	Db.Create(&submissions)
 
 	// id=1のRequest構造体データを格納するためのインスタンスを生成
