@@ -124,7 +124,10 @@
       </b-tabs>
     </section>
     <section class="mb-3 is-flex is-justify-content-center">
+      <!-- 依頼主であり提出物が1つ以上あれば -->
       <choose-winner v-if="true" :request="request" />
+      <!-- 依頼主以外であれば -->
+      <request-applier v-if="true" :request="request" />
     </section>
   </div>
 </template>
@@ -132,6 +135,7 @@
 <script>
 import RequestEditor from "@/components/RequestEditor";
 import ChooseWinner from "@/components/ChooseWinner.vue";
+import RequestApplier from "@/components/RequestApplier.vue";
 
 const request = require("../../src/assets/sampleRequest.json");
 
@@ -156,10 +160,12 @@ export default {
   },
   components: {
     "request-editor": RequestEditor,
-    "choose-winner": ChooseWinner
+    "choose-winner": ChooseWinner,
+    "request-applier": RequestApplier
   }
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+<!-
+    RequestApplier- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped></style>
