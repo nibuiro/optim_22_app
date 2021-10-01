@@ -10,10 +10,17 @@
         position="is-right"
         always
       >
-        <div
-          class="ml-3 mt-3 mb-6"
-          :style="iconStyle(64, submission.engineer.icon)"
-        />
+        <router-link
+          :to="{
+            name: 'MyPage',
+            params: { user_id: submission.engineer.userid }
+          }"
+        >
+          <div
+            class="ml-3 mt-3 mb-6"
+            :style="iconStyle(64, submission.engineer.icon)"
+          />
+        </router-link>
       </b-tooltip>
       <div class="hero-body is-flex pt-0 pb-5">
         <p class="title mb-0 pt-2" style="margin-left: 64px;">

@@ -12,14 +12,9 @@
       <b-navbar-item href="/">
         Home
       </b-navbar-item>
-      <b-navbar-dropdown label="Info">
-        <b-navbar-item href="#">
-          About
-        </b-navbar-item>
-        <b-navbar-item href="#">
-          Contact
-        </b-navbar-item>
-      </b-navbar-dropdown>
+      <b-navbar-item href="/">
+        About
+      </b-navbar-item>
     </template>
 
     <template #end>
