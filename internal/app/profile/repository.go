@@ -25,6 +25,12 @@ type repository struct {
 }
 
 
+
+func NewRepository(db *gorm.DB, logger log.Logger) Repository {
+  return repository{db, logger}
+}
+
+
 func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, error) {
   var userProfile typefile.Profile
   result := r.db.WithContext(ctx).Find("ID = ?", userId, &userProfile)
@@ -34,6 +40,7 @@ func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, erro
     return userProfile, nil
   }
 }
+
 
 func (r repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
   result := r.db.WithContext(ctx).Create(userProfile)
