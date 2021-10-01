@@ -92,8 +92,8 @@
                   v-for="submission in request.submissions"
                   :key="submission.submissionid"
                   :to="{
-                    name: 'MyPage',
-                    params: { user_id: submission.submissionid }
+                    name: 'SubmissionPage',
+                    query: { id: submission.submissionid }
                   }"
                 >
                   {{ submission.engineer.username }}による提出
