@@ -67,7 +67,7 @@ func (r repository) Delete(ctx context.Context, userId int) error {
 //#region 実績を取得
 func (r repository) GetRequested(ctx context.Context, userId int) ([]typefile.Request, error) {
   var requesteds []typefile.Request
-  result := r.db.WithContext(ctx).Find(&requesteds, "ClientID = ?", userId)
+  result := r.db.WithContext(ctx).Find(&requesteds, "client_id = ?", userId)
   return requesteds, result.Error
 }
 
@@ -77,9 +77,9 @@ func (r repository) GetParticipated(ctx context.Context, userId int) ([]typefile
   var participateds []typefile.Request //Submission  Request
   result := r.db.WithContext(ctx).
     Model(&typefile.Submission{}).
-    Select("request.Finish, submission.UpdatedAt, request.ClientID, request.RequestName, request.Content, submissionID").
-    Joins("INNER JOIN \"request\" ON submission.RequestID = request.ID").
-    Where("submission.EngineerID = ?", userId).
+    Select("requests.finish, submissions.updated_at, requests.client_id, requests.request_name, requests.content, submissions.id").
+    Joins("INNER JOIN requests ON submissions.request_id = requests.id").
+    Where("submissions.engineer_id = ?", userId).
     Scan(&participateds)
 
   return participateds, result.Error

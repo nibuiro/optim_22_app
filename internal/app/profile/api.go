@@ -47,7 +47,8 @@ func (rc resource) get() gin.HandlerFunc {
         return
       } else {
         //c.Header("Content-Type", "application/json")
-        c.JSON(http.StatusOK, userProfileText)
+        c.Header("Content-Type", "application/json")
+        c.String(http.StatusOK, string(userProfileText[:]))
         return
       }
     }
