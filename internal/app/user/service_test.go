@@ -1,6 +1,5 @@
-
 package user
-/*
+
 import (
   "testing"
 //  "github.com/gin-gonic/gin"
@@ -8,55 +7,56 @@ import (
 //  "optim_22_app/pkg/log"
 //  "optim_22_app/typefile"
   "github.com/stretchr/testify/assert"
+  "optim_22_app/pkg/log"
 )
   
 
-func TestCreateUserRequest_Validate(t *testing.T) {
-  //バグ予測、限界値テストに基づいてテストを設計
+func TestRegistrationInformationValidate(t *testing.T) {
+  logger := log.New()
   tests := []struct {
     name      string
-    model     CreateUserRequest
+    model     RegistrationInformation
     wantError bool
   }{
     {
-      "success", 
-      CreateUserRequest{
+      "normal address", 
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       false,
     },
     {
-      "success", 
-      CreateUserRequest{
+      "academic address", 
+      RegistrationInformation{
         Name:"test", 
         Email:"test@inc.test-ac.jp", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       false,
     },
     {
-      "success", 
-      CreateUserRequest{
+      "has dot", 
+      RegistrationInformation{
         Name:"test", 
         Email:"test.test@test.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       false,
     },
     {
       "invalid name type: empty", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"", 
         Email:"test@test.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
     {
       "invalid hash type: <len", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
         Password:"7f83b1657ff1fc53b92dc18148a1d65",
@@ -65,34 +65,34 @@ func TestCreateUserRequest_Validate(t *testing.T) {
     },
     {
       "invalid hash type: >len", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d67722d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d67722d4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
     {
       "invalid hash type: !format", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
-        Password:" 7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:" 7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
     {
       "invalid hash type: !format", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069 ",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069 ",
       }, 
       true,
     },
     {
       "invalid hash type: empty", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"test@test.com", 
         Password:"",
@@ -100,29 +100,38 @@ func TestCreateUserRequest_Validate(t *testing.T) {
       true,
     },
     {
-      "invalid email type: !format", 
-      CreateUserRequest{
+      "invalid email type: no at", 
+      RegistrationInformation{
         Name:"test", 
         Email:"testtest.com", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
     {
-      "invalid email type: !format", 
-      CreateUserRequest{
+      "invalid email type: invalid hyphen", 
+      RegistrationInformation{
+        Name:"test", 
+        Email:"test@test-.com", 
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
+      }, 
+      true,
+    },
+    {
+      "invalid email type: no TLD", 
+      RegistrationInformation{
         Name:"test", 
         Email:"test@testcom", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
     {
       "invalid email type: empty", 
-      CreateUserRequest{
+      RegistrationInformation{
         Name:"test", 
         Email:"", 
-        Password:"7f83b1657ff1fc53b92dc18148a1d65dsc2d4b1fa3d677284addd200126d9069",
+        Password:"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069",
       }, 
       true,
     },
@@ -130,8 +139,8 @@ func TestCreateUserRequest_Validate(t *testing.T) {
   for _, tt := range tests {
     t.Run(tt.name, func(t *testing.T) {
       err := tt.model.Validate()
+      logger.Debug(err)
       assert.Equal(t, tt.wantError, err != nil)
     })
   }
 }
-*/

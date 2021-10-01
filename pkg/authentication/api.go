@@ -16,7 +16,9 @@ const (
 
 
 type AuthorizationService interface {
-  New(args ...interface{}) string
+  //リフレッシュトークンとアクセストークンを返す
+  New(args ...interface{}) (string, string)
+  //リフレッシュトークンのリフレッシュ
   Refresh(refreshToken string) string
 }
 
@@ -26,7 +28,7 @@ type Authorizer struct {
   refreshTokenSecret []byte
   accessTokenSecret []byte
   validityPeriod time.Duration
-  authorizationService AuthorizationService
+  AuthorizationService AuthorizationService
 }
 
 
@@ -36,7 +38,7 @@ func New(domain string, refreshTokenSecret string, accessTokenSecret string, val
     refreshTokenSecret: []byte(refreshTokenSecret), 
     accessTokenSecret: []byte(accessTokenSecret), 
     validityPeriod: time.Duration(validityPeriod * ndaysPerYear * nhoursPerDay) * time.Hour,
-    authorizationService: authorizationService,
+    AuthorizationService: authorizationService,
   }
 }
 
@@ -55,7 +57,7 @@ func (auth *Authorizer) RefreshTokenRefreshHandler() gin.HandlerFunc {
   
       if ok {
         if token.Valid {
-          newRefreshToken := auth.authorizationService.Refresh(refreshToken)
+          newRefreshToken := auth.AuthorizationService.Refresh(refreshToken)
           c.SetCookie("refresh_token", newRefreshToken, 1, "/", auth.domain, false, true)
             //func (c *Context) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
 
