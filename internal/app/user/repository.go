@@ -27,34 +27,32 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 
 
 func (r repository) Create(ctx context.Context, user *typefile.User) error {
-  result := r.db.WithContext(ctx).Create(user)
-  if err := result.Error; err != nil {
+  
+  if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
     return err
   } else {
     //pass
   }
 
   client := &typefile.Client{}
-  client.User.ID: user.ID
-  client.User.Name: user.Name
-  client.User.Email: user.Email
-  client.User.Password: user.Password
+  client.User.ID = user.ID
+  client.User.Name = user.Name
+  client.User.Email = user.Email
+  client.User.Password = user.Password
   
-  result := r.db.WithContext(ctx).Create(client)
-  if err := result.Error; err != nil {
+  if err := r.db.WithContext(ctx).Create(client).Error; err != nil {
     return err
   } else {
     //pass
   }
 
   engineer := &typefile.Engineer{}
-  engineer.User.ID: user.ID
-  engineer.User.Name: user.Name
-  engineer.User.Email: user.Email
-  engineer.User.Password: user.Password
+  engineer.User.ID = user.ID
+  engineer.User.Name = user.Name
+  engineer.User.Email = user.Email
+  engineer.User.Password = user.Password
   
-  result := r.db.WithContext(ctx).Create(engineer)
-  if err := result.Error; err != nil {
+  if err := r.db.WithContext(ctx).Create(engineer).Error; err != nil {
     return err
   } else {
     //pass
