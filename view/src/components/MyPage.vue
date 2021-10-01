@@ -221,7 +221,14 @@
               width="20%"
               v-slot="props"
             >
-              <a href="">提出物</a>
+              <router-link
+                :to="{
+                  name: 'SubmissionPage',
+                  query: { id: props.submissionid }
+                }"
+              >
+                提出物
+              </router-link>
             </b-table-column>
           </b-table>
         </b-tab-item>
