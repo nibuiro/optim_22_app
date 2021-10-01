@@ -128,6 +128,8 @@
       <choose-winner v-if="true" :request="request" />
       <!-- 依頼主以外であれば -->
       <request-applier v-if="true" :request="request" />
+      <!-- 依頼主以外で参加済みであれば -->
+      <submission-submitter v-if="true" />
     </section>
   </div>
 </template>
@@ -136,6 +138,7 @@
 import RequestEditor from "@/components/RequestEditor";
 import ChooseWinner from "@/components/ChooseWinner.vue";
 import RequestApplier from "@/components/RequestApplier.vue";
+import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
 
 const request = require("../../src/assets/sampleRequest.json");
 
@@ -161,11 +164,11 @@ export default {
   components: {
     "request-editor": RequestEditor,
     "choose-winner": ChooseWinner,
-    "request-applier": RequestApplier
+    "request-applier": RequestApplier,
+    "submission-submitter": SubmissionSubmitter
   }
 };
 </script>
 
-<!-
-    RequestApplier- Add "scoped" attribute to limit CSS to this component only -->
+<!-- RequestApplier- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped></style>
