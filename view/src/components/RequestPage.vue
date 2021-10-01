@@ -109,6 +109,14 @@
               </li>
             </ul>
           </div>
+          <section class="is-flex is-justify-content-center">
+            <!-- 依頼主であり提出物が1つ以上あれば -->
+            <choose-winner v-if="true" :request="request" />
+            <!-- 依頼主以外であれば -->
+            <request-applier v-if="true" :request="request" />
+            <!-- 依頼主以外で参加済みであれば -->
+            <submission-submitter v-if="true" />
+          </section>
         </b-tab-item>
         <b-tab-item>
           <template #header>
@@ -117,25 +125,16 @@
               ディスカッション
             </span>
           </template>
-          <div class="content">
-            ここにディスカッションが表示されます。
-          </div>
+          <discussion-page />
         </b-tab-item>
       </b-tabs>
-    </section>
-    <section class="mb-3 is-flex is-justify-content-center">
-      <!-- 依頼主であり提出物が1つ以上あれば -->
-      <choose-winner v-if="true" :request="request" />
-      <!-- 依頼主以外であれば -->
-      <request-applier v-if="true" :request="request" />
-      <!-- 依頼主以外で参加済みであれば -->
-      <submission-submitter v-if="true" />
     </section>
   </div>
 </template>
 
 <script>
 import RequestEditor from "@/components/RequestEditor";
+import DiscussionPage from "@/components/DiscussionPage";
 import ChooseWinner from "@/components/ChooseWinner.vue";
 import RequestApplier from "@/components/RequestApplier.vue";
 import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
@@ -163,6 +162,7 @@ export default {
   },
   components: {
     "request-editor": RequestEditor,
+    "discussion-page": DiscussionPage,
     "choose-winner": ChooseWinner,
     "request-applier": RequestApplier,
     "submission-submitter": SubmissionSubmitter
