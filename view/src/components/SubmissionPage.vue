@@ -26,7 +26,7 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ submission.engineer.username }}さんの提出物
         </p>
-        <submission-form
+        <submission-editor
           class="is-light ml-auto mt-5"
           :submission="submission"
         />
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import SubmissionForm from "@/components/SubmissionForm";
+import SubmissionEditor from "@/components/SubmissionEditor";
 
 const submission = require("../../src/assets/sampleSubmission.json");
 const request = require("../../src/assets/sampleRequest.json");
@@ -94,7 +94,7 @@ export default {
     }
   },
   components: {
-    "submission-form": SubmissionForm
+    "submission-editor": SubmissionEditor
   }
 };
 </script>
