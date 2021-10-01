@@ -122,11 +122,15 @@
         </b-tab-item>
       </b-tabs>
     </section>
+    <section class="mb-3 is-flex is-justify-content-center">
+      <choose-winner v-if="true" :request="request" />
+    </section>
   </div>
 </template>
 
 <script>
 import RequestEditor from "@/components/RequestEditor";
+import ChooseWinner from "@/components/ChooseWinner.vue";
 
 const request = require("../../src/assets/sampleRequest.json");
 
@@ -150,7 +154,8 @@ export default {
     }
   },
   components: {
-    "request-editor": RequestEditor
+    "request-editor": RequestEditor,
+    "choose-winner": ChooseWinner
   }
 };
 </script>
