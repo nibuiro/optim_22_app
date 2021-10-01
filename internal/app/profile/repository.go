@@ -33,7 +33,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 
 func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, error) {
   var userProfile typefile.Profile
-  result := r.db.WithContext(ctx).Find("ID = ?", userId, &userProfile)
+  result := r.db.WithContext(ctx).Find(&userProfile, "ID = ?", userId)
   if result.Error != nil {
     return typefile.Profile{}, result.Error
   } else {
