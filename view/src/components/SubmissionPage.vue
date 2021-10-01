@@ -19,7 +19,10 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ submission.engineer.username }}さんの提出物
         </p>
-        <request-form class="is-light ml-auto mt-5" :request="request" />
+        <submission-form
+          class="is-light ml-auto mt-5"
+          :submission="submission"
+        />
       </div>
     </section>
     <section class="mb-3">
@@ -41,8 +44,8 @@
               <li>依頼名　：{{ request.request }}</li>
               <li>
                 提出物　：
-                <a href="">
-                  提出物のURL
+                <a :href="submission.url">
+                  {{ submission.url }}
                 </a>
               </li>
               <li>
@@ -58,7 +61,7 @@
 </template>
 
 <script>
-import RequestForm from "@/components/RequestForm";
+import SubmissionForm from "@/components/SubmissionForm";
 
 const submission = require("../../src/assets/sampleSubmission.json");
 const request = require("../../src/assets/sampleRequest.json");
@@ -84,7 +87,7 @@ export default {
     }
   },
   components: {
-    "request-form": RequestForm
+    "submission-form": SubmissionForm
   }
 };
 </script>
