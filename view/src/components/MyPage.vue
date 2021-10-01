@@ -14,7 +14,7 @@
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ profile.username }}
         </p>
-        <profile-form class="is-light ml-auto mt-5" :profile="profile" />
+        <profile-editor class="is-light ml-auto mt-5" :profile="profile" />
       </div>
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
@@ -238,7 +238,7 @@
 </template>
 
 <script>
-import ProfileForm from "@/components/ProfileForm";
+import ProfileEditor from "@/components/ProfileEditor";
 
 const profile = require("../../src/assets/sampleProfile.json");
 
@@ -262,7 +262,7 @@ export default {
     }
   },
   components: {
-    "profile-form": ProfileForm
+    "profile-editor": ProfileEditor
   }
 };
 </script>
