@@ -48,7 +48,34 @@
                    ${new Date(submission.date).toLocaleTimeString()}`
                 }}
               </li>
-              <li>依頼名　：{{ request.request }}</li>
+              <li>
+                依頼名　：
+                <router-link
+                  :to="{
+                    name: 'RequestPage',
+                    params: { request_id: request.request_id }
+                  }"
+                >
+                  {{ request.request }}
+                </router-link>
+              </li>
+              <li>
+                <div class="is-flex is-align-items-center">
+                  提出者　：
+                  <router-link
+                    class="is-flex is-align-items-center"
+                    :to="{
+                      name: 'MyPage',
+                      params: { user_id: submission.engineer_id }
+                    }"
+                  >
+                    <b-tooltip :label="submission.engineer.username">
+                      <div :style="iconStyle(32, request.client.icon)" />
+                    </b-tooltip>
+                    {{ submission.engineer.username }}
+                  </router-link>
+                </div>
+              </li>
               <li>
                 提出物　：
                 <a :href="submission.url">
