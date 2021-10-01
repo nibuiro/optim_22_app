@@ -36,7 +36,7 @@
       <b-tabs type="is-boxed">
         <b-tab-item>
           <template #header>
-            <b-icon icon="file-upload-outline"></b-icon>
+            <b-icon icon="file-upload-outline" />
             <span>提出物詳細</span>
           </template>
           <div class="content">
