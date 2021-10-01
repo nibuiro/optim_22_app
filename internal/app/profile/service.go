@@ -42,7 +42,7 @@ func (m sns) Validate() error {
 func (m profile) Validate() error {
   return validation.ValidateStruct(&m,
     //is unsigned integer
-    validation.Field(&m.Id, validation.Match(regexp.MustCompile("\\d+"))),
+    //validation.Field(&m.Id, validation.Match(regexp.MustCompile("\\d+"))),
     //is BIO
     validation.Field(&m.Bio, validation.Length(0, 4000)),
     //is BASE64 encoded image, limited to 2MB ([MB] 2 * 1.33 ~ 2.67) 
