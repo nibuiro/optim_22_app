@@ -31,7 +31,8 @@ const ModalForm = {
         email: "",
         password: ""
       },
-      invalid: false
+      invalid: false,
+      errorMessage: ""
     };
   },
   watch: {
@@ -77,18 +78,24 @@ const ModalForm = {
             }
             // レスポンスのbodyをjsonに変換
             response.json().then(data => {
+              const user_id = data.user_id;
               if (process.env.NODE_ENV === "development") {
-                console.log("user_id:");
-                console.log(data);
+                console.log(`user_id: ${user_id}`);
               }
               // localStorageにユーザIDを保存
-              localStorage.setItem("user_id", data.user_id);
+              localStorage.setItem("user_id", user_id);
               // localStorageにアクセストークンを保存
               localStorage.setItem("access_token", access_token);
+              // ログインフォームを閉じる
+              this.$emit("close");
             });
+          } else {
+            this.errorMessage = "ログインに失敗しました";
+            this.invalid = true;
           }
         });
       } else {
+        this.errorMessage = "正しく入力してください";
         this.invalid = true;
       }
     }
@@ -103,7 +110,7 @@ const ModalForm = {
         </header>
         <section class="modal-card-body">
           <b-message v-show="invalid" type="is-danger">
-            正しく入力してください
+            {{ errorMessage }}
           </b-message>
           <b-field label="メールアドレス">
             <div class="control has-icons-left">
