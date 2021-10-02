@@ -59,3 +59,13 @@ type Submission struct{
 	CreatedAt      time.Time      `gorm:"not null",json:"createdat"`
 	UpdatedAt      time.Time      `gorm:"not null"`
 }
+
+type Comment struct {
+  CreatedAt  time.Time
+  Id         int                 `gorm:"primaryKey"`
+  RequestID  int                 `gorm:"not null"`
+  UserID     int                 `gorm:"not null"`
+  Title      string    
+  Body       string    
+  ReplyID    int  
+}
