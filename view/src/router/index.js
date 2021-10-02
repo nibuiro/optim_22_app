@@ -4,6 +4,7 @@ import HomePage from '@/components/HomePage'
 import RequestPage from '@/components/RequestPage'
 import SubmissionPage from '@/components/SubmissionPage'
 import MyPage from '@/components/MyPage'
+import NotFound from '@/components/NotFound'
 
 Vue.use(Router)
 
@@ -28,6 +29,15 @@ export default new Router({
             path: '/user/:user_id',
             name: 'MyPage',
             component: MyPage
+        },
+        {
+            path: '/not-found',
+            name: 'NotFound',
+            component: NotFound
+        },
+        {
+            path: '/*',
+            component: NotFound
         }
     ]
 });
