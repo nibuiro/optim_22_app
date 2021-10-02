@@ -63,11 +63,9 @@
               v-slot="props"
             >
               <b-tag
-                :type="
-                  props.row.accepting === true ? 'is-success' : 'is-danger'
-                "
+                :type="props.row.finish === false ? 'is-success' : 'is-danger'"
               >
-                {{ props.row.accepting === true ? "受付中" : "終了" }}
+                {{ props.row.finish === false ? "受付中" : "終了" }}
               </b-tag>
             </b-table-column>
             <b-table-column
@@ -79,9 +77,9 @@
               centered
               v-slot="props"
             >
-              {{ new Date(props.row.date).toLocaleDateString() }}
+              {{ new Date(props.row.createdat).toLocaleDateString() }}
               <br />
-              {{ new Date(props.row.date).toLocaleTimeString() }}
+              {{ new Date(props.row.createdat).toLocaleTimeString() }}
             </b-table-column>
             <b-table-column
               cell-class="is-vcentered"
@@ -97,7 +95,7 @@
                   params: { request_id: props.row.request_id }
                 }"
               >
-                {{ props.row.request }}
+                {{ props.row.requestname }}
               </router-link>
             </b-table-column>
             <b-table-column
@@ -107,7 +105,7 @@
               width="35%"
               v-slot="props"
             >
-              {{ props.row.detail }}
+              {{ props.row.content }}
             </b-table-column>
             <b-table-column
               cell-class="is-vcentered"
@@ -118,10 +116,10 @@
             >
               <router-link
                 v-for="engineer in props.row.engineers"
-                :key="engineer.userid"
+                :key="engineer.user_id"
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: engineer.userid }
+                  params: { user_id: engineer.user_id }
                 }"
               >
                 <b-tooltip :label="engineer.username">
@@ -149,11 +147,9 @@
               v-slot="props"
             >
               <b-tag
-                :type="
-                  props.row.accepting === true ? 'is-success' : 'is-danger'
-                "
+                :type="props.row.finish === false ? 'is-success' : 'is-danger'"
               >
-                {{ props.row.accepting === true ? "受付中" : "終了" }}
+                {{ props.row.finish === false ? "受付中" : "終了" }}
               </b-tag>
             </b-table-column>
             <b-table-column
@@ -165,9 +161,9 @@
               centered
               v-slot="props"
             >
-              {{ new Date(props.row.date).toLocaleDateString() }}
+              {{ new Date(props.row.createdat).toLocaleDateString() }}
               <br />
-              {{ new Date(props.row.date).toLocaleTimeString() }}
+              {{ new Date(props.row.createdat).toLocaleTimeString() }}
             </b-table-column>
             <b-table-column
               cell-class="is-vcentered"
@@ -178,13 +174,14 @@
               v-slot="props"
             >
               <router-link
+                v-if="!!props.row.request"
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: props.row.client.userid }
+                  params: { user_id: props.row.request.client.user_id }
                 }"
               >
-                <b-tooltip :label="props.row.client.username">
-                  <div :style="iconStyle(64, props.row.client.icon)" />
+                <b-tooltip :label="props.row.request.client.username">
+                  <div :style="iconStyle(64, props.row.request.client.icon)" />
                 </b-tooltip>
               </router-link>
             </b-table-column>
@@ -197,12 +194,13 @@
               v-slot="props"
             >
               <router-link
+                v-if="!!props.row.request"
                 :to="{
                   name: 'RequestPage',
                   params: { request_id: props.row.request_id }
                 }"
               >
-                {{ props.row.request }}
+                {{ props.row.request.requestname }}
               </router-link>
             </b-table-column>
             <b-table-column
@@ -212,7 +210,7 @@
               width="30%"
               v-slot="props"
             >
-              {{ props.row.detail }}
+              {{ props.row.content }}
             </b-table-column>
             <b-table-column
               cell-class="is-vcentered"
@@ -224,7 +222,7 @@
               <router-link
                 :to="{
                   name: 'SubmissionPage',
-                  query: { id: props.submissionid }
+                  query: { id: props.submission_id }
                 }"
               >
                 提出物
@@ -240,15 +238,59 @@
 <script>
 import ProfileEditor from "@/components/ProfileEditor";
 
-const profile = require("../../src/assets/sampleProfile.json");
-
 export default {
   data() {
     return {
-      profile
+      profile: {
+        user_id: null,
+        username: "",
+        email: "",
+        icon: "",
+        comment: "",
+        SNS: {
+          Github: "",
+          Twitter: "",
+          Facebook: ""
+        },
+        requests: [],
+        submissions: []
+      }
     };
   },
+  watch: {
+    $route(to, from) {
+      this.getProfile(this.$route.params.user_id);
+    }
+  },
   methods: {
+    // ユーザプロフィールの取得
+    getProfile(user_id) {
+      fetch(`${process.env.API}/user/${user_id}`)
+        .then(data => data.json())
+        .then(profile => {
+          if (process.env.NODE_ENV === "development") {
+            console.log(`Profile:`);
+            console.log(profile);
+          }
+          this.profile = profile;
+          this.getRequest();
+        });
+    },
+    // リクエストの取得
+    getRequest() {
+      this.profile.submissions.forEach((submission, i) => {
+        fetch(`${process.env.API}/request/${submission.request_id}`)
+          .then(data => data.json())
+          .then(request => {
+            if (process.env.NODE_ENV === "development") {
+              console.log(`Request of Submission #${i}:`);
+              console.log(request);
+            }
+            submission.request = request;
+            this.$forceUpdate();
+          });
+      });
+    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -263,6 +305,9 @@ export default {
   },
   components: {
     "profile-editor": ProfileEditor
+  },
+  created() {
+    this.getProfile(this.$route.params.user_id);
   }
 };
 </script>
