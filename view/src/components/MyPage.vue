@@ -25,28 +25,34 @@
       </div>
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
-      <b-taglist class="m-0" attached>
+      <b-taglist v-if="!!profile.SNS.Github" class="m-0" attached>
         <b-tag style="background-color: #171516;">
           <b-icon icon="github" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
-          <a href="">@{{ profile.SNS.Github }}</a>
+          <a :href="`https://github.com/${profile.SNS.Github}`">
+            @{{ profile.SNS.Github }}
+          </a>
         </b-tag>
       </b-taglist>
-      <b-taglist class="m-0" attached>
+      <b-taglist v-if="!!profile.SNS.Twitter" class="m-0" attached>
         <b-tag style="background-color: #1D9BF0;">
           <b-icon icon="twitter" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
-          <a href="">@{{ profile.SNS.Twitter }}</a>
+          <a :href="`https://twitter.com/${profile.SNS.Twitter}`">
+            @{{ profile.SNS.Twitter }}
+          </a>
         </b-tag>
       </b-taglist>
-      <b-taglist class="m-0" attached>
+      <b-taglist v-if="!!profile.SNS.Facebook" class="m-0" attached>
         <b-tag style="background-color: #1877F2;">
           <b-icon icon="facebook" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
-          <a href="">@{{ profile.SNS.Facebook }}</a>
+          <a :href="`https://www.facebook.com/${profile.SNS.Facebook}`">
+            @{{ profile.SNS.Facebook }}
+          </a>
         </b-tag>
       </b-taglist>
     </section>
