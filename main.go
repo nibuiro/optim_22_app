@@ -109,7 +109,7 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
     // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
     client_e.POST("/decide_winner",client.DecideWinner)
     // クライアントが編集したリクエストを更新できるようにするハンドラ
-    client_e.POST("/update_request",client.UpdateRequest)
+    client_e.POST("/update_request/:request_id",client.UpdateRequest)
   }
 
   request_e := e.Group("/request")
@@ -133,7 +133,7 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
     // engineer_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
     engineer_e.GET("/show_join_request/:engineer_id", engineer.ShowJoinRequest)
     // エンジニアが編集したsubmissionを更新できるようにするハンドラ
-    engineer_e.POST("/update_submission",engineer.UpdateSubmission)
+    engineer_e.POST("/update_submission/:submission_id",engineer.UpdateSubmission)
   }
 
   e.NoRoute(func(c *gin.Context) {
