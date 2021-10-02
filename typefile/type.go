@@ -14,7 +14,7 @@ type User struct{
 }
 
 type Profile struct{
-	ID             int            `gorm:"primaryKey"`
+	ID             int            `gorm:"primaryKey";autoIncrement:false`
 	Bio            string        
 	Sns            []byte   
 	Icon           string
