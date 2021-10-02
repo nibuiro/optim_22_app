@@ -10,11 +10,18 @@
       >
         <div class="ml-3 mt-3 mb-6" :style="iconStyle(64, profile.icon)" />
       </b-tooltip>
-      <div class="hero-body is-flex pt-0 pb-5">
+      <div
+        class="hero-body is-flex pt-0 pb-5"
+        :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
+      >
         <p class="title mb-0 pt-2" style="margin-left: 64px;">
           {{ profile.username }}
         </p>
-        <profile-editor class="is-light ml-auto mt-5" :profile="profile" />
+        <profile-editor
+          v-if="myself"
+          class="is-light ml-auto mt-5"
+          :profile="profile"
+        />
       </div>
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
@@ -254,11 +261,14 @@ export default {
         },
         requests: [],
         submissions: []
-      }
+      },
+      myself: false
     };
   },
   watch: {
     $route(to, from) {
+      const user_id = localStorage.getItem("user_id");
+      this.myself = this.$route.params.user_id == user_id;
       this.getProfile(this.$route.params.user_id);
     }
   },
@@ -307,6 +317,8 @@ export default {
     "profile-editor": ProfileEditor
   },
   created() {
+    const user_id = localStorage.getItem("user_id");
+    this.myself = this.$route.params.user_id == user_id;
     this.getProfile(this.$route.params.user_id);
   }
 };
