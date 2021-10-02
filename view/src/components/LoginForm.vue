@@ -38,7 +38,7 @@ const ModalForm = {
     user: {
       handler() {
         // メールアドレスとパスワードが入力されていればアラートを消す
-        if (this.user.email.length * this.user.password.length > 0) {
+        if (this.isAllEntered()) {
           this.invalid = false;
         }
       },
@@ -46,10 +46,14 @@ const ModalForm = {
     }
   },
   methods: {
+    // 全項目入力されているかのチェック
+    isAllEntered() {
+      return this.user.email.length * this.user.password.length > 0;
+    },
     // ログイン処理
     async login() {
       // メールアドレスとパスワードの両方が入力されていれば
-      if (this.user.email.length * this.user.password.length > 0) {
+      if (this.isAllEntered()) {
         const msgUint8 = new TextEncoder().encode(this.user.password); // パスワードをUint8Array(utf-8)としてエンコード
         const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // エンコードされたパスワードをハッシュ化
         const hashArray = Array.from(new Uint8Array(hashBuffer)); // バッファをbyte配列に変換
