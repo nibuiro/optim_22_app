@@ -44,7 +44,7 @@ func ShowSubmission(c *gin.Context) {
 
 	if submission.ID == 0{
 		// 400ラーを返したいが指定方法が分からない。なので、存在しないファイルを指定することで、404errorを出させる。
-		c.JSON(http.StatusBadRequest, gin.H{})
+		c.JSON(http.StatusNotFound, gin.H{})
 	}else{
 		c.JSON(http.StatusOK, gin.H{
 			"submission": submission_json,

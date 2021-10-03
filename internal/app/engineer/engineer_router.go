@@ -81,28 +81,6 @@ func CreateSubmission(c *gin.Context) {
     c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }
 
-// エンジニアが参加しているリクエストを表示する
-func ShowJoinRequest(c *gin.Context) {
-	// urlの引数で受け取ったengineer_idをengineer_id_stringという変数に格納している。
-	engineer_id_string := c.Param("engineer_id")
-	// 文字列をintに変換
-	engineer_id, _ := strconv.Atoi(engineer_id_string)
-
-	// Engineer構造体データを格納するためのインスタンスを生成
-	engineer := typefile.Engineer{}
-	// Request構造体データを複数格納するためのインスタンスを生成
-	requests := []typefile.Request{}
-
-	model.Db.Find(&engineer,"id = ?",engineer_id)
-	// Associationによって、requestデータを取り出す。
-	model.Db.Model(&engineer).Association("Requests").Find(&requests)
-
-    c.HTML(http.StatusOK, "show_join_request.html", gin.H{
-    	"requests": requests,
-    	"engineer": engineer,
-    })
-}
-
 // エンジニアが編集済みのsubmissionを提出する。
 func UpdateSubmission(c *gin.Context) {
 	// urlの引数で受け取ったsubmission_idをsubmission_id_stringという変数に格納している。
@@ -131,7 +109,7 @@ func UpdateSubmission(c *gin.Context) {
 	model.Db.Save(&submission)
 
 	// redirect先を追加している。
-	redirect_url := "//localhost:8080/submission/show_submission/" + submission_id_string
+	redirect_url := "//localhost:8080/submission/" + submission_id_string
     // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, redirect_url)
 }
