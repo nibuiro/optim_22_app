@@ -9,8 +9,8 @@ import (
 type User struct{
 	ID             int            `gorm:"primaryKey",json:"user_id"`
 	Name           string         `gorm:"not null",json:"username"`
-	//Email          string         `gorm:"not null",json:"email"`  
-	//Password       string         `gorm:"not null",json:"password"`     
+	Email          string         `gorm:"not null",json:"email"`  
+	Password       string         `gorm:"not null",json:"password"`     
 }
 
 type Profile struct{
