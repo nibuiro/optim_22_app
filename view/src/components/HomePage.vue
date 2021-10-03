@@ -24,16 +24,14 @@
       </div>
 
       <b-table
-        :data="data"
+        :data="requests"
         :accepting="onlyAccepting"
         :paginated="isPaginated"
         :per-page="perPage"
         :current-page.sync="currentPage"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
-        :row-class="
-          row => onlyAccepting && row.accepting === false && 'is-hidden'
-        "
+        :row-class="row => onlyAccepting && row.finish === true && 'is-hidden'"
         :default-sort="defaultSort"
       >
         <b-table-column
@@ -45,9 +43,9 @@
           v-slot="props"
         >
           <b-tag
-            :type="props.row.accepting === true ? 'is-success' : 'is-danger'"
+            :type="props.row.finish === false ? 'is-success' : 'is-danger'"
           >
-            {{ props.row.accepting === true ? "受付中" : "終了" }}
+            {{ props.row.finish === false ? "受付中" : "終了" }}
           </b-tag>
         </b-table-column>
         <b-table-column
@@ -59,9 +57,9 @@
           centered
           v-slot="props"
         >
-          {{ new Date(props.row.date).toLocaleDateString() }}
+          {{ new Date(props.row.createdat).toLocaleDateString() }}
           <br />
-          {{ new Date(props.row.date).toLocaleTimeString() }}
+          {{ new Date(props.row.createdat).toLocaleTimeString() }}
         </b-table-column>
         <b-table-column
           cell-class="is-vcentered"
@@ -75,7 +73,7 @@
           <router-link
             :to="{
               name: 'MyPage',
-              params: { user_id: props.row.client.userid }
+              params: { user_id: props.row.client.user_id }
             }"
           >
             <b-tooltip :label="props.row.client.username">
@@ -94,10 +92,10 @@
           <router-link
             :to="{
               name: 'RequestPage',
-              params: { request_id: props.row.requestid }
+              params: { request_id: props.row.request_id }
             }"
           >
-            {{ props.row.request }}
+            {{ props.row.requestname }}
           </router-link>
         </b-table-column>
         <b-table-column
@@ -107,7 +105,7 @@
           width="30%"
           v-slot="props"
         >
-          {{ props.row.detail }}
+          {{ props.row.content }}
         </b-table-column>
         <b-table-column
           cell-class="is-vcentered"
@@ -118,10 +116,10 @@
         >
           <router-link
             v-for="engineer in props.row.engineers"
-            :key="engineer.userid"
+            :key="engineer.user_id"
             :to="{
               name: 'MyPage',
-              params: { user_id: engineer.userid }
+              params: { user_id: engineer.user_id }
             }"
           >
             <b-tooltip :label="engineer.username">
@@ -137,12 +135,10 @@
 <script>
 import RequestForm from "@/components/RequestForm";
 
-const data = require("../../src/assets/sampleRequests.json");
-
 export default {
   data() {
     return {
-      data,
+      requests: [],
       onlyAccepting: false,
       isPaginated: true,
       defaultSort: ["date", "desc"],
@@ -153,6 +149,14 @@ export default {
     };
   },
   methods: {
+    // リクエスト一覧の取得
+    getRequests() {
+      fetch(`${process.env.API}/requests`)
+        .then(data => data.json())
+        .then(requests => {
+          this.requests = requests.requests;
+        });
+    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -167,6 +171,10 @@ export default {
   },
   components: {
     "request-form": RequestForm
+  },
+  created() {
+    // リクエスト一覧の取得
+    this.getRequests();
   }
 };
 </script>
