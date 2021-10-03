@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import Cookies from "js-cookie";
-
 const ModalForm = {
   data() {
     return {
@@ -91,10 +89,8 @@ const ModalForm = {
               localStorage.setItem("user_id", user_id);
               // localStorageにアクセストークンを保存
               localStorage.setItem("access_token", access_token);
-              // cookieにリフレッシュトークンを保存(有効期限: 1ヶ月)
-              Cookies.set("refresh_token", refresh_token, {
-                expires: 30
-              });
+              // cookieにリフレッシュトークンを保存（有効期限: 1ヶ月）
+              this.$cookies.set("refresh_token", refresh_token, "1m");
               // ログインフォームを閉じる
               this.$emit("close");
             });
