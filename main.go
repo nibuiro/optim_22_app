@@ -6,6 +6,7 @@ import (
   "fmt"
   "time"
   "net/http"
+  "gorm.io/gorm"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
@@ -18,7 +19,9 @@ import (
   "optim_22_app/internal/app/request"
   "optim_22_app/internal/app/submission"
   "optim_22_app/internal/app/engineer"
-  //"optim_22_app/internal/app/user"
+  "optim_22_app/internal/app/user"
+  "optim_22_app/internal/app/profile"  
+  "optim_22_app/internal/app/comment"  
 )
 
 var (
@@ -56,7 +59,16 @@ func main() {
   // マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
   // それに対応するテーブルの作成を行う。
   // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
-  model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{},&typefile.Submission{})
+  model.Db.AutoMigrate(
+    &typefile.User{},
+    &typefile.Profile{},
+    &typefile.Client{},
+    &typefile.Engineer{},
+    &typefile.Winner{},
+    &typefile.Request{},
+    &typefile.Comment{},
+    &typefile.Submission{},
+  )
   // テスト実行前に利用するデータを作成する
   model.CreateTestData()
 
@@ -66,7 +78,7 @@ func main() {
 
   hs := &http.Server{
     Addr:    address,
-    Handler: buildHandler(logger, cfg), //, dbcontext.New(db)
+    Handler: buildHandler(model.Db, logger, cfg),
   }
   //#endregion
 
@@ -82,7 +94,7 @@ func main() {
 
 
 //任意のポートについてのHTTPハンドラを構築
-func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *dbcontext.DB
+func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
 
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
@@ -113,6 +125,18 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
   e.POST("/submission/:request_id",engineer.CreateSubmission)
 
+  
+  userRepository := user.NewRepository(db, logger)
+  userService := user.NewService(userRepository, logger)
+  user.RegisterHandlers(e.Group(""), userService, logger)
+  
+  profileRepository := profile.NewRepository(db, logger)
+  profileService := profile.NewService(profileRepository, logger)
+  profile.RegisterHandlers(e.Group(""), profileService, logger)
+
+  commentRepository := comment.NewRepository(db, logger)
+  commentService := comment.NewService(commentRepository, logger)
+  comment.RegisterHandlers(e.Group(""), commentService, logger)
   //authHandler := auth.Handler(cfg.JWTSigningKey)
 
 //  user.RegisterHandlers(rg.Group(""),

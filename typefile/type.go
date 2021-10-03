@@ -14,7 +14,7 @@ type User struct{
 }
 
 type Profile struct{
-	ID             int            `gorm:"primaryKey"`
+	ID             int            `gorm:"primaryKey";autoIncrement:false`
 	Bio            string        
 	Sns            []byte   
 	Icon           string
@@ -58,4 +58,14 @@ type Submission struct{
 	Content        string         `gorm:"not null",json:"content"`
 	CreatedAt      time.Time      `gorm:"not null",json:"createdat"`
 	UpdatedAt      time.Time      `gorm:"not null"`
+}
+
+type Comment struct {
+  CreatedAt  time.Time
+  Id         int                 `gorm:"primaryKey"`
+  RequestID  int                 `gorm:"not null"`
+  UserID     int                 `gorm:"not null"`
+  Title      string    
+  Body       string    
+  ReplyID    int  
 }
