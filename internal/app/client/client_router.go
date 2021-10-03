@@ -21,8 +21,8 @@ type ReceiveRequestJson struct{
 
 // フロントからサーバーサイドにwinnerのjsonデータが送られた際に利用する構造体
 type ReceiveWinnerJson struct{
-	EngineerID     int                 `gorm:"not null",json:"engineer_id"`
-	RequestID      int                 `gorm:"unique;not null",json:"request_id"`
+	EngineerID     string              `gorm:"not null",json:"engineer_id"`
+	RequestID      string              `gorm:"unique;not null",json:"request_id"`
 }
 
 // クライアントがリクエストを依頼する。(入力内容をDBに格納)
