@@ -16,21 +16,189 @@
       aria-modal
     >
       <template #default="props">
-        <modal-form :profile="formProps" @close="props.close"></modal-form>
+        <modal-form
+          @close="props.close"
+          @displayMessage="isMessageModalActive = true"
+        />
       </template>
+    </b-modal>
+    <b-modal v-model="isMessageModalActive">
+      <b-message type="is-success" has-icon>
+        編集が完了しました
+        <br />
+        マイページに移動します
+      </b-message>
     </b-modal>
   </section>
 </template>
 
 <script>
 const ModalForm = {
-  props: ["profile"],
   data() {
     return {
       file: null,
+      profile: {
+        user_id: null,
+        username: "",
+        email: "",
+        icon: "",
+        comment: "",
+        SNS: {
+          Github: "",
+          Twitter: "",
+          Facebook: ""
+        }
+      },
       password: "",
-      confirm_password: ""
+      confirm_password: "",
+      invalid: false,
+      errorMessage: ""
     };
+  },
+  watch: {
+    user: {
+      handler() {
+        // 少なくともユーザ名、メールアドレス、パスワードが入力されていればアラートを消す
+        if (this.isNeedsEntered()) {
+          this.invalid = false;
+        }
+      },
+      deep: true
+    },
+    file() {
+      // アイコン画像がアップロードされたらbase64で変換する
+      this.convertIcon(this.file);
+    }
+  },
+  methods: {
+    // ユーザプロフィールの取得
+    getProfile(user_id) {
+      const access_token = localStorage.getItem("access_token");
+      fetch(`${process.env.API}/user/${user_id}`, {
+        method: "GET",
+        headers: {
+          Authorization: access_token
+        }
+      })
+        .then(data => data.json())
+        .then(profile => {
+          if (process.env.NODE_ENV === "development") {
+            console.log(`Edit Profile:`);
+            console.log(profile);
+          }
+          this.profile = profile;
+        });
+    },
+    // 画像をbase64で変換
+    convertIcon(file) {
+      const ICON_WIDTH = 500; // リサイズ後のアイコンの幅
+      const ICON_HEIGHT = 500; // リサイズ後のアイコンの高さ
+
+      // jpg画像もしくはpng画像でなければ中止
+      if (file.type !== "image/jpg" && file.type !== "image/png") {
+        return;
+      }
+
+      const reader = new FileReader();
+      const icon = new Image();
+      reader.onload = () => {
+        icon.onload = () => {
+          // 画像の種類の取得
+          const iconType = icon.src.substring(5, icon.src.indexOf(";"));
+          // 画像のリサイズ
+          let width, height;
+          if (icon.width > icon.height) {
+            // 横長の場合
+            const ratio = icon.height / icon.width;
+            width = ICON_WIDTH;
+            height = ICON_WIDTH * ratio;
+          } else {
+            // 縦長の場合
+            const ratio = icon.width / icon.height;
+            width = ICON_HEIGHT * ratio;
+            height = ICON_HEIGHT;
+          }
+
+          // リサイズされた画像の大きさのキャンバスを作成
+          const canvas = document.createElement("canvas");
+          canvas.setAttribute("width", width);
+          canvas.setAttribute("height", height);
+          // キャンバスにリサイズされた画像を描画
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(icon, 0, 0, width, height);
+          // キャンバスから画像をbase64で取得
+          const base64 = canvas.toDataURL(iconType);
+          this.profile.icon = base64;
+        };
+        icon.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    // 少なくともユーザ名、メールアドレス、パスワードが入力されているかのチェック
+    isNeedsEntered() {
+      return (
+        this.profile.username.length *
+          this.profile.email.length *
+          this.password.length *
+          this.confirm_password.length >
+        0
+      );
+    },
+    // パスワードが一致しているかチェック
+    isPasswordsCorrect() {
+      return this.password === this.confirm_password;
+    },
+    // プロフィール編集処理
+    async editProfile() {
+      // すべての情報が正しく入力されていれば
+      if (this.isNeedsEntered() && this.isPasswordsCorrect()) {
+        const msgUint8 = new TextEncoder().encode(this.profile.password); // パスワードをUint8Array(utf-8)としてエンコード
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // エンコードされたパスワードをハッシュ化
+        const hashArray = Array.from(new Uint8Array(hashBuffer)); // バッファをbyte配列に変換
+        const hashHex = hashArray
+          .map(b => b.toString(16).padStart(2, "0"))
+          .join(""); // byte配列を16進文字列に変換
+        this.profile.password = hashHex; // プロフィールにパスワードを追加
+        // プロフィール情報をサーバに送信し，レスポンスを得る
+        fetch(`${process.env.API}/user/${this.profile.user_id}`, {
+          method: "PUT",
+          headers: {
+            Authorization: localStorage.getItem("access_token")
+          },
+          body: JSON.stringify(this.profile)
+        }).then(response => {
+          // 登録成功時
+          if (response.status === 200) {
+            // 編集フォームを閉じる
+            this.$emit("close");
+            // ユーザ登録成功メッセージを表示する
+            this.$emit("displayMessage");
+          }
+        });
+      } else {
+        this.invalid = true;
+        if (!this.isNeedsEntered()) {
+          this.errorMessage = "必須項目を入力してください";
+        } else if (!this.isPasswordsCorrect()) {
+          this.errorMessage = "パスワードが違います";
+        }
+      }
+    },
+    iconStyle(size, image) {
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${image}")`,
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        borderRadius: "100%"
+      };
+    }
+  },
+  created() {
+    const user_id = localStorage.getItem("user_id");
+    this.getProfile(user_id);
   },
   /* html */
   template: `
@@ -41,26 +209,30 @@ const ModalForm = {
           <button type="button" class="delete" @click="$emit('close')" />
         </header>
         <section class="modal-card-body">
+          <b-message v-show="invalid" type="is-danger">
+            {{ errorMessage }}
+          </b-message>
           <b-field label="ユーザ名">
             <div class="control has-icons-left">
               <b-icon icon="account" size="is-small"></b-icon>
               <b-input
                 type="text"
-                :value="profile.username"
+                v-model="profile.username"
                 placeholder="username"
                 required
               />
             </div>
           </b-field>
-          <b-field label="アイコン画像">
+          <b-field label="アイコン画像（.jpgまたは.png）">
             <p class="control">
+              <div v-show="!!profile.icon" class="mr-3" :style="iconStyle(48, profile.icon)" />
               <div class="control has-icons-left">
                 <b-icon icon="image" size="is-small" />
                 <b-input :value="!!file?file.name:''" disabled/>
               </div>
             </p>
             <b-field class="file is-primary">
-              <b-upload v-model="file" class="file-label">
+              <b-upload class="file-label" v-model="file" accept=".jpg,.png">
                 <span class="file-cta">
                   <b-icon class="file-icon" icon="upload" />
                   <span class="file-label">アップロード</span>
@@ -73,7 +245,7 @@ const ModalForm = {
               <b-icon icon="email" size="is-small"></b-icon>
               <b-input
                 type="email"
-                :value="profile.email"
+                v-model="profile.email"
                 placeholder="email@example.com"
                 required
               />
@@ -83,7 +255,7 @@ const ModalForm = {
             <div class="control has-icons-left">
               <b-icon icon="comment" size="is-small"></b-icon>
               <b-input
-                :value="profile.comment"
+                v-model="profile.comment"
                 placeholder="email@example.com"
                 required
               />
@@ -97,7 +269,7 @@ const ModalForm = {
                     <b-icon class="is-inline-flex" icon="github" type="is-light" />
                   </span>
                 </p>
-                <b-input :value="profile.SNS.Github" placeholder="Github" />
+                <b-input v-model="profile.SNS.Github" placeholder="Github" />
               </b-field>
             </p>
             <p class="control">
@@ -107,7 +279,7 @@ const ModalForm = {
                     <b-icon class="is-inline-flex" icon="twitter" type="is-light" />
                   </span>
                 </p>
-                <b-input :value="profile.SNS.Twitter" placeholder="Twitter" />
+                <b-input v-model="profile.SNS.Twitter" placeholder="Twitter" />
               </b-field>
             </p>
             <p class="control">
@@ -117,7 +289,7 @@ const ModalForm = {
                     <b-icon class="is-inline-flex" icon="facebook" type="is-light" />
                   </span>
                 </p>
-                <b-input :value="profile.SNS.Facebook" placeholder="Facebook" />
+                <b-input v-model="profile.SNS.Facebook" placeholder="Facebook" />
               </b-field>
             </p>
           </b-field>
@@ -126,7 +298,7 @@ const ModalForm = {
               <b-icon icon="key" size="is-small"></b-icon>
               <b-input
                 type="password"
-                :value="password"
+                v-model="password"
                 password-reveal
                 placeholder="Enter password"
                 required
@@ -138,7 +310,7 @@ const ModalForm = {
               <b-icon icon="key-outline" size="is-small"></b-icon>
               <b-input
                 type="password"
-                :value="confirm_password"
+                v-model="confirm_password"
                 password-reveal
                 placeholder="Confirm password"
                 required
@@ -148,7 +320,7 @@ const ModalForm = {
           </b-field>
         </section>
         <footer class="modal-card-foot is-flex is-justify-content-center">
-          <b-button label="編集する" type="is-primary" />
+          <b-button label="編集する" type="is-primary" @click="editProfile" />
           <b-button label="キャンセル" @click="$emit('close')" />
         </footer>
       </div>
@@ -160,19 +332,18 @@ export default {
   data() {
     return {
       isComponentModalActive: false,
-      formProps: {
-        username: this.profile.username,
-        email: this.profile["e-mail"],
-        comment: this.profile.comment,
-        SNS: {
-          Github: this.profile.SNS.Github,
-          Facebook: this.profile.SNS.Facebook,
-          Twitter: this.profile.SNS.Twitter
-        }
-      }
+      isMessageModalActive: false
     };
   },
-  props: ["profile"],
+  watch: {
+    // ユーザがプロフィール編集成功メッセージを閉じたらページをリロードする
+    isMessageModalActive(newVal, oldVal) {
+      if (newVal === false && oldVal === true) {
+        const user_id = localStorage.getItem("user_id");
+        this.$router.go({ name: "MyPage", params: { user_id } });
+      }
+    }
+  },
   components: {
     ModalForm
   }

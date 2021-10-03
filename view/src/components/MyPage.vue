@@ -285,7 +285,7 @@ export default {
         .then(data => data.json())
         .then(profile => {
           if (process.env.NODE_ENV === "development") {
-            console.log(`Profile:`);
+            console.log(`Profile of ${profile.username}:`);
             console.log(profile);
           }
           this.profile = profile;
@@ -298,10 +298,6 @@ export default {
         fetch(`${process.env.API}/request/${submission.request_id}`)
           .then(data => data.json())
           .then(request => {
-            if (process.env.NODE_ENV === "development") {
-              console.log(`Request of Submission #${i}:`);
-              console.log(request);
-            }
             submission.request = request;
             this.$forceUpdate();
           });
