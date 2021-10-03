@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
+
 const ModalForm = {
   data() {
     return {
@@ -72,9 +74,12 @@ const ModalForm = {
           // ログイン成功時
           if (response.status === 200) {
             const access_token = response.headers.get("Authorization");
+            const refresh_token = response.headers.get("Refresh-Token");
             if (process.env.NODE_ENV === "development") {
               console.log("access_token:");
               console.log(access_token);
+              console.log("refresh_token:");
+              console.log(refresh_token);
             }
             // レスポンスのbodyをjsonに変換
             response.json().then(data => {
@@ -86,6 +91,10 @@ const ModalForm = {
               localStorage.setItem("user_id", user_id);
               // localStorageにアクセストークンを保存
               localStorage.setItem("access_token", access_token);
+              // cookieにリフレッシュトークンを保存(有効期限: 1ヶ月)
+              Cookies.set("refresh_token", refresh_token, {
+                expires: 30
+              });
               // ログインフォームを閉じる
               this.$emit("close");
             });
