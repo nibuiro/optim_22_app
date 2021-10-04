@@ -1,7 +1,7 @@
 <!-- ディスカッションページ -->
 
 <template>
-  <div class="container" :request="request">
+  <div class="container">
     <section class="mb-3">
       <div v-for="comment in comments" :key="comment.comment_id" class="card">
         <div class="card-content">
@@ -21,7 +21,7 @@
               class="is-flex is-flex-direction-column"
               :to="{
                 name: 'MyPage',
-                params: { user_id: comment.user.userid }
+                params: { user_id: comment.user.user_id }
               }"
             >
               <div class="mx-auto" :style="iconStyle(32, comment.user.icon)" />
@@ -72,12 +72,12 @@
 </template>
 
 <script>
-const comments = require("../../src/assets/sampleComments.json");
+import * as api from "@/modules/API";
 
 export default {
   data() {
     return {
-      comments: comments.comments,
+      comments: [],
       comment: ""
     };
   },
@@ -93,6 +93,10 @@ export default {
         borderRadius: "100%"
       };
     }
+  },
+  async created() {
+    const request_id = this.$route.params.request_id;
+    this.comments = await api.getComments(request_id);
   }
 };
 </script>

@@ -147,6 +147,10 @@ async function editProfile(component, user, access_token) {
 async function getRequests() {
     const response = await fetch(`${process.env.API}/requests`);
     const requests = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`All Requests:`);
+        console.log(requests.requests);
+    }
     return requests.requests;
 }
 
@@ -178,7 +182,23 @@ async function makeRequest(component, user_id, request, access_token) {
 async function getRequest(request_id) {
     const response = await fetch(`${process.env.API}/request/${request_id}`);
     const request = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`Request #${request.request_id}:`);
+        console.log(request);
+    }
     return request;
+}
+
+
+// ディスカッション取得API
+async function getComments(request_id) {
+    const response = await fetch(`${process.env.API}/discussion/${request_id}`);
+    const comments = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`Discussion of Request #${request_id}:`);
+        console.log(comments.comments);
+    }
+    return comments.comments;
 }
 
 
@@ -189,5 +209,6 @@ export {
     editProfile,
     getRequests,
     makeRequest,
-    getRequest
+    getRequest,
+    getComments
 }
