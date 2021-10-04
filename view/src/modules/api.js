@@ -223,12 +223,14 @@ async function addComment(component, comment, access_token) {
 
 // サブミッション取得API
 async function getsubmission(submission_id) {
-    const response = await fetch(`${process.env.API}/request/${submission_id}`);
-    const submission = await response.json();
+    const response = await fetch(`${process.env.API}/submission/${submission_id}`);
+    let submission = await response.json();
     if (process.env.NODE_ENV === "development") {
         console.log(`Submission #${submission.submission_id}:`);
         console.log(submission);
     }
+    const request = await getRequest(submission.request_id);
+    submission.request = request;
     return submission;
 }
 

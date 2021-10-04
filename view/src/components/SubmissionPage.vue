@@ -1,7 +1,7 @@
 <!-- サブミッション詳細ページ -->
 
 <template>
-  <div class="container" :request="request" :submission="submission">
+  <div class="container">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute;"
@@ -40,7 +40,7 @@
             <span>提出物詳細</span>
           </template>
           <div class="content">
-            <ul :request="request" :submission="submission">
+            <ul>
               <li>
                 提出日時：
                 {{
@@ -53,10 +53,10 @@
                 <router-link
                   :to="{
                     name: 'RequestPage',
-                    params: { request_id: request.request_id }
+                    params: { request_id: submission.request.request_id }
                   }"
                 >
-                  {{ request.requestname }}
+                  {{ submission.request.requestname }}
                 </router-link>
               </li>
               <li>
@@ -70,7 +70,7 @@
                     }"
                   >
                     <b-tooltip :label="submission.engineer.username">
-                      <div :style="iconStyle(32, request.client.icon)" />
+                      <div :style="iconStyle(32, submission.engineer.icon)" />
                     </b-tooltip>
                     {{ submission.engineer.username }}
                   </router-link>
@@ -78,7 +78,11 @@
               </li>
               <li>
                 提出物　：
-                <a :href="submission.url">
+                <a
+                  class="is-inline-flex is-align-items-center"
+                  :href="submission.url"
+                >
+                  <b-icon icon="attachment" />
                   {{ submission.url }}
                 </a>
               </li>
@@ -105,15 +109,22 @@ export default {
         submission_id: null,
         createdat: "",
         request_id: null,
-        engineer: {},
-        content: ""
-      },
-      request: {
-        request_id: null,
-        finish: null,
-        createdat: "",
-        requestname: "",
-        client: {},
+        engineer: {
+          user_id: null,
+          username: "",
+          icon: "",
+          comment: "",
+          SNS: {}
+        },
+        content: "",
+        url: "",
+        request: {
+          request_id: null,
+          finish: null,
+          createdat: "",
+          requestname: "",
+          client: {}
+        },
         engineers: [],
         content: "",
         submissions: [],
@@ -140,8 +151,6 @@ export default {
   async created() {
     const submission_id = this.$route.params.submission_id;
     this.submission = await api.getsubmission(submission_id);
-    const request_id = this.submission.request_id;
-    this.request = await api.getRequest(request_id);
   }
 };
 </script>
