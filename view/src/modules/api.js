@@ -90,7 +90,7 @@ async function login(component, user) {
         // ログインフォームを閉じる
         component.$emit("close");
         // ページをリロード
-        component.$router.go('/');
+        component.$router.push('/');
     } else {
         component.errorMessage = "ログインに失敗しました";
         component.invalid = true;

@@ -251,6 +251,9 @@
         </b-tab-item>
       </b-tabs>
     </section>
+    <section v-if="loggedin" class="mb-3 is-flex is-justify-content-center">
+      <b-button label="ログアウト" type="is-primary" outlined @click="logout" />
+    </section>
   </div>
 </template>
 
@@ -261,6 +264,7 @@ import * as api from "@/modules/API";
 export default {
   data() {
     return {
+      loggedin: false,
       profile: {
         SNS: {
           Github: "",
@@ -276,8 +280,10 @@ export default {
   watch: {
     async $route(to, from) {
       this.loading = true;
+      const refresh_token = this.$cookies.get("refresh_token");
+      this.loggedin = refresh_token !== null ? true : false;
       const user_id = localStorage.getItem("user_id");
-      this.myself = this.$route.params.user_id == user_id;
+      this.myself = this.$route.params.user_id == user_id && this.loggedin;
       const access_token = localStorage.getItem("access_token");
       this.profile = await api.getProfile(
         this.$route.params.user_id,
@@ -287,6 +293,13 @@ export default {
     }
   },
   methods: {
+    // ログアウトする
+    logout() {
+      // cookieからリフレッシュトークンを削除
+      this.$cookies.remove("refresh_token");
+      // ホームページに移動する
+      this.$router.push("/");
+    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -304,8 +317,10 @@ export default {
   },
   async created() {
     this.loading = true;
+    const refresh_token = this.$cookies.get("refresh_token");
+    this.loggedin = refresh_token !== null ? true : false;
     const user_id = localStorage.getItem("user_id");
-    this.myself = this.$route.params.user_id == user_id;
+    this.myself = this.$route.params.user_id == user_id && this.loggedin;
     const access_token = localStorage.getItem("access_token");
     this.profile = await api.getProfile(
       this.$route.params.user_id,
