@@ -187,7 +187,7 @@
               v-slot="props"
             >
               <router-link
-                v-if="!!props.row.request"
+                v-if="!!props.row.request.client"
                 :to="{
                   name: 'MyPage',
                   params: { user_id: props.row.request.client.user_id }
@@ -207,7 +207,7 @@
               v-slot="props"
             >
               <router-link
-                v-if="!!props.row.request"
+                v-if="!!props.row.request.requestname"
                 :to="{
                   name: 'RequestPage',
                   params: { request_id: props.row.request_id }
@@ -250,6 +250,7 @@
 
 <script>
 import ProfileEditor from "@/components/ProfileEditor";
+import * as api from "@/modules/API";
 
 export default {
   data() {
@@ -272,37 +273,14 @@ export default {
     };
   },
   watch: {
-    $route(to, from) {
+    async $route(to, from) {
       const user_id = localStorage.getItem("user_id");
       this.myself = this.$route.params.user_id == user_id;
-      this.getProfile(this.$route.params.user_id);
+      this.profile = await api.getProfile(this.$route.params.user_id);
+      this.$forceUpdate();
     }
   },
   methods: {
-    // ユーザプロフィールの取得
-    getProfile(user_id) {
-      fetch(`${process.env.API}/user/${user_id}`)
-        .then(data => data.json())
-        .then(profile => {
-          if (process.env.NODE_ENV === "development") {
-            console.log(`Profile of ${profile.username}:`);
-            console.log(profile);
-          }
-          this.profile = profile;
-          this.getRequest();
-        });
-    },
-    // リクエストの取得
-    getRequest() {
-      this.profile.submissions.forEach((submission, i) => {
-        fetch(`${process.env.API}/request/${submission.request_id}`)
-          .then(data => data.json())
-          .then(request => {
-            submission.request = request;
-            this.$forceUpdate();
-          });
-      });
-    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -318,10 +296,11 @@ export default {
   components: {
     "profile-editor": ProfileEditor
   },
-  created() {
+  async created() {
     const user_id = localStorage.getItem("user_id");
     this.myself = this.$route.params.user_id == user_id;
-    this.getProfile(this.$route.params.user_id);
+    this.profile = await api.getProfile(this.$route.params.user_id);
+    this.$forceUpdate();
   }
 };
 </script>

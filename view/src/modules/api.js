@@ -98,6 +98,22 @@ async function login(component, user) {
 }
 
 
+// ユーザプロフィール取得API
+async function getProfile(user_id) {
+    const response = await fetch(`${process.env.API}/user/${user_id}`);
+    const profile = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`Profile of ${profile.username}:`);
+        console.log(profile);
+    }
+    profile.submissions.forEach(submission => {
+        const request = getRequest(submission.request_id);
+        submission.request = request;
+    })
+    return profile;
+}
+
+
 // リクエスト一覧取得API
 async function getRequests() {
     const response = await fetch(`${process.env.API}/requests`);
@@ -105,8 +121,19 @@ async function getRequests() {
     return requests.requests;
 }
 
+
+// リクエスト取得API
+async function getRequest(request_id) {
+    const response = await fetch(`${process.env.API}/request/${request_id}`);
+    const request = await response.json();
+    return request;
+}
+
+
 export {
     register,
     login,
-    getRequests
+    getProfile,
+    getRequests,
+    getRequest
 }
