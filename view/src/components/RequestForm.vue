@@ -33,10 +33,11 @@
 </template>
 
 <script>
+import * as api from "@/modules/API.js";
+
 const ModalForm = {
   data() {
     return {
-      access_token: localStorage.getItem("access_token"),
       user_id: localStorage.getItem("user_id"),
       request: {
         title: "",
@@ -66,32 +67,8 @@ const ModalForm = {
     makeRequest() {
       // すべての情報が正しく入力されていれば
       if (this.isAllEntered()) {
-        fetch(`${process.env.API}/request`, {
-          method: "POST",
-          headers: {
-            Authorization: this.access_token
-          },
-          body: JSON.stringify({
-            requestname: this.request.title,
-            client_id: this.user_id,
-            content: this.request.detail
-          })
-        }).then(response => {
-          // 登録成功時
-          if (response.status === 200) {
-            const access_token = response.headers.get("Authorization");
-            if (process.env.NODE_ENV === "development") {
-              console.log("access_token:");
-              console.log(access_token);
-            }
-            // localStorageにアクセストークンを保存
-            localStorage.setItem("access_token", access_token);
-            // 新規リクエストフォームを閉じる
-            this.$emit("close");
-            // ユーザ登録成功メッセージを表示する
-            this.$emit("displayMessage");
-          }
-        });
+        const access_token = localStorage.getItem("access_token");
+        api.makeRequest(this, this.user_id, this.request, access_token);
       } else {
         this.invalid = true;
         this.errorMessage = "すべての項目を入力してください";
