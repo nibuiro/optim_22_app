@@ -16,15 +16,63 @@
       aria-modal
     >
       <template #default="props">
-        <modal-form :request="formProps" @close="props.close"></modal-form>
+        <modal-form
+          :requestProps="request"
+          @close="props.close"
+          @displayMessage="isMessageModalActive = true"
+        />
       </template>
+    </b-modal>
+    <b-modal v-model="isMessageModalActive">
+      <b-message type="is-success" has-icon>
+        編集が完了しました
+        <br />
+        ページを更新します
+      </b-message>
     </b-modal>
   </section>
 </template>
 
 <script>
+import * as api from "@/modules/API";
+
 const ModalForm = {
-  props: ["request"],
+  props: ["requestProps"],
+  data() {
+    return {
+      request: {
+        request_id: this.requestProps.request_id,
+        requestname: this.requestProps.requestname,
+        content: this.requestProps.content
+      },
+      invalid: false,
+      errorMessage: ""
+    };
+  },
+  watch: {
+    submission: {
+      handler() {
+        // 依頼名と依頼内容が入力されていればアラートを消す
+        if (this.request.requestname.length * this.request.content.length > 0) {
+          this.invalid = false;
+        }
+      },
+      deep: true
+    }
+  },
+  methods: {
+    // リクエストを編集する
+    async editRequest() {
+      // 依頼名と依頼内容が入力されていれば
+      if (this.request.requestname.length * this.request.content.length > 0) {
+        const access_token = localStorage.getItem("access_token");
+        api.editRequest(this, this.request, access_token);
+      } else {
+        this.errorMessage = "すべての項目を入力してください";
+        this.invalid = true;
+      }
+    }
+  },
   /* html */
   template: `
     <form action="">
@@ -34,11 +82,14 @@ const ModalForm = {
           <button type="button" class="delete" @click="$emit('close')" />
         </header>
         <section class="modal-card-body">
+          <b-message v-show="invalid" type="is-danger">
+            {{ errorMessage }}
+          </b-message>
           <b-field label="依頼名">
             <div class="control">
               <b-input
                 type="text"
-                :value="request.title"
+                v-model="request.requestname"
                 placeholder="依頼内容を分かりやすく一言で！"
                 required
               />
@@ -48,7 +99,7 @@ const ModalForm = {
             <div class="control">
               <b-input
                 type="textarea"
-                :value="request.detail"
+                v-model="request.content"
                 placeholder="依頼内容について具体的に説明してください。(500字以内)"
                 maxlength="500"
                 required
@@ -57,7 +108,7 @@ const ModalForm = {
           </b-field>
         </section>
         <footer class="modal-card-foot is-flex is-justify-content-center">
-          <b-button label="編集する" type="is-primary" />
+          <b-button label="編集する" type="is-primary" @click="editRequest" />
           <b-button label="キャンセル" @click="$emit('close')" />
         </footer>
       </div>
@@ -69,11 +120,17 @@ export default {
   data() {
     return {
       isComponentModalActive: false,
-      formProps: {
-        title: this.request.request,
-        detail: this.request.detail
-      }
+      isMessageModalActive: false
     };
+  },
+  watch: {
+    // ユーザがリクエスト編集成功メッセージを閉じたらページをリロードする
+    isMessageModalActive(newVal, oldVal) {
+      if (newVal === false && oldVal === true) {
+        const request_id = this.$route.params.request_id;
+        this.$router.go({ name: "RequestPage", params: { request_id } });
+      }
+    }
   },
   props: ["request"],
   components: {
