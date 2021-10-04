@@ -151,6 +151,29 @@ async function getRequests() {
 }
 
 
+// 新規リクエスト投稿API
+async function makeRequest(component, user_id, request, access_token) {
+    const response = await fetch(`${process.env.API}/request`, {
+        method: "POST",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify({
+            requestname: request.title,
+            client_id: user_id,
+            content: request.detail
+        })
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // 新規リクエストフォームを閉じる
+        component.$emit("close");
+        // ユーザ登録成功メッセージを表示する
+        component.$emit("displayMessage");
+    }
+}
+
+
 // リクエスト取得API
 async function getRequest(request_id) {
     const response = await fetch(`${process.env.API}/request/${request_id}`);
@@ -165,5 +188,6 @@ export {
     getProfile,
     editProfile,
     getRequests,
+    makeRequest,
     getRequest
 }

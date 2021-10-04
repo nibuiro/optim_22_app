@@ -5,7 +5,7 @@
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute;"
-        :label="request.request"
+        :label="request.requestname"
         type="is-light"
         position="is-right"
         always
@@ -13,7 +13,7 @@
         <router-link
           :to="{
             name: 'MyPage',
-            params: { user_id: request.client.userid }
+            params: { user_id: request.client.user_id }
           }"
         >
           <div
@@ -43,19 +43,17 @@
               <li>
                 依頼日時：
                 {{
-                  `${new Date(request.date).toLocaleDateString()}
-                   ${new Date(request.date).toLocaleTimeString()}`
+                  `${new Date(request.createdat).toLocaleDateString()}
+                   ${new Date(request.createdat).toLocaleTimeString()}`
                 }}
                 <b-tag
-                  :type="
-                    request.accepting === true ? 'is-success' : 'is-danger'
-                  "
+                  :type="request.finish === false ? 'is-success' : 'is-danger'"
                 >
-                  {{ request.accepting === true ? "受付中" : "終了" }}
+                  {{ request.finish === false ? "受付中" : "終了" }}
                 </b-tag>
               </li>
-              <li>依頼名　：{{ request.request }}</li>
-              <li>依頼内容：{{ request.detail }}</li>
+              <li>依頼名　：{{ request.requestname }}</li>
+              <li>依頼内容：{{ request.content }}</li>
               <li>
                 <div class="is-flex is-align-items-center">
                   依頼者　：
@@ -63,7 +61,7 @@
                     class="is-flex is-align-items-center"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: request.client.userid }
+                      params: { user_id: request.client.user_id }
                     }"
                   >
                     <b-tooltip :label="request.client.username">
@@ -79,10 +77,10 @@
                   <router-link
                     class="is-flex is-align-items-center mr-3"
                     v-for="engineer in request.engineers"
-                    :key="engineer.userid"
+                    :key="engineer.user_id"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: engineer.userid }
+                      params: { user_id: engineer.user_id }
                     }"
                   >
                     <b-tooltip :label="engineer.username">
@@ -100,7 +98,7 @@
                   :key="submission.submissionid"
                   :to="{
                     name: 'SubmissionPage',
-                    query: { id: submission.submissionid }
+                    query: { id: submission.submission_id }
                   }"
                 >
                   <b-icon icon="file-upload-outline" />
@@ -133,18 +131,37 @@
 </template>
 
 <script>
+import * as api from "@/modules/API";
 import RequestEditor from "@/components/RequestEditor";
 import DiscussionPage from "@/components/DiscussionPage";
 import ChooseWinner from "@/components/ChooseWinner.vue";
 import RequestApplier from "@/components/RequestApplier.vue";
 import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
 
-const request = require("../../src/assets/sampleRequest.json");
-
 export default {
   data() {
     return {
-      request
+      request: {
+        request_id: null,
+        finish: null,
+        createdat: "",
+        requestname: "",
+        client: {
+          user_id: null,
+          username: "",
+          icon: "",
+          comment: "",
+          SNS: {
+            Github: "client0",
+            Twitter: "client0",
+            Facebook: "client0"
+          }
+        },
+        engineers: [],
+        content: "",
+        submissions: [],
+        winner: null
+      }
     };
   },
   methods: {
@@ -166,6 +183,10 @@ export default {
     "choose-winner": ChooseWinner,
     "request-applier": RequestApplier,
     "submission-submitter": SubmissionSubmitter
+  },
+  async created() {
+    const request_id = this.$route.params.request_id;
+    this.request = await api.getRequest(request_id);
   }
 };
 </script>
