@@ -21,7 +21,7 @@ export default new Router({
             component: RequestPage
         },
         {
-            path: '/submission',
+            path: '/submission/:submission_id',
             name: 'SubmissionPage',
             component: SubmissionPage
         },

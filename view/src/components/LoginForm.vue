@@ -17,7 +17,7 @@
       aria-modal
     >
       <template #default="props">
-        <modal-form @close="props.close"></modal-form>
+        <modal-form @close="props.close" />
       </template>
     </b-modal>
   </section>

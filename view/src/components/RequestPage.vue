@@ -146,17 +146,7 @@ export default {
         finish: null,
         createdat: "",
         requestname: "",
-        client: {
-          user_id: null,
-          username: "",
-          icon: "",
-          comment: "",
-          SNS: {
-            Github: "client0",
-            Twitter: "client0",
-            Facebook: "client0"
-          }
-        },
+        client: {},
         engineers: [],
         content: "",
         submissions: [],

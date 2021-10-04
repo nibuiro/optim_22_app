@@ -202,6 +202,23 @@ async function getComments(request_id) {
 }
 
 
+// コメント投稿API
+async function addComment(component, comment, access_token) {
+    const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
+        method: "POST",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify(comment)
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // ユーザ登録成功メッセージを表示する
+        return true;
+    }
+}
+
+
 export {
     register,
     login,
@@ -210,5 +227,6 @@ export {
     getRequests,
     makeRequest,
     getRequest,
-    getComments
+    getComments,
+    addComment
 }
