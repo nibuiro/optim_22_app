@@ -14,14 +14,14 @@ import (
 
 
 type Service interface {
-  ReadRefreshToken(reader jwt.MapClaims, tokenString string) (bool, error)
-  ReadAccessToken(reader jwt.MapClaims, tokenString string) (bool, error)
+  ReadRefreshToken(writer jwt.MapClaims, tokenString string) (bool, error)
+  ReadAccessToken(writer jwt.MapClaims, tokenString string) (bool, error)
   RefreshAccessToken(writer jwt.MapClaims) (string, error)
   RefreshRefreshToken(writer jwt.MapClaims) (string, error)
   ReadCredential(data []byte) (*Credential, error)
-  ValidateCredential(ctx context.Context, reader jwt.MapClaims, writer *Credential) error
-  GenerateRefreshToken(reader jwt.MapClaims) (string, error)
-  GenerateAccessToken(reader jwt.MapClaims) (string, error)
+  ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) error
+  GenerateRefreshToken(writer jwt.MapClaims) (string, error)
+  GenerateAccessToken(writer jwt.MapClaims) (string, error)
 }
 
 
@@ -68,11 +68,11 @@ func NewService(cfg *config.Config, repo Repository, logger log.Logger) Service 
 }
 
 
-func (s service) ReadRefreshToken(reader jwt.MapClaims, tokenString string) (bool, error) {
+func (s service) ReadRefreshToken(writer jwt.MapClaims, tokenString string) (bool, error) {
   token, err := jwt.Parse(tokenString, MakeTokenSecretSender(s.RefreshTokenSecret))
   claims, ok := token.Claims.(jwt.MapClaims)
   for key, value := range claims {
-    reader[key] = value
+    writer[key] = value
   }
   if ok {
     return token.Valid, nil
@@ -81,11 +81,11 @@ func (s service) ReadRefreshToken(reader jwt.MapClaims, tokenString string) (boo
   }
 }
 
-func (s service) ReadAccessToken(reader jwt.MapClaims, tokenString string) (bool, error) {
+func (s service) ReadAccessToken(writer jwt.MapClaims, tokenString string) (bool, error) {
   token, err := jwt.Parse(tokenString, MakeTokenSecretSender(s.AccessTokenSecret))
   claims, ok := token.Claims.(jwt.MapClaims)
   for key, value := range claims {
-    reader[key] = value
+    writer[key] = value
   }
   if ok {
     return token.Valid, nil
@@ -130,17 +130,17 @@ func (s service) ReadCredential(data []byte) (*Credential, error) {
 }
 
 
-func (s service) ValidateCredential(ctx context.Context, reader jwt.MapClaims, writer *Credential) error {
+func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) error {
   //リクエストの値を検証
-  if err := writer.Validate(); err != nil {
+  if err := reader.Validate(); err != nil {
     s.logger.Error(err)
     return err
   } 
 
   //idを抽出するSQL構文のWhere句の値
   filter := typefile.User{
-    Email: writer.email,
-    Password: writer.password,
+    Email: reader.email,
+    Password: reader.password,
   }
   
   //資格情報の検証とユーザIDの取
@@ -148,17 +148,17 @@ func (s service) ValidateCredential(ctx context.Context, reader jwt.MapClaims, w
     s.logger.Error(err)
     return err
   } else {
-    reader["userID"] = userId
+    writer["userID"] = userId
     return nil
   }
 }
 
 
-func (s service) GenerateRefreshToken(reader jwt.MapClaims) (string, error) {
+func (s service) GenerateRefreshToken(writer jwt.MapClaims) (string, error) {
   //リフレッシュトークンの期限を設定
-  AddRefreshTokenExpiration(reader, s.RefreshTokenExpiration)
+  AddRefreshTokenExpiration(writer, s.RefreshTokenExpiration)
   //リフレッシュトークンを生成
-  refreshToken, err := NewToken(reader, s.RefreshTokenSecret)
+  refreshToken, err := NewToken(writer, s.RefreshTokenSecret)
   if err != nil {
     s.logger.Error(err)
     return "", err
@@ -168,11 +168,11 @@ func (s service) GenerateRefreshToken(reader jwt.MapClaims) (string, error) {
 }
 
 
-func (s service) GenerateAccessToken(reader jwt.MapClaims) (string, error) {
+func (s service) GenerateAccessToken(writer jwt.MapClaims) (string, error) {
   //アクセストークンの期限を設定
-  AddAccessTokenExpiration(reader, s.AccessTokenExpiration)
+  AddAccessTokenExpiration(writer, s.AccessTokenExpiration)
   //アクセストークンを生成
-  accessToken, err := NewToken(reader, s.AccessTokenSecret)
+  accessToken, err := NewToken(writer, s.AccessTokenSecret)
   if err != nil {
     s.logger.Error(err)
     return "", err
@@ -183,13 +183,13 @@ func (s service) GenerateAccessToken(reader jwt.MapClaims) (string, error) {
 
 
 
-func AddRefreshTokenExpiration(reader jwt.MapClaims, RefreshTokenExpiration int) {
-  reader["exp"] = CalcFutureUnixTime(RefreshTokenExpiration)
+func AddRefreshTokenExpiration(writer jwt.MapClaims, RefreshTokenExpiration int) {
+  writer["exp"] = CalcFutureUnixTime(RefreshTokenExpiration)
 }
 
 
-func AddAccessTokenExpiration(reader jwt.MapClaims, RefreshTokenExpiration int) {
-  reader["exp"] = CalcFutureUnixTime(RefreshTokenExpiration)
+func AddAccessTokenExpiration(writer jwt.MapClaims, RefreshTokenExpiration int) {
+  writer["exp"] = CalcFutureUnixTime(RefreshTokenExpiration)
 }
 
 
