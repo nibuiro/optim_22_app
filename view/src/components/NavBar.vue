@@ -27,15 +27,15 @@
           <router-link
             :to="{
               name: 'MyPage',
-              params: { user_id: user_id }
+              params: { user_id: user.user_id }
             }"
           >
             <b-tooltip
               class="is-flex is-align-items-center"
-              :label="username"
+              :label="user.username"
               position="is-left"
             >
-              <div class="mr-3" :style="iconStyle(40, icon)" />
+              <div class="mr-3" :style="iconStyle(40, user.icon)" />
             </b-tooltip>
           </router-link>
         </div>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import * as api from "@/modules/API";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
 
@@ -52,26 +53,20 @@ export default {
   name: "NavBar",
   data() {
     return {
-      refresh_token: this.$cookies.get("refresh_token"),
-      user_id: null,
-      username: "",
-      icon: ""
+      refresh_token: null,
+      user: {
+        user_id: null,
+        username: "",
+        icon: ""
+      }
     };
   },
+  watch: {
+    async $route(to, from) {
+      this.refresh_token = this.$cookies.get("refresh_token");
+    }
+  },
   methods: {
-    // ユーザプロフィールの取得
-    getProfile(user_id) {
-      fetch(`${process.env.API}/user/${user_id}`)
-        .then(data => data.json())
-        .then(profile => {
-          if (process.env.NODE_ENV === "development") {
-            console.log(`Profile of ${profile.username}:`);
-            console.log(profile);
-          }
-          this.username = profile.username;
-          this.icon = profile.icon;
-        });
-    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -88,11 +83,12 @@ export default {
     "register-form": RegisterForm,
     "login-form": LoginForm
   },
-  created() {
+  async created() {
+    this.refresh_token = this.$cookies.get("refresh_token");
     // ログイン済みであればプロフィールを取得
     if (this.refresh_token !== null) {
       this.user_id = localStorage.getItem("user_id");
-      this.getProfile(this.user_id);
+      this.user = await api.getProfile(this.user_id);
     }
   }
 };
