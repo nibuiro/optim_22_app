@@ -134,6 +134,7 @@
 
 <script>
 import RequestForm from "@/components/RequestForm";
+import * as api from "@/modules/API";
 
 export default {
   data() {
@@ -173,8 +174,8 @@ export default {
     "request-form": RequestForm
   },
   created() {
-    // リクエスト一覧の取得
-    this.getRequests();
+    // リクエスト一覧の取得\
+    api.getRequests().then(requests => (this.requests = requests));
   }
 };
 </script>
