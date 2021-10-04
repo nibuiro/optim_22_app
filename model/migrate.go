@@ -19,7 +19,7 @@ func InitDB() {
 	// https://github.com/go-sql-driver/mysql#dsn-data-source-name に詳細が記載されている。
 	// DSN(データソース名)の作成。
 	// 開発用のデータベース名はoptim_dev,テスト用のデータベース名はotpim_testである。
-	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev?parseTime=true&loc=Asia%2FTokyo"
+	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -98,11 +98,8 @@ func CreateTestData() {
 	Db.Create(&winners)
 
 	var submissions = []typefile.Submission{
-		{RequestID: 1,EngineerID: 1,URL: "http://example.com/1",Content: "submission1 of engineerID 1"},
-		{RequestID: 2,EngineerID: 1,URL: "http://example.com/2",Content: "submission2 of engineerID 1"},
 		{RequestID: 1,EngineerID: 2,URL: "http://example.com/3",Content: "submission3 of engineerID 2"},
 		{RequestID: 4,EngineerID: 2,URL: "http://example.com/4",Content: "submission4 of engineerID 2"},
-		{RequestID: 4,EngineerID: 3,URL: "http://example.com/5",Content: "submission5 of engineerID 3"},
 		{RequestID: 3,EngineerID: 1,URL: "http://example.com/6",Content: "submission6 of engineerID 1"},
 		{RequestID: 5,EngineerID: 4,URL: "http://example.com/7",Content: "submission7 of engineerID 4"}}
 	Db.Create(&submissions)
@@ -168,14 +165,12 @@ func CreateTestData() {
 	// SELECT * FROM `engineers` WHERE id = 5
 
 	var request1_engineers_association = []typefile.Engineer{
-		engineer1,
 		engineer2}
 
 	// リクエスト1に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
 	Db.Model(&request1).Association("Engineers").Append(&request1_engineers_association)
 
 	var request2_engineers_association = []typefile.Engineer{
-		engineer1,
 		engineer2}
 
 	// リクエスト2に参加しているエンジニアを外部キーなしで取得するために、Associationを追加している。
@@ -191,7 +186,6 @@ func CreateTestData() {
 
 	var request4_engineers_association = []typefile.Engineer{
 		engineer2,
-		engineer3,
 		engineer4,
 		engineer5}
 
@@ -206,8 +200,6 @@ func CreateTestData() {
 	Db.Model(&request5).Association("Engineers").Append(&request5_engineers_association)
 
 	var engineer1_requests_association = []typefile.Request{
-		request1,
-		request2,
 		request3}
 
 	// エンジニア1が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
@@ -222,8 +214,7 @@ func CreateTestData() {
 	Db.Model(&engineer2).Association("Requests").Append(&engineer2_requests_association)
 
 	var engineer3_requests_association = []typefile.Request{
-		request3,
-		request4}
+		request3}
 
 	// エンジニア3が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
 	Db.Model(&engineer3).Association("Requests").Append(&engineer3_requests_association)
