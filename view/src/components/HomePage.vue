@@ -24,6 +24,7 @@
       </div>
 
       <b-table
+        :loading="loading"
         :data="requests"
         :accepting="onlyAccepting"
         :paginated="isPaginated"
@@ -146,18 +147,11 @@ export default {
       sortIcon: "chevron-up",
       sortIconSize: "",
       currentPage: 1,
-      perPage: 10
+      perPage: 10,
+      loading: false
     };
   },
   methods: {
-    // リクエスト一覧の取得
-    getRequests() {
-      fetch(`${process.env.API}/requests`)
-        .then(data => data.json())
-        .then(requests => {
-          this.requests = requests.requests;
-        });
-    },
     iconStyle(size, image) {
       return {
         width: `${size}px`,
@@ -173,9 +167,11 @@ export default {
   components: {
     "request-form": RequestForm
   },
-  created() {
-    // リクエスト一覧の取得\
-    api.getRequests().then(requests => (this.requests = requests));
+  async created() {
+    this.loading = true;
+    // リクエスト一覧の取得
+    this.requests = await api.getRequests();
+    this.loading = false;
   }
 };
 </script>
