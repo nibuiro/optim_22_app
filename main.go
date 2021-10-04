@@ -6,6 +6,7 @@ import (
   "fmt"
   "time"
   "net/http"
+  "gorm.io/gorm"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
@@ -19,6 +20,8 @@ import (
   "optim_22_app/internal/app/submission"
   "optim_22_app/internal/app/engineer"
   "optim_22_app/internal/app/user"
+  "optim_22_app/internal/app/profile"  
+  "optim_22_app/internal/app/comment"  
 )
 
 var (
@@ -56,7 +59,16 @@ func main() {
   // マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
   // それに対応するテーブルの作成を行う。
   // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
-  model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{},&typefile.Submission{})
+  model.Db.AutoMigrate(
+    &typefile.User{},
+    &typefile.Profile{},
+    &typefile.Client{},
+    &typefile.Engineer{},
+    &typefile.Winner{},
+    &typefile.Request{},
+    &typefile.Comment{},
+    &typefile.Submission{},
+  )
   // テスト実行前に利用するデータを作成する
   model.CreateTestData()
 
@@ -66,7 +78,7 @@ func main() {
 
   hs := &http.Server{
     Addr:    address,
-    Handler: buildHandler(logger, cfg), //, dbcontext.New(db)
+    Handler: buildHandler(model.Db, logger, cfg),
   }
   //#endregion
 
@@ -82,7 +94,7 @@ func main() {
 
 
 //任意のポートについてのHTTPハンドラを構築
-func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *dbcontext.DB
+func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
 
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
@@ -92,53 +104,39 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   //パニック時ステータスコード500を送出
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
 
-  // 事前にテンプレートをロード
-  e.LoadHTMLGlob("views/*/*.html")
+  // homepageを表示するハンドラ
+  e.GET("/requests",home.ShowHomepage)
+  // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
+  e.POST("/request",client.CreateRequest)
+  // request_idをparamにして特定リクエストの詳細を表示する。
+  e.GET("/request/:request_id",request.ShowRequest)
+  // クライアントが編集したリクエストを更新できるようにするハンドラ
+  e.PUT("/request/:request_id",client.UpdateRequest)
+  // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
+  e.POST("/request/:request_id",engineer.CreateEngineerJoin)
 
-  // homepageを標示するハンドラ
-  e.GET("/", home.ShowHomepage)
+  // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
+  e.POST("/winner/:request_id",client.DecideWinner)
 
-  client_e := e.Group("/client")
-  {
-    // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
-    client_e.POST("/create_request",client.CreateRequest)
-    // client_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
-    client_e.GET("/show_request/:client_id", client.ShowRequest)
-    // request_idをparamにして特定リクエストのサブミッションを表示するハンドラ
-    client_e.GET("/show_submission/:request_id",client.ShowSubmission)
-    // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
-    client_e.POST("/decide_winner",client.DecideWinner)
-    // クライアントが編集したリクエストを更新できるようにするハンドラ
-    client_e.POST("/update_request",client.UpdateRequest)
-  }
+  // submission_idをparamにして特定サブミッションの詳細を表示する。
+  e.GET("/submission/:submission_id",submission.ShowSubmission)
+  // エンジニアが編集したsubmissionを更新できるようにするハンドラ
+  e.PUT("/submission/:submission_id",engineer.UpdateSubmission)
+  // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
+  e.POST("/submission/:request_id",engineer.CreateSubmission)
 
-  request_e := e.Group("/request")
-  {
-    // request_idをparamにして特定リクエストの詳細を表示する。
-    request_e.GET("/show_request/:request_id",request.ShowRequest)
-  }
+  
+  userRepository := user.NewRepository(db, logger)
+  userService := user.NewService(userRepository, logger)
+  user.RegisterHandlers(e.Group(""), userService, logger)
+  
+  profileRepository := profile.NewRepository(db, logger)
+  profileService := profile.NewService(profileRepository, logger)
+  profile.RegisterHandlers(e.Group(""), profileService, logger)
 
-  submission_e := e.Group("/submission")
-  {
-    // request_idをparamにして特定リクエストの詳細を表示する。
-    submission_e.GET("/show_submission/:submission_id",submission.ShowSubmission)
-  }
-
-  engineer_e := e.Group("/engineer")
-  {
-    // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
-    engineer_e.POST("/create_engineer_join",engineer.CreateEngineerJoin)
-    // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
-    engineer_e.POST("/create_submission",engineer.CreateSubmission)
-    // engineer_idはサーバーサイドで直接取得できると捉えているため、開発後はクエリパラメータに入れない。
-    engineer_e.GET("/show_join_request/:engineer_id", engineer.ShowJoinRequest)
-    // エンジニアが編集したsubmissionを更新できるようにするハンドラ
-    engineer_e.POST("/update_submission",engineer.UpdateSubmission)
-  }
-
-  e.NoRoute(func(c *gin.Context) {
-    c.HTML(http.StatusOK, "error404.html", gin.H{})})
-
+  commentRepository := comment.NewRepository(db, logger)
+  commentService := comment.NewService(commentRepository, logger)
+  comment.RegisterHandlers(e.Group(""), commentService, logger)
   //authHandler := auth.Handler(cfg.JWTSigningKey)
 
 //  user.RegisterHandlers(rg.Group(""),

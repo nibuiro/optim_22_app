@@ -3,7 +3,9 @@
 package model
 
 import (
+	"os"
 	"fmt"
+	"strings"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"typefile"
@@ -42,30 +44,44 @@ func InitDB() {
 
 // テストを実行するために前もって必要なデータを作成する。
 func CreateTestData() {
+
+	icon, err := os.ReadFile("/go/src/optim_22_app/model/icon")
+
+	fmt.Println(err)
+
 	var users = []typefile.User{
-		{Name: "user1"},
-		{Name: "user2"},
-		{Name: "user3"},
-		{Name: "user4"},
-		{Name: "user5"}}
+		{Name: "user1", Email: "test@test.test", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
+		{Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
+		{Name: "user3", Email: "test.test@test.com", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
+		{Name: "user4", Email: "test@test.test", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
+		{Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}
 	Db.Create(&users)
+
+	var profile = []typefile.Profile{
+		{ID: 1,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+		{ID: 2,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+		{ID: 3,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+		{ID: 4,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+		{ID: 5,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+	}
+	Db.Create(&profile)
 
 	// userが作成された直後にengineerも作成する。
 	var engineers = []typefile.Engineer{
-		{User: typefile.User{ID: 1,Name: "user1"}},
-		{User: typefile.User{ID: 2,Name: "user2"}},
-		{User: typefile.User{ID: 3,Name: "user3"}},
-		{User: typefile.User{ID: 4,Name: "user4"}},
-		{User: typefile.User{ID: 5,Name: "user5"}}}
+		{User: typefile.User{ID: 1,Name: "user1", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 3,Name: "user3", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}}
 	Db.Create(&engineers)
 
 	//userが作成された直後にclientも作成する。
 	var clients = []typefile.Client{
-		{User: typefile.User{ID: 1,Name: "user1"}},
-		{User: typefile.User{ID: 2,Name: "user2"}},
-		{User: typefile.User{ID: 3,Name: "user3"}},
-		{User: typefile.User{ID: 4,Name: "user4"}},
-		{User: typefile.User{ID: 5,Name: "user5"}}}
+		{User: typefile.User{ID: 1,Name: "user1", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 3,Name: "user3", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}}
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
@@ -226,4 +242,13 @@ func CreateTestData() {
 
 	// エンジニア5が参加しているリクエストを外部キーなしで取得するために、Associationを追加している。
 	Db.Model(&engineer5).Association("Requests").Append(&engineer5_requests_association)
+
+	var comments = []typefile.Comment{
+		{UserID: 1,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 0,},
+		{UserID: 2,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 1,},
+		{UserID: 1,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 2,},
+		{UserID: 3,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 3,},
+		{UserID: 1,RequestID: 2,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 0,},
+	}
+	Db.Create(&comments)
 }

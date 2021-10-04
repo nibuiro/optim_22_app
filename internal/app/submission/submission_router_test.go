@@ -55,6 +55,6 @@ func TestFailureShowSubmission(t *testing.T) {
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。
 		router.ServeHTTP(w,req)
 
-		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, http.StatusNotFound, w.Code)
 	}
 }
