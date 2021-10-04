@@ -235,6 +235,26 @@ async function getsubmission(submission_id) {
 }
 
 
+// サブミッション編集API
+async function editProfile(component, submission, access_token) {
+    // 提出物の情報をサーバに送信し，レスポンスを得る
+    const response = await fetch(`${process.env.API}/submission/${submission.submission_id}`, {
+        method: "PUT",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify(submission)
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // 編集フォームを閉じる
+        component.$emit("close");
+        // ユーザ登録成功メッセージを表示する
+        component.$emit("displayMessage");
+    }
+}
+
+
 export {
     register,
     login,
@@ -245,5 +265,6 @@ export {
     getRequest,
     getComments,
     addComment,
-    getsubmission
+    getsubmission,
+    editSubmission
 }
