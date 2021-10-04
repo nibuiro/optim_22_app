@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import * as api from "@/modules/API";
+
 const ModalForm = {
   data() {
     return {
@@ -72,53 +74,10 @@ const ModalForm = {
       return this.user.password === this.user.confirm_password;
     },
     // ユーザ登録処理
-    async register() {
+    register() {
       // すべての情報が正しく入力されていれば
       if (this.isAllEntered() && this.isPasswordsCorrect()) {
-        const msgUint8 = new TextEncoder().encode(this.user.password); // パスワードをUint8Array(utf-8)としてエンコード
-        const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // エンコードされたパスワードをハッシュ化
-        const hashArray = Array.from(new Uint8Array(hashBuffer)); // バッファをbyte配列に変換
-        const hashHex = hashArray
-          .map(b => b.toString(16).padStart(2, "0"))
-          .join(""); // byte配列を16進文字列に変換
-        // ログイン情報をサーバに送信し，レスポンスを得る
-        fetch(`${process.env.API}/register`, {
-          method: "POST",
-          body: JSON.stringify({
-            username: this.user.username,
-            email: this.user.email,
-            password: hashHex
-          })
-        }).then(response => {
-          // 登録成功時
-          if (response.status === 200) {
-            const access_token = response.headers.get("Authorization");
-            const refresh_token = response.headers.get("Refresh-Token");
-            if (process.env.NODE_ENV === "development") {
-              console.log("access_token:");
-              console.log(access_token);
-              console.log("refresh_token:");
-              console.log(refresh_token);
-            }
-            // レスポンスのbodyをjsonに変換
-            response.json().then(data => {
-              const user_id = data.user_id;
-              if (process.env.NODE_ENV === "development") {
-                console.log(`user_id: ${user_id}`);
-              }
-              // localStorageにユーザIDを保存
-              localStorage.setItem("user_id", user_id);
-              // localStorageにアクセストークンを保存
-              localStorage.setItem("access_token", access_token);
-              // cookieにリフレッシュトークンを保存（有効期限: 1ヶ月）
-              this.$cookies.set("refresh_token", refresh_token, "1m");
-              // 新規登録フォームを閉じる
-              this.$emit("close");
-              // ユーザ登録成功メッセージを表示する
-              this.$emit("displayMessage");
-            });
-          }
-        });
+        api.register(this, this.user);
       } else {
         this.invalid = true;
         if (!this.isAllEntered()) {

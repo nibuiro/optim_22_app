@@ -57,7 +57,7 @@ const ModalForm = {
     login() {
       // メールアドレスとパスワードの両方が入力されていれば
       if (this.isAllEntered()) {
-        api.login(this, this.user.email, this.user.password);
+        api.login(this, this.user);
       } else {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
