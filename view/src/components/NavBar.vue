@@ -64,6 +64,11 @@ export default {
   watch: {
     async $route(to, from) {
       this.refresh_token = this.$cookies.get("refresh_token");
+      // ログイン済みであればプロフィールを取得
+      if (this.refresh_token !== null) {
+        this.user_id = localStorage.getItem("user_id");
+        this.user = await api.getProfile(this.user_id);
+      }
     }
   },
   methods: {

@@ -109,11 +109,17 @@
           </div>
           <section class="is-flex is-justify-content-center">
             <!-- 依頼主であり提出物が1つ以上あれば -->
-            <choose-winner v-if="true" :request="request" />
-            <!-- 依頼主以外であれば -->
-            <request-applier v-if="true" :request="request" />
+            <choose-winner
+              v-if="myself && request.submissions.length > 0"
+              :request="request"
+            />
+            <!-- 依頼主以外で未参加あれば -->
+            <request-applier
+              v-else-if="!myself && !joined && loggedin"
+              :client_id="user_id"
+            />
             <!-- 依頼主以外で参加済みであれば -->
-            <submission-submitter v-if="true" />
+            <submission-submitter v-else-if="!myself && loggedin" />
           </section>
         </b-tab-item>
         <b-tab-item>
@@ -141,12 +147,15 @@ import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
 export default {
   data() {
     return {
+      loggedin: false,
+      myself: false,
+      joined: false,
       request: {
         request_id: null,
         finish: null,
         createdat: "",
         requestname: "",
-        client: {},
+        client: { user_id: null },
         engineers: [],
         content: "",
         submissions: [],
@@ -175,8 +184,16 @@ export default {
     "submission-submitter": SubmissionSubmitter
   },
   async created() {
+    const refresh_token = this.$cookies.get("refresh_token");
+    this.loggedin = refresh_token !== null ? true : false;
+    this.user_id = localStorage.getItem("user_id");
     const request_id = this.$route.params.request_id;
     this.request = await api.getRequest(request_id);
+    this.myself = this.request.client.user_id == this.user_id && this.loggedin;
+    this.joined = this.request.engineers.some(
+      engineer => engineer.user_id == this.user_id
+    );
+    console.log(this.joined, this.myself, this.loggedin);
   }
 };
 </script>
