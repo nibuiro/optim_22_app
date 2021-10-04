@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import * as api from "@/modules/API";
+
 const ModalForm = {
   data() {
     return {
@@ -71,24 +73,6 @@ const ModalForm = {
     }
   },
   methods: {
-    // ユーザプロフィールの取得
-    getProfile(user_id) {
-      const access_token = localStorage.getItem("access_token");
-      fetch(`${process.env.API}/user/${user_id}`, {
-        method: "GET",
-        headers: {
-          Authorization: access_token
-        }
-      })
-        .then(data => data.json())
-        .then(profile => {
-          if (process.env.NODE_ENV === "development") {
-            console.log(`Edit Profile:`);
-            console.log(profile);
-          }
-          this.profile = profile;
-        });
-    },
     // 画像をbase64で変換
     convertIcon(file) {
       const ICON_WIDTH = 500; // リサイズ後のアイコンの幅
@@ -152,29 +136,8 @@ const ModalForm = {
     async editProfile() {
       // すべての情報が正しく入力されていれば
       if (this.isNeedsEntered() && this.isPasswordsCorrect()) {
-        const msgUint8 = new TextEncoder().encode(this.profile.password); // パスワードをUint8Array(utf-8)としてエンコード
-        const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // エンコードされたパスワードをハッシュ化
-        const hashArray = Array.from(new Uint8Array(hashBuffer)); // バッファをbyte配列に変換
-        const hashHex = hashArray
-          .map(b => b.toString(16).padStart(2, "0"))
-          .join(""); // byte配列を16進文字列に変換
-        this.profile.password = hashHex; // プロフィールにパスワードを追加
-        // プロフィール情報をサーバに送信し，レスポンスを得る
-        fetch(`${process.env.API}/user/${this.profile.user_id}`, {
-          method: "PUT",
-          headers: {
-            Authorization: localStorage.getItem("access_token")
-          },
-          body: JSON.stringify(this.profile)
-        }).then(response => {
-          // 登録成功時
-          if (response.status === 200) {
-            // 編集フォームを閉じる
-            this.$emit("close");
-            // ユーザ登録成功メッセージを表示する
-            this.$emit("displayMessage");
-          }
-        });
+        const access_token = localStorage.getItem("access_token");
+        api.editProfile(this, this.profile, access_token);
       } else {
         this.invalid = true;
         if (!this.isNeedsEntered()) {
@@ -196,9 +159,10 @@ const ModalForm = {
       };
     }
   },
-  created() {
+  async created() {
     const user_id = localStorage.getItem("user_id");
-    this.getProfile(user_id);
+    const access_token = localStorage.getItem("access_token");
+    this.profile = await api.getProfile(user_id, access_token);
   },
   /* html */
   template: `

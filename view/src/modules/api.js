@@ -98,9 +98,14 @@ async function login(component, user) {
 }
 
 
-// ユーザプロフィール取得API
-async function getProfile(user_id) {
-    const response = await fetch(`${process.env.API}/user/${user_id}`);
+// ユーザプロフィールの取得API
+async function getProfile(user_id, access_token) {
+    const response = await fetch(`${process.env.API}/user/${user_id}`, {
+        method: 'GET',
+        headers: {
+            Authorization: access_token
+        }
+    });
     const profile = await response.json();
     if (process.env.NODE_ENV === "development") {
         console.log(`Profile of ${profile.username}:`);
@@ -111,6 +116,30 @@ async function getProfile(user_id) {
         submission.request = request;
     })
     return profile;
+}
+
+
+// ユーザプロフィールの編集API
+async function editProfile(component, user, access_token) {
+    // パスワードのハッシュ化
+    const hashHex = await hashPassword(user.password);
+    const profile = user;
+    profile.password = hashHex;
+    // プロフィール情報をサーバに送信し，レスポンスを得る
+    const response = await fetch(`${process.env.API}/user/${profile.user_id}`, {
+        method: "PUT",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify(profile)
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // 編集フォームを閉じる
+        component.$emit("close");
+        // ユーザ登録成功メッセージを表示する
+        component.$emit("displayMessage");
+    }
 }
 
 
@@ -134,6 +163,7 @@ export {
     register,
     login,
     getProfile,
+    editProfile,
     getRequests,
     getRequest
 }

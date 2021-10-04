@@ -276,7 +276,11 @@ export default {
     async $route(to, from) {
       const user_id = localStorage.getItem("user_id");
       this.myself = this.$route.params.user_id == user_id;
-      this.profile = await api.getProfile(this.$route.params.user_id);
+      const access_token = localStorage.getItem("access_token");
+      this.profile = await api.getProfile(
+        this.$route.params.user_id,
+        access_token
+      );
       this.$forceUpdate();
     }
   },
