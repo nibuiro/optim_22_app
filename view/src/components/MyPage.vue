@@ -66,7 +66,11 @@
               <b-tag rounded> {{ profile.requests.length }} </b-tag>
             </span>
           </template>
-          <b-table :data="profile.requests" :default-sort="['date', 'desc']">
+          <b-table
+            :loading="loading"
+            :data="profile.requests"
+            :default-sort="['date', 'desc']"
+          >
             <b-table-column
               cell-class="is-vcentered"
               field="state"
@@ -150,7 +154,11 @@
               <b-tag rounded> {{ profile.submissions.length }} </b-tag>
             </span>
           </template>
-          <b-table :data="profile.submissions" :default-sort="['date', 'desc']">
+          <b-table
+            :loading="loading"
+            :data="profile.submissions"
+            :default-sort="['date', 'desc']"
+          >
             <b-table-column
               cell-class="is-vcentered"
               field="state"
@@ -187,7 +195,6 @@
               v-slot="props"
             >
               <router-link
-                v-if="!!props.row.request.client"
                 :to="{
                   name: 'MyPage',
                   params: { user_id: props.row.request.client.user_id }
@@ -207,7 +214,6 @@
               v-slot="props"
             >
               <router-link
-                v-if="!!props.row.request.requestname"
                 :to="{
                   name: 'RequestPage',
                   params: { request_id: props.row.request_id }
@@ -235,7 +241,7 @@
               <router-link
                 :to="{
                   name: 'SubmissionPage',
-                  query: { id: props.submission_id }
+                  params: { submission_id: props.submission_id }
                 }"
               >
                 提出物
@@ -256,11 +262,6 @@ export default {
   data() {
     return {
       profile: {
-        user_id: null,
-        username: "",
-        email: "",
-        icon: "",
-        comment: "",
         SNS: {
           Github: "",
           Twitter: "",
@@ -274,6 +275,7 @@ export default {
   },
   watch: {
     async $route(to, from) {
+      this.loading = true;
       const user_id = localStorage.getItem("user_id");
       this.myself = this.$route.params.user_id == user_id;
       const access_token = localStorage.getItem("access_token");
@@ -281,7 +283,7 @@ export default {
         this.$route.params.user_id,
         access_token
       );
-      this.$forceUpdate();
+      this.loading = false;
     }
   },
   methods: {
@@ -301,10 +303,15 @@ export default {
     "profile-editor": ProfileEditor
   },
   async created() {
+    this.loading = true;
     const user_id = localStorage.getItem("user_id");
     this.myself = this.$route.params.user_id == user_id;
-    this.profile = await api.getProfile(this.$route.params.user_id);
-    this.$forceUpdate();
+    const access_token = localStorage.getItem("access_token");
+    this.profile = await api.getProfile(
+      this.$route.params.user_id,
+      access_token
+    );
+    this.loading = false;
   }
 };
 </script>

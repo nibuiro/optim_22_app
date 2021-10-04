@@ -98,7 +98,7 @@
                   :key="submission.submissionid"
                   :to="{
                     name: 'SubmissionPage',
-                    query: { id: submission.submission_id }
+                    params: { submission_id: submission.submission_id }
                   }"
                 >
                   <b-icon icon="file-upload-outline" />

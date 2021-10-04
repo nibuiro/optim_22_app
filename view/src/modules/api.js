@@ -111,11 +111,13 @@ async function getProfile(user_id, access_token) {
         console.log(`Profile of ${profile.username}:`);
         console.log(profile);
     }
-    profile.submissions.forEach(submission => {
-        const request = getRequest(submission.request_id);
-        submission.request = request;
-    })
-    return profile;
+    for (let i = 0; i < profile.submissions.length; i++) {
+        const request = await getRequest(profile.submissions[i].request_id);
+        profile.submissions[i].request = request;
+        if (i === profile.submissions.length - 1) {
+            return profile;
+        }
+    }
 }
 
 
@@ -219,6 +221,18 @@ async function addComment(component, comment, access_token) {
 }
 
 
+// サブミッション取得API
+async function getsubmission(submission_id) {
+    const response = await fetch(`${process.env.API}/request/${submission_id}`);
+    const submission = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`Submission #${submission.submission_id}:`);
+        console.log(submission);
+    }
+    return submission;
+}
+
+
 export {
     register,
     login,
@@ -228,5 +242,6 @@ export {
     makeRequest,
     getRequest,
     getComments,
-    addComment
+    addComment,
+    getsubmission
 }

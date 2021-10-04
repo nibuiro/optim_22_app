@@ -5,7 +5,7 @@
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute;"
-        :label="submission.comment"
+        :label="submission.content"
         type="is-light"
         position="is-right"
         always
@@ -13,7 +13,7 @@
         <router-link
           :to="{
             name: 'MyPage',
-            params: { user_id: submission.engineer.userid }
+            params: { user_id: submission.engineer.user_id }
           }"
         >
           <div
@@ -44,8 +44,8 @@
               <li>
                 提出日時：
                 {{
-                  `${new Date(submission.date).toLocaleDateString()}
-                   ${new Date(submission.date).toLocaleTimeString()}`
+                  `${new Date(submission.createdat).toLocaleDateString()}
+                   ${new Date(submission.createdat).toLocaleTimeString()}`
                 }}
               </li>
               <li>
@@ -56,7 +56,7 @@
                     params: { request_id: request.request_id }
                   }"
                 >
-                  {{ request.request }}
+                  {{ request.requestname }}
                 </router-link>
               </li>
               <li>
@@ -84,7 +84,7 @@
               </li>
               <li>
                 コメント：
-                {{ submission.comment }}
+                {{ submission.content }}
               </li>
             </ul>
           </div>
@@ -95,16 +95,30 @@
 </template>
 
 <script>
+import * as api from "@/modules/API";
 import SubmissionEditor from "@/components/SubmissionEditor";
-
-const submission = require("../../src/assets/sampleSubmission.json");
-const request = require("../../src/assets/sampleRequest.json");
 
 export default {
   data() {
     return {
-      submission,
-      request
+      submission: {
+        submission_id: null,
+        createdat: "",
+        request_id: null,
+        engineer: {},
+        content: ""
+      },
+      request: {
+        request_id: null,
+        finish: null,
+        createdat: "",
+        requestname: "",
+        client: {},
+        engineers: [],
+        content: "",
+        submissions: [],
+        winner: null
+      }
     };
   },
   methods: {
@@ -122,6 +136,12 @@ export default {
   },
   components: {
     "submission-editor": SubmissionEditor
+  },
+  async created() {
+    const submission_id = this.$route.params.submission_id;
+    this.submission = await api.getsubmission(submission_id);
+    const request_id = this.submission.request_id;
+    this.request = await api.getRequest(request_id);
   }
 };
 </script>
