@@ -22,22 +22,23 @@ type Service interface {
   ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) error
   GenerateRefreshToken(writer jwt.MapClaims) (string, error)
   GenerateAccessToken(writer jwt.MapClaims) (string, error)
+  ValidateAccessTokenSignature(tokenString string) (bool, error)
 }
 
 
 //`POST /api/auth`が要求する情報
 type Credential struct {
-  email    string `json:"email"`
-  password string `json:"password"`
+  Email    string `json:"email"`
+  Password string `json:"password"`
 }
 
 
 func (m Credential) Validate() error {
   return validation.ValidateStruct(&m,
     //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
-    validation.Field(&m.email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
+    validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
     //is SHA256
-    validation.Field(&m.password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+    validation.Field(&m.Password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
   )
 }
 
@@ -125,6 +126,7 @@ func (s service) ReadCredential(data []byte) (*Credential, error) {
     s.logger.Error(err)
     return &Credential{}, err
   } else {
+    s.logger.Debug(reader)
     return &reader, nil
   }
 }
@@ -139,8 +141,8 @@ func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, r
 
   //idを抽出するSQL構文のWhere句の値
   filter := typefile.User{
-    Email: reader.email,
-    Password: reader.password,
+    Email: reader.Email,
+    Password: reader.Password,
   }
   
   //資格情報の検証とユーザIDの取
@@ -181,7 +183,14 @@ func (s service) GenerateAccessToken(writer jwt.MapClaims) (string, error) {
   }
 }
 
-
+func (s service) ValidateAccessTokenSignature(tokenString string) (bool, error) {
+  if isValid, err := ValidateSignature(tokenString, s.AccessTokenSecret); err != nil {
+    s.logger.Error(err)
+    return false, err
+  } else {
+    return isValid, nil
+  }
+}
 
 func AddRefreshTokenExpiration(writer jwt.MapClaims, RefreshTokenExpiration int) {
   writer["exp"] = CalcFutureUnixTime(RefreshTokenExpiration)
@@ -193,10 +202,3 @@ func AddAccessTokenExpiration(writer jwt.MapClaims, RefreshTokenExpiration int) 
 }
 
 
-
-func MakeTokenSecretSender(secret[]byte) func(token *jwt.Token) (interface{}, error) {
-  secretSender := func(token *jwt.Token) (interface{}, error) {
-    return secret, nil
-  }
-  return secretSender
-}

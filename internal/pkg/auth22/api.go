@@ -2,11 +2,13 @@ package auth22
 
 
 import (
-  "io"
+  //"io"
   "net/http"
  // "time"
   "github.com/gin-gonic/gin"
   "github.com/golang-jwt/jwt/v4"
+  //"fmt"
+  "optim_22_app/pkg/log"
 )
 
 
@@ -15,13 +17,15 @@ type Rule map[string]map[string]bool
 
 type resource struct {
   service Service
+  logger log.Logger
   domain string
 }
 
 
-func New(service Service, domain string) *resource {
+func New(service Service, logger log.Logger, domain string) *resource {
   return &resource{
     service: service,
+    logger: logger,
     domain: domain,
   }
 }
@@ -30,10 +34,9 @@ func New(service Service, domain string) *resource {
 func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
   return func(c *gin.Context) {
 
-    var claims jwt.MapClaims
-    claims = make(jwt.MapClaims)
+    claims := make(jwt.MapClaims)
 
-    if refreshToken, err := c.Cookie("refresh_token"); err != nil {
+    if refreshToken := c.GetHeader("Refresh-Token"); refreshToken == "" {
       c.Status(http.StatusBadRequest)
       return
     } else {
@@ -46,10 +49,11 @@ func (rc *resource) RefreshTokenRefreshHandler() gin.HandlerFunc {
           return
         }
         if newRefreshToken, err := rc.service.RefreshRefreshToken(claims); err != nil {
-          c.Status(http.StatusUnauthorized)
+          c.Status(http.StatusInternalServerError)
           return
         } else {
-          c.SetCookie("refresh_token", newRefreshToken, 1, "/", rc.domain, false, true)  
+          SetTokenWithControl(c, newRefreshToken, "")
+          c.Status(http.StatusOK)
           return
         }
       }
@@ -63,10 +67,11 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
 
     claims := make(jwt.MapClaims)
 
-    refreshToken, err := c.Cookie("refresh_token")
+    refreshToken := c.GetHeader("Refresh-Token")
 
-    if err != nil {
-      c.AbortWithStatus(http.StatusBadRequest)
+    if refreshToken == "" {
+      c.Status(http.StatusBadRequest)
+      return
     } else {
 
       if valid, err := rc.service.ReadRefreshToken(claims, refreshToken); err != nil {
@@ -79,27 +84,28 @@ func (rc *resource) AccessTokenRefreshHandler() gin.HandlerFunc {
         }
         //リフレッシュトークンが期限内
         accessToken := c.GetHeader("Authorization")
-      
         if _, err := rc.service.ReadAccessToken(claims, accessToken); err != nil {
           c.Status(http.StatusBadRequest)
           return
         } else {
-/*
-          expiration := time.Now()
-          expiration = expiration.Add(rc.accessTokenExpiration)
-
-          claims["exp"] = expiration.Unix()
-          newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
-          // Sign and get the complete encoded token as a string using the secret
-          newTokenString, _ := newToken.SignedString([]byte(rc.accessTokenSecret))
-*/
-          if newTokenString, err := rc.service.RefreshAccessToken(claims); err != nil {
-            c.Status(http.StatusUnauthorized)
+          if isValid, err := rc.service.ValidateAccessTokenSignature(accessToken); err != nil {
+            c.Status(http.StatusInternalServerError)
             return
           } else {
-            c.Header("Authorization", newTokenString)
-            c.Status(http.StatusOK)
-            return
+            if isValid {
+              if newTokenString, err := rc.service.RefreshAccessToken(claims); err != nil {
+                c.Status(http.StatusBadRequest)
+                return
+              } else {
+                SetTokenWithControl(c, "", newTokenString)
+                c.Status(http.StatusOK)
+                return
+              }
+            } else {
+              //リフレッシュトークンを利用したアクセストークンの不正取得の試行
+              c.Status(http.StatusBadRequest)
+              return
+            }
           }
         }
       }
@@ -113,34 +119,39 @@ func (rc resource) Login() gin.HandlerFunc {
 
     claims := make(jwt.MapClaims)
   
+    //buf := make([]byte, 1028)
+    
     //BodyからJSONをパースして読み取る
-    if body, err := io.ReadAll(c.Request.Body); err != nil {
+      //  rc.logger.Debug(buf)
+    if body, err := c.GetRawData(); err != nil {
       c.Status(http.StatusBadRequest)
       return
     } else {
+      rc.logger.Debug(string(body))
       if credential, err := rc.service.ReadCredential(body); err != nil {
+        rc.logger.Debug(err)
         c.Status(http.StatusBadRequest)
         return
       } else {
+        rc.logger.Debug(credential)
         //資格情報の確認
         if err := rc.service.ValidateCredential(c.Request.Context(), claims, credential); err != nil {
-          c.Status(http.StatusUnauthorized)
+          c.Status(http.StatusBadRequest)
+          rc.logger.Debug(err)
           return 
         } else {
+
           //認証情報取得
           if refreshToken, err := rc.service.GenerateRefreshToken(claims); err != nil {
             c.Status(http.StatusInternalServerError)
             return
           } else {
-            if accessToken, err := rc.service.RefreshAccessToken(claims); err != nil {
+            if accessToken, err := rc.service.GenerateAccessToken(claims); err != nil {
               c.Status(http.StatusInternalServerError)
               return
             } else {
-              //#region ヘッダに認証情報を付加
-              c.Header("Authorization", accessToken)
-              c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.domain, false, true)
-              c.Status(http.StatusCreated)
-              //#endregion
+              SetTokenWithControl(c, refreshToken, accessToken)
+              c.Status(http.StatusOK)
               return 
             }
           }
@@ -156,9 +167,9 @@ func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
 
     claims := make(jwt.MapClaims)
 
-    refreshToken, err := c.Cookie("refresh_token")
+    refreshToken := c.GetHeader("Refresh-Token")
 
-    if err != nil {
+    if refreshToken == "" {
       c.Status(http.StatusBadRequest)
       return
     } else {  
@@ -167,7 +178,7 @@ func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
         return
       } else {
         if !valid {
-          c.Status(http.StatusUnauthorized)
+          c.Status(http.StatusBadRequest)
           return
         }
         //認証情報取得
@@ -180,9 +191,8 @@ func (rc resource) RefreshAccessTokenAndRefreshToken() gin.HandlerFunc {
             return
           } else {
             //#region ヘッダに認証情報を付加
-            c.Header("Authorization", accessToken)
-            c.SetCookie("refresh_token", refreshToken, 1, "/",  rc.domain, false, true)
-            c.Status(http.StatusCreated)
+            SetTokenWithControl(c, refreshToken, accessToken)
+            c.Status(http.StatusOK)
             //#endregion
             return 
           }

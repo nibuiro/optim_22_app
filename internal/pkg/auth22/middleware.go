@@ -27,7 +27,7 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
         if valid {
           //なにもしない
         } else {
-          c.AbortWithStatus(http.StatusUnauthorized)
+          c.AbortWithStatus(http.StatusForbidden)
         }
       }
     }

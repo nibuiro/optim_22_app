@@ -56,11 +56,11 @@ func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
   logger := log.New()
-  cfg, _ := config.Load("/go/src/configs/app.yaml", logger)
+  cfg, _ := config.Load("/go/src/optim_22_app/configs/app.yaml", logger)
   logger.Debug(cfg.RefreshTokenSecret)
-  auth := New(NewService(cfg, nil, logger), "localhost")
+  auth := New(NewService(cfg, nil, logger), logger, "localhost")
   
-  router.Use(auth.ValidateAccessToken(GetRuleForTest(), false))
+  router.Use(auth.ValidateAccessToken(GetRuleForTest(), true))
 
 
   router.POST("/test", func(c *gin.Context) {
@@ -73,7 +73,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2100, nil), 
+      MakeAuthorizationHeader("", accessToken2100), 
       http.StatusCreated, 
       "",
     },
@@ -82,8 +82,8 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2000, nil), 
-      http.StatusUnauthorized, 
+      MakeAuthorizationHeader("", accessToken2000), 
+      http.StatusForbidden, 
       "",
     },
   }

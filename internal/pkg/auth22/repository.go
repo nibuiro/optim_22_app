@@ -8,6 +8,7 @@ import (
 )
 
 
+
 type Repository interface {
   GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error)
 }
@@ -36,6 +37,7 @@ func (r repository) GetUserIdByCredential(ctx context.Context, credential *typef
   	r.logger.Error(err)
   	return 0, err
   } else {
+    r.logger.Debug(userId)
   	return userId, nil
   }
 }
