@@ -8,6 +8,9 @@ import (
 )
 
 
+type UserId struct{
+  ID             int
+}
 
 type Repository interface {
   GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error)
@@ -26,7 +29,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 
 
 func (r repository) GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error) {
-  var userId int
+  var userId UserId
   result := r.db.WithContext(ctx).
     Model(&typefile.User{}).
     Select("id").
@@ -37,7 +40,7 @@ func (r repository) GetUserIdByCredential(ctx context.Context, credential *typef
   	r.logger.Error(err)
   	return 0, err
   } else {
-    r.logger.Debug(userId)
-  	return userId, nil
+    r.logger.Debug(userId.ID)
+  	return userId.ID, nil
   }
 }
