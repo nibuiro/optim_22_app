@@ -135,24 +135,29 @@ func (rc resource) Login() gin.HandlerFunc {
       } else {
         rc.logger.Debug(credential)
         //資格情報の確認
-        if err := rc.service.ValidateCredential(c.Request.Context(), claims, credential); err != nil {
+        if valid, err := rc.service.ValidateCredential(c.Request.Context(), claims, credential); err != nil {
           c.Status(http.StatusBadRequest)
           rc.logger.Debug(err)
           return 
         } else {
-
-          //認証情報取得
-          if refreshToken, err := rc.service.GenerateRefreshToken(claims); err != nil {
-            c.Status(http.StatusInternalServerError)
+          if !valid {
+            //不正なログイン
+            c.Status(http.StatusUnauthorized)
             return
           } else {
-            if accessToken, err := rc.service.GenerateAccessToken(claims); err != nil {
+            //認証情報取得
+            if refreshToken, err := rc.service.GenerateRefreshToken(claims); err != nil {
               c.Status(http.StatusInternalServerError)
               return
             } else {
-              SetTokenWithControl(c, refreshToken, accessToken)
-              c.Status(http.StatusOK)
-              return 
+              if accessToken, err := rc.service.GenerateAccessToken(claims); err != nil {
+                c.Status(http.StatusInternalServerError)
+                return
+              } else {
+                SetTokenWithControl(c, refreshToken, accessToken)
+                c.Status(http.StatusOK)
+                return 
+              }
             }
           }
         }

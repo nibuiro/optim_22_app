@@ -19,7 +19,7 @@ type Service interface {
   RefreshAccessToken(writer jwt.MapClaims) (string, error)
   RefreshRefreshToken(writer jwt.MapClaims) (string, error)
   ReadCredential(data []byte) (*Credential, error)
-  ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) error
+  ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) (bool, error)
   GenerateRefreshToken(writer jwt.MapClaims) (string, error)
   GenerateAccessToken(writer jwt.MapClaims) (string, error)
   ValidateAccessTokenSignature(tokenString string) (bool, error)
@@ -132,11 +132,11 @@ func (s service) ReadCredential(data []byte) (*Credential, error) {
 }
 
 
-func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) error {
+func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, reader *Credential) (bool, error) {
   //リクエストの値を検証
   if err := reader.Validate(); err != nil {
     s.logger.Error(err)
-    return err
+    return false, err
   } 
 
   //idを抽出するSQL構文のWhere句の値
@@ -148,10 +148,14 @@ func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, r
   //資格情報の検証とユーザIDの取
   if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
     s.logger.Error(err)
-    return err
+    return false, err
   } else {
-    writer["userID"] = userId
-    return nil
+    if isInvalidCredential := 0 == userId; isInvalidCredential {
+      return false, nil
+    } else {
+      writer["userID"] = userId
+      return true, nil
+    }
   }
 }
 
