@@ -67,7 +67,7 @@ const ModalForm = {
       // 提出物のURLと内容が入力されていれば
       if (this.submission.content.length * this.submission.url.length > 0) {
         const access_token = localStorage.getItem("access_token");
-        api.editProfile(this, this.submission, access_token);
+        api.editSubmission(this, this.submission, access_token);
       } else {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;

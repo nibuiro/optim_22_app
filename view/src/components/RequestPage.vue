@@ -109,17 +109,19 @@
           </div>
           <section class="is-flex is-justify-content-center">
             <!-- 依頼主であり提出物が1つ以上あれば -->
-            <choose-winner
+            <winner-chooser
               v-if="myself && request.submissions.length > 0"
               :request="request"
             />
             <!-- 依頼主以外で未参加あれば -->
             <request-applier
-              v-else-if="!myself && !joined && loggedin"
+              v-else-if="!myself && loggedin && !joined"
               :client_id="user_id"
             />
-            <!-- 依頼主以外で参加済みであれば -->
-            <submission-submitter v-else-if="!myself && loggedin" />
+            <!-- 依頼主以外で参加済みであり未提出であれば -->
+            <submission-submitter
+              v-else-if="!myself && loggedin && !submitted"
+            />
           </section>
         </b-tab-item>
         <b-tab-item>
@@ -140,7 +142,7 @@
 import * as api from "@/modules/API";
 import RequestEditor from "@/components/RequestEditor";
 import DiscussionPage from "@/components/DiscussionPage";
-import ChooseWinner from "@/components/ChooseWinner.vue";
+import WinnerChooser from "@/components/WinnerChooser.vue";
 import RequestApplier from "@/components/RequestApplier.vue";
 import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
 
@@ -150,6 +152,7 @@ export default {
       loggedin: false,
       myself: false,
       joined: false,
+      submitted: false,
       request: {
         request_id: null,
         finish: null,
@@ -179,7 +182,7 @@ export default {
   components: {
     "request-editor": RequestEditor,
     "discussion-page": DiscussionPage,
-    "choose-winner": ChooseWinner,
+    "winner-chooser": WinnerChooser,
     "request-applier": RequestApplier,
     "submission-submitter": SubmissionSubmitter
   },
@@ -193,7 +196,24 @@ export default {
     this.joined = this.request.engineers.some(
       engineer => engineer.user_id == this.user_id
     );
-    console.log(this.joined, this.myself, this.loggedin);
+    this.submitted = this.request.submissions.some(
+      submission => submission.engineer.user_id == this.user_id
+    );
+    if (process.env.NODE_ENV === "development") {
+      if (this.myself) {
+        console.log(
+          `User #${this.user_id} is the Client of this Request #${this.request.request_id}.`
+        );
+      } else if (this.loggedin && !this.joined) {
+        console.log(
+          `User #${this.user_id} has not joined this Request #${this.request.request_id}.`
+        );
+      } else if (this.loggedin) {
+        console.log(
+          `User #${this.user_id} is one of the Engineers of this Request #${this.request.request_id}`
+        );
+      }
+    }
   }
 };
 </script>

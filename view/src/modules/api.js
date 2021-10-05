@@ -236,31 +236,22 @@ async function joinRequest(component, request, access_token) {
 }
 
 
-// ディスカッション取得API
-async function getComments(request_id) {
-    const response = await fetch(`${process.env.API}/discussion/${request_id}`);
-    const comments = await response.json();
-    if (process.env.NODE_ENV === "development") {
-        console.log(`Discussion of Request #${request_id}:`);
-        console.log(comments.comments);
-    }
-    return comments.comments;
-}
-
-
-// コメント投稿API
-async function addComment(component, comment, access_token) {
-    const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
+// サブミッション提出API
+async function submitSubmission(component, submission, access_token) {
+    // 提出物の情報をサーバに送信し，レスポンスを得る
+    const response = await fetch(`${process.env.API}/submission/${submission.request_id}`, {
         method: "POST",
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(comment)
+        body: JSON.stringify(submission)
     });
     // 登録成功時
     if (response.status === 200) {
+        // 編集フォームを閉じる
+        component.$emit("close");
         // ユーザ登録成功メッセージを表示する
-        return true;
+        component.$emit("displayMessage");
     }
 }
 
@@ -280,7 +271,7 @@ async function getsubmission(submission_id) {
 
 
 // サブミッション編集API
-async function editProfile(component, submission, access_token) {
+async function editSubmission(component, submission, access_token) {
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/submission/${submission.submission_id}`, {
         method: "PUT",
@@ -288,6 +279,55 @@ async function editProfile(component, submission, access_token) {
             Authorization: access_token
         },
         body: JSON.stringify(submission)
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // 編集フォームを閉じる
+        component.$emit("close");
+        // ユーザ登録成功メッセージを表示する
+        component.$emit("displayMessage");
+    }
+}
+
+
+// ディスカッション取得API
+async function getComments(request_id) {
+    const response = await fetch(`${process.env.API}/discussion/${request_id}`);
+    const comments = await response.json();
+    if (process.env.NODE_ENV === "development") {
+        console.log(`Discussion of Request #${request_id}:`);
+        console.log(comments.comments);
+    }
+    return comments.comments;
+}
+
+
+// コメント投稿API
+async function addComment(comment, access_token) {
+    const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
+        method: "POST",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify(comment)
+    });
+    // 登録成功時
+    if (response.status === 200) {
+        // ユーザ登録成功メッセージを表示する
+        return true;
+    }
+}
+
+
+// 勝者決定API
+async function chooseWinner(component, request, access_token) {
+    // 提出物の情報をサーバに送信し，レスポンスを得る
+    const response = await fetch(`${process.env.API}/winner/${request.request_id}`, {
+        method: "POST",
+        headers: {
+            Authorization: access_token
+        },
+        body: JSON.stringify(request.request_id)
     });
     // 登録成功時
     if (response.status === 200) {
@@ -309,8 +349,10 @@ export {
     getRequest,
     editRequest,
     joinRequest,
+    submitSubmission,
     getsubmission,
     editSubmission,
     getComments,
-    addComment
+    addComment,
+    chooseWinner
 }
