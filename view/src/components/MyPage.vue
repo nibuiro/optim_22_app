@@ -241,7 +241,7 @@
               <router-link
                 :to="{
                   name: 'SubmissionPage',
-                  params: { submission_id: props.submission_id }
+                  params: { submission_id: props.row.submission_id }
                 }"
               >
                 提出物
@@ -251,7 +251,7 @@
         </b-tab-item>
       </b-tabs>
     </section>
-    <section v-if="loggedin" class="mb-3 is-flex is-justify-content-center">
+    <section v-if="myself" class="mb-3 is-flex is-justify-content-center">
       <b-button label="ログアウト" type="is-primary" outlined @click="logout" />
     </section>
   </div>
