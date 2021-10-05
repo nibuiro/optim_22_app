@@ -69,6 +69,12 @@ const ModalForm = {
         0
       );
     },
+    // パスワードが条件を満たしているかチェック
+    isPasswordSecure() {
+      return this.user.password.match(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$/
+      );
+    },
     // パスワードが一致しているかチェック
     isPasswordsCorrect() {
       return this.user.password === this.user.confirm_password;
@@ -76,12 +82,19 @@ const ModalForm = {
     // ユーザ登録処理
     register() {
       // すべての情報が正しく入力されていれば
-      if (this.isAllEntered() && this.isPasswordsCorrect()) {
+      if (
+        this.isAllEntered() &&
+        this.isPasswordSecure() &&
+        this.isPasswordsCorrect()
+      ) {
         api.register(this, this.user);
       } else {
         this.invalid = true;
         if (!this.isAllEntered()) {
           this.errorMessage = "すべての項目を入力してください";
+        } else if (!this.isPasswordSecure()) {
+          this.errorMessage =
+            "パスワードは少なくとも1文字以上の大文字を含んだ、半角英数字8文字以上で入力してください";
         } else if (!this.isPasswordsCorrect()) {
           this.errorMessage = "パスワードが違います";
         }
@@ -131,7 +144,8 @@ const ModalForm = {
                 type="password"
                 v-model="user.password"
                 password-reveal
-                placeholder="Enter password"
+                placeholder="パスワード(大文字を含む半角英数字で8文字以上)"
+                pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
                 required
               >
               </b-input>
@@ -144,7 +158,7 @@ const ModalForm = {
                 type="password"
                 v-model="user.confirm_password"
                 password-reveal
-                placeholder="Confirm password"
+                placeholder="パスワードを再入力してください"
                 required
               >
               </b-input>
@@ -184,7 +198,11 @@ export default {
     isMessageModalActive(newVal, oldVal) {
       if (newVal === false && oldVal === true) {
         const user_id = localStorage.getItem("user_id");
-        this.$router.go({ name: "MyPage", params: { user_id } });
+        if (this.$route.path !== "/user") {
+          this.$router.push({ name: "MyPage", params: { user_id } });
+        } else {
+          this.$router.go({ name: "MyPage", params: { user_id } });
+        }
       }
     }
   }
