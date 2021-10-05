@@ -19,7 +19,7 @@ import (
 func TestSuccessShowSubmission(t *testing.T) {
 	router := gin.New()
 
-	router.GET("submission/show_submission/:submission_id",submission.ShowSubmission)
+	router.GET("submission/:submission_id",submission.ShowSubmission)
 
 	model.InitDB()
 
@@ -27,7 +27,7 @@ func TestSuccessShowSubmission(t *testing.T) {
 	test_ids := []int{1,2,3}
 	for _, test_id := range test_ids{
 		w := httptest.NewRecorder()
-		url := "/submission/show_submission/" + strconv.Itoa(test_id)
+		url := "/submission/" + strconv.Itoa(test_id)
 		req, _ := http.NewRequest("GET", url, nil)
 		// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。
@@ -37,11 +37,11 @@ func TestSuccessShowSubmission(t *testing.T) {
 	}
 }
 
-// 特定のsubmissionの詳細を表示する関数のテスト。400ステータスコードを返すテストを実行している。
+// 特定のsubmissionの詳細を表示する関数のテスト。404ステータスコードを返すテストを実行している。
 func TestFailureShowSubmission(t *testing.T) {
 	router := gin.New()
 
-	router.GET("submission/show_submission/:submission_id",submission.ShowSubmission)
+	router.GET("submission/:submission_id",submission.ShowSubmission)
 
 	model.InitDB()
 
@@ -49,7 +49,7 @@ func TestFailureShowSubmission(t *testing.T) {
 	test_ids := []int{1001,1002,1003}
 	for _, test_id := range test_ids{
 		w := httptest.NewRecorder()
-		url := "/submission/show_submission/" + strconv.Itoa(test_id)
+		url := "/submission/" + strconv.Itoa(test_id)
 		req, _ := http.NewRequest("GET", url, nil)
 		// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。

@@ -19,11 +19,12 @@ type UserProfileJson struct{
 }
 
 type SubmissionJson struct{
-	ID                int                 `json:"submission_id"`
-	CreatedAt         time.Time           `json:"createdat"`
-	EngineerProfile   UserProfileJson     `json:"engineer"`
-	URL               string              `json:url`
-	Content           string              `json:"content"`
+	ID                int                   `json:"submission_id"`
+	RequestID         int                   `json:"request_id"`
+	CreatedAt         time.Time             `json:"createdat"`
+	EngineerProfile   UserProfileJson       `json:"engineer"`
+	URL               string                `json:url`
+	Content           string                `json:"content"`
 }
 
 // 特定submissionの詳細を表示する
@@ -54,6 +55,7 @@ func ShowSubmission(c *gin.Context) {
 
 	// submissionが持つデータをsubmission_jsonのそれぞれの対応する属性に格納する。
 	submission_json.ID = submission.ID
+	submission_json.RequestID = submission.RequestID
 	submission_json.CreatedAt = submission.CreatedAt
 	submission_json.URL = submission.URL
 	submission_json.Content = submission.Content

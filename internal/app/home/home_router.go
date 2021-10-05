@@ -19,6 +19,7 @@ type UserProfileJson struct{
 
 type SubmissionJson struct{
 	ID                int                 `json:"submission_id"`
+	RequestID         int                 `json:"request_id"`
 	CreatedAt         time.Time           `json:"createdat"`
 	EngineerProfile   UserProfileJson     `json:"engineer"`
 	URL               string              `json:url`
@@ -123,6 +124,7 @@ func ShowHomepage(c *gin.Context) {
 
 			// submissionが持つデータをsubmission_jsonのそれぞれの対応する属性に格納する。
 			submission_json.ID = submission.ID
+			submission_json.RequestID = submission.RequestID
 			submission_json.CreatedAt = submission.CreatedAt
 			submission_json.URL = submission.URL
 			submission_json.EngineerProfile.UserID = engineer.User.ID
