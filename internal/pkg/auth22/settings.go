@@ -8,6 +8,7 @@ func GetRule() Rule {
     },
     "POST": map[string]bool{
       "/auth": true,
+      "/auth/refresh_token": true,
     },
   }
 }
