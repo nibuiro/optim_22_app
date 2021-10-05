@@ -63,11 +63,3 @@ func SetTokenWithControl(c *gin.Context, refreshToken string, accessToken string
   c.Header("Access-Control-Request-Headers", "Authorization,Refresh-Token")
   c.Header("Access-Control-Expose-Headers", "Authorization,Refresh-Token")
 }
-
-func UnquoteByteString(reader []byte) ([]byte, error) {
-  if _, err := strconv.Unquote(`\"` +string(reader)+`\"`); err != nil {
-    return []byte(`{"email": "test@inc.test-ac.jp","password": "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}`), nil
-  } else {
-    return []byte(`{"email": "test@inc.test-ac.jp","password": "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}`), nil
-  }
-}
