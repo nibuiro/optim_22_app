@@ -21,13 +21,17 @@ func (rc *resource) ValidateAccessToken(rule Rule, methodFirst bool) gin.Handler
       //Authorizationヘッダーからstring型のトークンを取得
       tokenString := c.GetHeader("Authorization")
 
-      if valid, err := rc.service.ReadAccessToken(claims, tokenString); err != nil {
-        c.AbortWithStatus(http.StatusBadRequest)
+      if hasToken := "" != tokenString; !hasToken {
+        c.AbortWithStatus(http.StatusForbidden)
       } else {
-        if valid {
-          //なにもしない
+        if valid, err := rc.service.ReadAccessToken(claims, tokenString); err != nil {
+          c.AbortWithStatus(http.StatusBadRequest)
         } else {
-          c.AbortWithStatus(http.StatusForbidden)
+          if valid {
+            //なにもしない
+          } else {
+            c.AbortWithStatus(http.StatusForbidden)
+          }
         }
       }
     }
