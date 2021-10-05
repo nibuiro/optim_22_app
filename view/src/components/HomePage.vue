@@ -5,7 +5,7 @@
         <p class="title mb-0">
           リクエスト一覧
         </p>
-        <request-form class="is-light" />
+        <request-form v-if="loggedin" class="is-light" />
       </div>
     </section>
     <section class="mb-3">
@@ -140,6 +140,7 @@ import * as api from "@/modules/API";
 export default {
   data() {
     return {
+      loggedin: this.$cookies.get("refresh_token") !== null,
       requests: [],
       onlyAccepting: false,
       isPaginated: true,
