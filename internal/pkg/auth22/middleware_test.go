@@ -1,10 +1,12 @@
-package authentication
+package auth22
 
 import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
   "optim_22_app/internal/pkg/test"
+  "optim_22_app/internal/pkg/config"
+  "optim_22_app/pkg/log"
 
 )
 
@@ -53,9 +55,12 @@ const (
 func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
+  logger := log.New()
+  cfg, _ := config.Load("/go/src/optim_22_app/configs/app.yaml", logger)
+  logger.Debug(cfg.RefreshTokenSecret)
+  auth := New(NewService(cfg, nil, logger), logger, "localhost")
   
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 157680000, nil)
-  router.Use(auth.ValidateAccessToken())
+  router.Use(auth.ValidateAccessToken(GetRuleForTest(), true))
 
 
   router.POST("/test", func(c *gin.Context) {
@@ -68,7 +73,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2100, nil), 
+      MakeAuthorizationHeader("", accessToken2100), 
       http.StatusCreated, 
       "",
     },
@@ -77,12 +82,21 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2000, nil), 
-      http.StatusUnauthorized, 
+      MakeAuthorizationHeader("", accessToken2000), 
+      http.StatusForbidden, 
       "",
     },
   }
   for _, tc := range tests {
     test.Endpoint(t, router, tc)
+  }
+}
+
+
+func GetRuleForTest() Rule {
+  return Rule{
+    "GET": map[string]bool{
+      "*": true,
+    },
   }
 }
