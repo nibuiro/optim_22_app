@@ -5,19 +5,24 @@ import (
   "os"
   "fmt"
   "time"
-//  "time"
   "net/http"
-
+  "gorm.io/gorm"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
-  // コメントを外す
-//  "optim_22_app/model"
- // "optim_22_app/typefile"
+  "optim_22_app/model"
+  "optim_22_app/typefile"
   "optim_22_app/pkg/log"
+  "optim_22_app/internal/pkg/auth22"
   "optim_22_app/internal/pkg/config"
-  "optim_22_app/internal/pkg/test"
-  "optim_22_app/internal/app/user"  
+  "optim_22_app/internal/app/home"
+  "optim_22_app/internal/app/client"
+  "optim_22_app/internal/app/request"
+  "optim_22_app/internal/app/submission"
+  "optim_22_app/internal/app/engineer"
+  "optim_22_app/internal/app/user"
+  "optim_22_app/internal/app/profile"  
+  "optim_22_app/internal/app/comment"  
 )
 
 var (
@@ -46,26 +51,27 @@ func main() {
   logger.Debugf(cfg.DSN)
   
 
-//  // DB接続後、マイグレーションを実行する。
-//  // 手順としては、まずコンテナを立ち上げた後、mysqlでoptim_devデータベースを作成する。
-//  // その後、model.InitDB(),import(optim_22_app/model)のコメントを外し、カレントディレクトリでgo run main.goを実行する。
-//  // プログラムの詳細はmodel/migrate.goに記載。
-//  model.InitDB()
-//
-//  // マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
-//  // それに対応するテーブルの作成を行う。
-//  // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
-//  model.Db.AutoMigrate(&typefile.User{},&typefile.Client{},&typefile.Engineer{},&typefile.Winner{},&typefile.Request{})
-//
-//  // Insert
-//  // db.Create(&request)
-//
-  // Select
-  // db.Find(&request, "id = ?", 10)
+  // DB接続後、マイグレーションを実行する。
+  // 手順としては、まずコンテナを立ち上げた後、mysqlでoptim_devデータベースを作成する。
+  // その後、model.InitDB(),import(optim_22_app/model)のコメントを外し、カレントディレクトリでgo run main.goを実行する。
+  // プログラムの詳細はmodel/migrate.goに記載。
+  model.InitDB()
 
-  // Batch Insert
-  // var requests = []User{request1, request2, request3}
-  // db.Create(&users)
+  // マイグレーションは定義したstructをAutoMigrateの引数に渡すことで、
+  // それに対応するテーブルの作成を行う。
+  // テーブル作成時にオプションを付けたい場合、db.Set()を利用する。
+  model.Db.AutoMigrate(
+    &typefile.User{},
+    &typefile.Profile{},
+    &typefile.Client{},
+    &typefile.Engineer{},
+    &typefile.Winner{},
+    &typefile.Request{},
+    &typefile.Comment{},
+    &typefile.Submission{},
+  )
+  // テスト実行前に利用するデータを作成する
+  model.CreateTestData()
 
 
   //#region HTTPサーバをビルド
@@ -73,7 +79,7 @@ func main() {
 
   hs := &http.Server{
     Addr:    address,
-    Handler: buildHandler(logger, cfg), //, dbcontext.New(db)
+    Handler: buildHandler(model.Db, logger, cfg),
   }
   //#endregion
 
@@ -89,7 +95,7 @@ func main() {
 
 
 //任意のポートについてのHTTPハンドラを構築
-func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *dbcontext.DB
+func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
 
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
@@ -98,18 +104,58 @@ func buildHandler(logger log.Logger, cfg *config.Config) http.Handler { //, db *
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
+
+  //#region 認証機能群
+  authRepository := auth22.NewRepository(db, logger)
+  authService := auth22.NewService(cfg, authRepository, logger)
+  auth := auth22.New(authService, logger, "localhost")
+  //アクセストークンとリフレッシュトークンの発行
+  e.POST("/auth", auth.Login())
+  //トークンのリフレッシュ
+  e.POST("/auth/refresh_token", auth.RefreshAccessTokenAndRefreshToken())
+  //許可されたメソッドとパスのペア以外についてアクセストークンを検証
+  e.Use(auth.ValidateAccessToken(auth22.GetRule(), true))
+  //#endregion
+
+  // homepageを表示するハンドラ
+  e.GET("/requests",home.ShowHomepage)
+  // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
+  e.POST("/request",client.CreateRequest)
+  // request_idをparamにして特定リクエストの詳細を表示する。
+  e.GET("/request/:request_id",request.ShowRequest)
+  // クライアントが編集したリクエストを更新できるようにするハンドラ
+  e.PUT("/request/:request_id",client.UpdateRequest)
+  // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
+  e.POST("/request/:request_id",engineer.CreateEngineerJoin)
+
+  // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
+  e.POST("/winner/:request_id",client.DecideWinner)
+
+  // submission_idをparamにして特定サブミッションの詳細を表示する。
+  e.GET("/submission/:submission_id",submission.ShowSubmission)
+  // エンジニアが編集したsubmissionを更新できるようにするハンドラ
+  e.PUT("/submission/:submission_id",engineer.UpdateSubmission)
+  // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
+  e.POST("/submission/:request_id",engineer.CreateSubmission)
+
   
+  userRepository := user.NewRepository(db, logger)
+  userService := user.NewService(userRepository, logger)
+  user.RegisterHandlers(e.Group(""), userService, logger)
+  
+  profileRepository := profile.NewRepository(db, logger)
+  profileService := profile.NewService(profileRepository, logger)
+  profile.RegisterHandlers(e.Group(""), profileService, logger)
 
-  e.GET("/hello", func(c *gin.Context) {
-    c.String(http.StatusOK, "Hello World!!")
-  })
-
+  commentRepository := comment.NewRepository(db, logger)
+  commentService := comment.NewService(commentRepository, logger)
+  comment.RegisterHandlers(e.Group(""), commentService, logger)
   //authHandler := auth.Handler(cfg.JWTSigningKey)
 
-  user.RegisterHandlers(e.Group(""),
-    user.StubNewService(user.StubNewRepository()),
-    logger, //authHandler
-  )
+//  user.RegisterHandlers(rg.Group(""),
+//    user.NewService(user.NewRepository(db, logger), logger),
+//    authHandler, logger,
+//  )
 //
 //  auth.RegisterHandlers(rg.Group(""),
 //    auth.NewService(cfg.JWTSigningKey, cfg.JWTExpiration, logger),
