@@ -327,7 +327,7 @@ async function chooseWinner(component, request, access_token) {
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(request.request_id)
+        body: JSON.stringify(request)
     });
     // 登録成功時
     if (response.status === 200) {

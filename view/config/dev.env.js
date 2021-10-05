@@ -4,5 +4,5 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
     NODE_ENV: '"development"',
-    API: '"https://596f143a-7437-4f17-8068-22937e868886.mock.pstmn.io/api"'
+    API: '"https://05efb1e3-21f2-4031-8cd8-c5f6cc9dcc3d.mock.pstmn.io/api"'
 })
