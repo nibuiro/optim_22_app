@@ -15,7 +15,7 @@ async function register(component, user) {
     // パスワードのハッシュ化
     const hashHex = await hashPassword(user.password);
     // ログイン情報をサーバに送信し，レスポンスを得る
-    const response = await fetch(`${process.env.API}/register`, {
+    const response = await fetch(`${process.env.API}/user`, {
         method: "POST",
         body: JSON.stringify({
             username: user.username,
