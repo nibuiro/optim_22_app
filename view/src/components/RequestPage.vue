@@ -110,17 +110,17 @@
           <section class="is-flex is-justify-content-center">
             <!-- 依頼主であり提出物が1つ以上あれば -->
             <winner-chooser
-              v-if="myself && request.submissions.length > 0"
+              v-if="!finish && myself && request.submissions.length > 0"
               :request="request"
             />
             <!-- 依頼主以外で未参加あれば -->
             <request-applier
-              v-else-if="!myself && loggedin && !joined"
+              v-else-if="!finish && !myself && loggedin && !joined"
               :client_id="user_id"
             />
             <!-- 依頼主以外で参加済みであり未提出であれば -->
             <submission-submitter
-              v-else-if="!myself && loggedin && !submitted"
+              v-else-if="!finish && !myself && loggedin && !submitted"
             />
           </section>
         </b-tab-item>
@@ -192,6 +192,7 @@ export default {
     this.user_id = localStorage.getItem("user_id");
     const request_id = this.$route.params.request_id;
     this.request = await api.getRequest(request_id);
+    this.finish = this.request.finish;
     this.myself = this.request.client.user_id == this.user_id && this.loggedin;
     this.joined = this.request.engineers.some(
       engineer => engineer.user_id == this.user_id
