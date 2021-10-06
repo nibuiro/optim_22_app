@@ -1,3 +1,5 @@
+<!-- リクエスト一覧ページ -->
+
 <template>
   <div class="container">
     <section class="hero is-small is-primary mb-3">

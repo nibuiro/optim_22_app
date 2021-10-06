@@ -10,31 +10,38 @@ Vue.use(Router)
 
 export default new Router({
     mode: 'history',
-    routes: [{
+    routes: [
+        // ホームページ
+        {
             path: '/',
             name: 'HomePage',
             component: HomePage
         },
+        // リクエスト詳細ページ
         {
             path: '/request/:request_id',
             name: 'RequestPage',
             component: RequestPage
         },
+        // サブミッション詳細ページ
         {
             path: '/submission/:submission_id',
             name: 'SubmissionPage',
             component: SubmissionPage
         },
+        // マイページ
         {
             path: '/user/:user_id',
             name: 'MyPage',
             component: MyPage
         },
+        // NotFoundページ
         {
             path: '/not-found',
             name: 'NotFound',
             component: NotFound
         },
+        // 上記以外のページをNotFoundページへリダイレクト
         {
             path: '/*',
             component: NotFound

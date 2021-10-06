@@ -1,3 +1,5 @@
+<!-- リクエスト参加フォーム -->
+
 <template>
   <section>
     <b-button

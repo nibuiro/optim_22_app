@@ -1,3 +1,5 @@
+<!-- 勝者決定フォーム -->
+
 <template>
   <section>
     <b-button

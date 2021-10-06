@@ -1,3 +1,5 @@
+<!-- マイページ -->
+
 <template>
   <div class="container" :profile="profile">
     <section class="hero is-primary is-small mb-3">

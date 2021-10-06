@@ -1,3 +1,5 @@
+<!-- サブミッション提出フォーム -->
+
 <template>
   <section>
     <b-button

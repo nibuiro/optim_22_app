@@ -1,3 +1,5 @@
+<!-- ユーザ登録フォーム -->
+
 <template>
   <section>
     <b-button

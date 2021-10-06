@@ -1,3 +1,5 @@
+<!-- ナビゲーションバー -->
+
 <template>
   <b-navbar>
     <template #brand>
