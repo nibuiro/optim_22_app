@@ -5,6 +5,9 @@ import (
   "github.com/gin-gonic/gin"
   "optim_22_app/pkg/log"
   "optim_22_app/internal/pkg/utils"
+  "encoding/json"
+  "optim_22_app/internal/pkg/auth22"
+  "bytes"
 
 )
 
@@ -26,7 +29,6 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
 
 }
 
-
 func (rc resource) post() gin.HandlerFunc {
   return func(c *gin.Context) {
     var input RegistrationInformation
@@ -39,15 +41,30 @@ func (rc resource) post() gin.HandlerFunc {
     }
   
     //ユーザ作成及び認証情報取得 
-    userId, err := rc.service.Create(c.Request.Context(), input)
+    _, err := rc.service.Create(c.Request.Context(), input)
     if err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
       return 
     } else {
-      rc.logger.Debug(userId)
-      c.Status(http.StatusCreated)
-      return 
+      reader := auth22.Credential{
+        Email: input.Email,
+        Password: input.Password,
+      }
+      credentialJSON, err := json.Marshal(reader)
+      if err != nil {
+        rc.logger.Debug(err, string(credentialJSON))
+        c.Status(http.StatusInternalServerError)
+        return
+      } else {
+        rc.logger.Debug(string(credentialJSON))
+        c.Writer = &utils.HttpBodyWriter{
+          Body: bytes.NewBuffer(credentialJSON), 
+          ResponseWriter: c.Writer,
+        }
+        c.Redirect(http.StatusTemporaryRedirect, "/auth")
+        return
+      }
     }
   }
 }
