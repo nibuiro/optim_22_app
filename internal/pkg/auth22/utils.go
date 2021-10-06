@@ -3,7 +3,6 @@ package auth22
 import (
   "time"
   "github.com/golang-jwt/jwt/v4"
-  "github.com/gin-gonic/gin"
  // "errors"
 )
 
@@ -14,7 +13,7 @@ const (
 )
 
 
-
+//実行されたシステム日時よりndays日後のUnix時間を取得
 func CalcFutureUnixTime(ndays int) int64 {
     expiration := time.Now()
     nhours := time.Duration(ndays * nhoursPerDay) //単位は10^-9秒
@@ -22,7 +21,7 @@ func CalcFutureUnixTime(ndays int) int64 {
     return expiration.Unix()
 }
 
-
+//トークンの作成
 func NewToken(claims map[string]interface{}, secret []byte) (string, error) {
   var jwtClaims jwt.MapClaims
   jwtClaims = claims
@@ -31,6 +30,7 @@ func NewToken(claims map[string]interface{}, secret []byte) (string, error) {
   return tokenString, err 
 }
 
+//トークンの改竄検証
 func ValidateSignature(tokenString string, secret []byte) (bool, error) {
   token, _ := jwt.Parse(tokenString, MakeTokenSecretSender(secret))
 
@@ -42,8 +42,8 @@ func ValidateSignature(tokenString string, secret []byte) (bool, error) {
   }
 
 }
-
-
+//秘密鍵を送信するクロージャ
+//jwtパッケージはRSA鍵ファイルの読込みなどを想定しパーサに関数を渡す仕様
 func MakeTokenSecretSender(secret[]byte) func(token *jwt.Token) (interface{}, error) {
   secretSender := func(token *jwt.Token) (interface{}, error) {
     return secret, nil
@@ -53,12 +53,3 @@ func MakeTokenSecretSender(secret[]byte) func(token *jwt.Token) (interface{}, er
 
 
 
-
-func SetTokenWithControl(c *gin.Context, refreshToken string, accessToken string) {
-  c.Header("Authorization", accessToken)
-  c.Header("Refresh-Token", refreshToken)
-  c.Header("Access-Control-Allow-Origin", "*")
-  c.Header("Access-Control-Allow-Methods", "GET,POST,PUT,HEAD,OPTION")
-  c.Header("Access-Control-Request-Headers", "Authorization,Refresh-Token")
-  c.Header("Access-Control-Expose-Headers", "Authorization,Refresh-Token")
-}
