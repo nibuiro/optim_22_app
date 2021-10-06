@@ -149,6 +149,7 @@ import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
 export default {
   data() {
     return {
+      finish: false,
       loggedin: false,
       myself: false,
       joined: false,
