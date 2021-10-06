@@ -1,14 +1,23 @@
-package authentication
+package auth22
 
 import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
   "optim_22_app/internal/pkg/test"
+  "optim_22_app/internal/pkg/config"
+  "optim_22_app/pkg/log"
 
 )
 
 const (
+  accessToken2021 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MzM0NDQ0MTEsInVzZXJJRCI6Mn0.Vr3t57_ty9jBtNpLfYzupz59stbEHciPaPbZEFT2J88`
+  refreshToken2022 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTk5MzA4MTEsInVzZXJJRCI6Mn0.qbU04Ub-s5O7dy5NAvb4modDqQ4_iSqgmjH-sCQRaZw`
+  /*
+   *
+   *  jwtパッケージにより生成
+   *
+   */
   refreshToken2010 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIwMDEiLCJleHAiOjEyODM2NTg3Mjh9.krKE34GBpQBMwSMFHf8iMpM36fxycGLvUf9Mi70--cM"
   refreshToken2020 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIwMDEiLCJleHAiOjE1NzgxOTMyNzl9.QrcRvgE6PbiqpAI9eLM9TeQWe6iRt0tEb-rQvnp7U_E"
   refreshToken2030 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIwMDEiLCJleHAiOjE5MTQ4MTA3Mjh9.QHGNRk1KMQyx8rLscYdkKxQ7nBp7ZmcLDsF8fsk40dA"
@@ -53,9 +62,12 @@ const (
 func TestAccessTokenAuthentication(t *testing.T) {
 
   router := gin.New()
+  logger := log.New()
+  cfg, _ := config.Load("test/app.yaml", logger)
+  logger.Debug(cfg.RefreshTokenSecret)
+  auth := New(NewService(cfg, nil, logger), "localhost")
   
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 157680000, nil)
-  router.Use(auth.ValidateAccessToken())
+  router.Use(auth.ValidateAccessToken(GetRuleForTest(), true))
 
 
   router.POST("/test", func(c *gin.Context) {
@@ -68,7 +80,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2100, nil), 
+      MakeAuthorizationHeader("", accessToken2100), 
       http.StatusCreated, 
       "",
     },
@@ -77,12 +89,21 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "POST", 
       "/test", 
       "", 
-      MakeAuthorizationHeader(accessToken2000, nil), 
-      http.StatusUnauthorized, 
+      MakeAuthorizationHeader("", accessToken2000), 
+      http.StatusForbidden, 
       "",
     },
   }
   for _, tc := range tests {
     test.Endpoint(t, router, tc)
+  }
+}
+
+
+func GetRuleForTest() Rule {
+  return Rule{
+    "GET": map[string]bool{
+      "*": true,
+    },
   }
 }

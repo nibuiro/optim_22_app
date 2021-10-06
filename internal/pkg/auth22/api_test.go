@@ -1,10 +1,9 @@
-package authentication
+package auth22
 
 import (
   "net/http"
   "testing"
   "github.com/gin-gonic/gin"
-  "time"
   "github.com/golang-jwt/jwt/v4"
   "optim_22_app/internal/pkg/test"
   "net/http/httptest"
@@ -12,6 +11,8 @@ import (
   "bytes"
   "strings"
 //  "fmt"
+  "optim_22_app/internal/pkg/config"
+  "optim_22_app/pkg/log"
 )
 
 
@@ -37,26 +38,20 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
   //logger := gin.Logger()
 
   //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, &FakeAuthorizationService{})
+  logger := log.New()
+  cfg, err := config.Load("test/app.yaml", logger)
+    logger.Debug(err)
+  auth := New(NewService(cfg, nil, logger), "localhost")
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
   //router.DELETE("/auth", auth.revokeHandler())
 
-  cookies := []http.Cookie{
-    http.Cookie{
-      Name: "refresh_token", 
-      Value: refreshToken2020, 
-      HttpOnly: true, 
-      Path: "/", 
-      Secure: false,
-    },
-  }
 
   tc := test.APITestCase{
     Name: "refresh-token refresh denied", 
     Method: "POST", 
     URL: "/auth/refresh_token", 
-    Header: MakeAuthorizationHeader("", cookies), 
+    Header: MakeAuthorizationHeader(refreshToken2020, ""), 
     Body: "",
     WantStatus: http.StatusUnauthorized, 
     WantResponse: "",
@@ -70,28 +65,17 @@ func TestRefreshTokenRefreshDenied(t *testing.T) {
 func TestRefreshTokenRefreshSuccess(t *testing.T) {
 
   router := gin.New()
-  //logger := gin.Logger()
-
-  //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, &FakeAuthorizationService{})
+  logger := log.New()
+  cfg, _ := config.Load("test/app.yaml", logger)
+  auth := New(NewService(cfg, nil, logger), "localhost")
   //router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
-
-  cookies := []http.Cookie{
-    http.Cookie{
-      Name: "refresh_token", 
-      Value: refreshToken2030, 
-      HttpOnly: true, 
-      Path: "/", 
-      Secure: false,
-    },
-  }
 
   tc := test.APITestCase{
     Name: "refresh-token refresh success", 
     Method: "POST", 
     URL: "/auth/refresh_token", 
-    Header: MakeAuthorizationHeader("", cookies), 
+    Header: MakeAuthorizationHeader(refreshToken2030, ""), 
     Body: "",
     WantStatus: http.StatusOK, 
     WantResponse: "",
@@ -110,13 +94,12 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
     router.ServeHTTP(res, req)
     assert.Equal(t, tc.WantStatus, res.Code, "status mismatch")
 
-    onlyCookiePacket := &http.Request{Header: http.Header{"Cookie": res.HeaderMap["Set-Cookie"]}}
+    //onlyCookiePacket := &http.Request{Header: http.Header{"Cookie": res.HeaderMap["Set-Cookie"]}}
 
     //#region BodyからJWTをパースし有効期限内であることを検証
-    cookie, _  := onlyCookiePacket.Cookie("refresh_token") //("access_token", _) :=
-    tokenString := cookie.Value
+    tokenString := res.HeaderMap["Refresh-Token"][0]
 
-    token, _ := jwt.Parse(tokenString, auth.refreshTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, refreshTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -128,28 +111,18 @@ func TestRefreshTokenRefreshSuccess(t *testing.T) {
 func TestAccessTokenRefreshDenied(t *testing.T) {
 
   router := gin.New()
-  //logger := gin.Logger()
+  logger := log.New()
+  cfg, _ := config.Load("test/app.yaml", logger)
+  auth := New(NewService(cfg, nil, logger), "localhost")
 
-  //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
-
-  cookies := []http.Cookie{
-    http.Cookie{
-      Name: "refresh_token", 
-      Value: refreshToken2020, 
-      HttpOnly: true, 
-      Path: "/", 
-      Secure: false,
-    },
-  }
 
   tc := test.APITestCase{
     Name: "access-token refresh denied", 
     Method: "POST", 
     URL: "/auth/access_token", 
-    Header: MakeAuthorizationHeader(accessToken2000, cookies), 
+    Header: MakeAuthorizationHeader(refreshToken2020, accessToken2000), 
     Body: "",
     WantStatus: http.StatusUnauthorized,
     WantResponse: "",
@@ -162,28 +135,18 @@ func TestAccessTokenRefreshDenied(t *testing.T) {
 func TestAccessTokenRefreshSuccess(t *testing.T) {
 
   router := gin.New()
-  //logger := gin.Logger()
+  logger := log.New()
+  cfg, _ := config.Load("test/app.yaml", logger)
+  auth := New(NewService(cfg, nil, logger), "localhost")
 
-  //cfg.JWTExpiration => 5年 => 157680000秒
-  auth := New("localhost", "secret_key_for_refresh", "secret_key", 5, nil)
   router.POST("/auth/access_token", auth.AccessTokenRefreshHandler())
   //router.POST("/auth/refresh_token", auth.RefreshTokenRefreshHandler())
-
-  cookies := []http.Cookie{
-    http.Cookie{
-      Name: "refresh_token", 
-      Value: refreshToken2030, 
-      HttpOnly: true, 
-      Path: "/", 
-      Secure: false,
-    },
-  }
 
   tc := test.APITestCase{
     Name: "access-token refresh success", 
     Method: "POST", 
     URL: "/auth/access_token", 
-    Header: MakeAuthorizationHeader(accessToken2000, cookies), 
+    Header: MakeAuthorizationHeader(refreshToken2022, accessToken2021), 
     Body: "",
     WantStatus: http.StatusOK, 
     WantResponse: "",
@@ -205,7 +168,7 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
     //#region BodyからJWTをパースし有効期限内であることを検証
     tokenString := res.HeaderMap["Authorization"][0]
 
-    token, _ := jwt.Parse(tokenString, auth.accessTokenSecretSender)
+    token, _ := jwt.Parse(tokenString, accessTokenSecretSender)
 
     assert.True(t, token.Valid)
     //#endregion
@@ -214,13 +177,13 @@ func TestAccessTokenRefreshSuccess(t *testing.T) {
 
 
 //パース関数に秘密鍵を渡すコールバック
-func accessTokenSecretSender(token *jwt.Token) (string, error) {
-  return "secret_key", nil
+func accessTokenSecretSender(token *jwt.Token) (interface{}, error) {
+  return []byte("secret_key"), nil
 }
 
 //パース関数に秘密鍵を渡すコールバック
-func refreshTokenSecretSender(token *jwt.Token) (string, error) {
-  return "secret_key_for_refresh", nil
+func refreshTokenSecretSender(token *jwt.Token) (interface{}, error) {
+  return []byte("secret_key_for_refresh"), nil
 }
 
 //文字列表現が等しいか確認 //JSONの表記ゆれに対応
@@ -236,44 +199,10 @@ func stringEq(t *testing.T, given string, want string) {
 }
 
 
-func MakeAuthorizationHeader(token string, cookies []http.Cookie) http.Header {
+func MakeAuthorizationHeader(refreshToken string, accessToken string) http.Header {
   header := http.Header{}
-  header.Add("Authorization", token)
+  header.Add("Authorization", accessToken)
+  header.Add("Refresh-Token", refreshToken)
 
-  cookieCount := len(cookies)
-  if cookieCount != 0 {
-    for _, cookie := range cookies {
-      header.Add("Cookie", cookie.String())
-    }
-  }
   return header
 }
-
-
-type FakeAuthorizationService struct {
-  repository interface{}
-}
-
-func (as *FakeAuthorizationService) New(args ...interface{}) (string, string) { 
-  return "", ""
-}
-
-func (as *FakeAuthorizationService) Refresh(refreshToken string) string {
-    sender :=  func (token *jwt.Token) (interface{}, error) {
-      return "secret_key_for_refresh", nil
-    }
-    token, _ := jwt.Parse(refreshToken, sender)
-    claims, _ := token.Claims.(jwt.MapClaims)
-
-    expiration := time.Now()
-    expiration = expiration.Add(time.Duration(5*365*24) * time.Hour)
-
-    claims["exp"] = expiration.Unix()
-    newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)              
-    // Sign and get the complete encoded token as a string using the secret
-    newTokenString, _ := newToken.SignedString([]byte("secret_key_for_refresh"))
-
-    return newTokenString
-}
-
-

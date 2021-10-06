@@ -13,6 +13,7 @@ import (
   "optim_22_app/model"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
+  "optim_22_app/internal/pkg/auth22"
   "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/app/home"
   "optim_22_app/internal/app/client"
@@ -103,6 +104,18 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
+
+  //#region 認証機能群
+  authRepository := auth22.NewRepository(db, logger)
+  authService := auth22.NewService(cfg, authRepository, logger)
+  auth := auth22.New(authService, logger, "localhost")
+  //アクセストークンとリフレッシュトークンの発行
+  e.POST("/auth", auth.Login())
+  //トークンのリフレッシュ
+  e.POST("/auth/refresh_token", auth.RefreshAccessTokenAndRefreshToken())
+  //許可されたメソッドとパスのペア以外についてアクセストークンを検証
+  e.Use(auth.ValidateAccessToken(auth22.GetRule(), true))
+  //#endregion
 
   // homepageを表示するハンドラ
   e.GET("/requests",home.ShowHomepage)
