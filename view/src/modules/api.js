@@ -28,6 +28,7 @@ async function register(component, user) {
         const access_token = response.headers.get("Authorization");
         const refresh_token = response.headers.get("Refresh-Token");
         if (process.env.NODE_ENV === "development") {
+            console.log('POST /api/user\tRegister');
             console.log("access_token:");
             console.log(access_token);
             console.log("refresh_token:");
@@ -70,6 +71,7 @@ async function login(component, user) {
         const access_token = response.headers.get("Authorization");
         const refresh_token = response.headers.get("Refresh-Token");
         if (process.env.NODE_ENV === "development") {
+            console.log('POST /api/auth\tLogin');
             console.log("access_token:");
             console.log(access_token);
             console.log("refresh_token:");
@@ -102,6 +104,55 @@ async function login(component, user) {
 }
 
 
+// トークンの更新
+async function refreshToken(component, access_token, refresh_token) {
+    // トークン情報をサーバに送信し，レスポンスを得る
+    const response = await fetch(`${process.env.API}/refresh_token`, {
+        method: "GET",
+        body: JSON.stringify({
+            "Authorization": access_token,
+            "Refresh-Token": refresh_token
+        })
+    });
+    // 更新成功時
+    if (response.status === 200) {
+        const access_token = response.headers.get("Authorization");
+        const refresh_token = response.headers.get("Refresh-Token");
+        if (process.env.NODE_ENV === "development") {
+            console.log('GET /api/refresh_token\tRefreshToken');
+            console.log("access_token:");
+            console.log(access_token);
+            console.log("refresh_token:");
+            console.log(refresh_token);
+        }
+        // レスポンスのbodyをjsonに変換
+        const data = await response.json();
+        const user_id = data.user_id;
+        if (process.env.NODE_ENV === "development") {
+            console.log(`user_id: ${user_id}`);
+        }
+        // localStorageにユーザIDを保存
+        localStorage.setItem("user_id", user_id);
+        // localStorageにアクセストークンを保存
+        localStorage.setItem("access_token", access_token);
+        // cookieにリフレッシュトークンを保存（有効期限: 1ヶ月）
+        component.$cookies.set("refresh_token", refresh_token, "1m");
+        //リフレッシュトークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        // cookieからリフレッシュトークンを削除
+        component.$cookies.remove("refresh_token");
+        // ユーザにセッションの有効期限が切れたことを伝える
+        window.alert("セッションの有効期限が切れました。再度ログインしてください");
+        // ホームページに移動する
+        if (component.$route.path !== "/") {
+            component.$router.push('/');
+        } else {
+            component.$router.go('/');
+        }
+    }
+}
+
+
 // ユーザプロフィールの取得API
 async function getProfile(user_id, access_token) {
     const response = await fetch(`${process.env.API}/user/${user_id}`, {
@@ -110,16 +161,20 @@ async function getProfile(user_id, access_token) {
             Authorization: access_token
         }
     });
-    const profile = await response.json();
-    if (process.env.NODE_ENV === "development") {
-        console.log(`Profile of ${profile.username}:`);
-        console.log(profile);
-    }
-    for (let i = 0; i < profile.submissions.length; i++) {
-        const request = await getRequest(profile.submissions[i].request_id);
-        profile.submissions[i].request = request;
-        if (i === profile.submissions.length - 1) {
-            return profile;
+    // 更新成功時
+    if (response.status === 200) {
+        const profile = await response.json();
+        if (process.env.NODE_ENV === "development") {
+            console.log(`GET /api/user/${user_id}\tUserProfile`);
+            console.log(`Profile of ${profile.username}:`);
+            console.log(profile);
+        }
+        for (let i = 0; i < profile.submissions.length; i++) {
+            const request = await getRequest(profile.submissions[i].request_id);
+            profile.submissions[i].request = request;
+            if (i === profile.submissions.length - 1) {
+                return profile;
+            }
         }
     }
 }
@@ -141,10 +196,20 @@ async function editProfile(component, user, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`PUT /api/user/${user.user_id}\tEditProfile`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度ユーザプロフィールの編集をリクエストする
+        await editProfile(component, user, access_token);
     }
 }
 
@@ -154,7 +219,7 @@ async function getRequests() {
     const response = await fetch(`${process.env.API}/requests`);
     const requests = await response.json();
     if (process.env.NODE_ENV === "development") {
-        console.log(`All Requests:`);
+        console.log('GET /api/requests\tAllRequests');
         console.log(requests.requests);
     }
     return requests.requests;
@@ -176,10 +241,20 @@ async function makeRequest(component, user_id, request, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log('POST /api/request\tNewRequest');
+        }
         // 新規リクエストフォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度新規リクエストの投稿をリクエストする
+        await makeRequest(component, user_id, request, access_token);
     }
 }
 
@@ -189,7 +264,7 @@ async function getRequest(request_id) {
     const response = await fetch(`${process.env.API}/request/${request_id}`);
     const request = await response.json();
     if (process.env.NODE_ENV === "development") {
-        console.log(`Request #${request.request_id}:`);
+        console.log(`GET /api/request/${request_id}\tShowRequest`);
         console.log(request);
     }
     return request;
@@ -208,10 +283,20 @@ async function editRequest(component, request, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`PUT /api/request/${request.request_id}\tEditRequest`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度リクエストの編集をリクエストする
+        await editRequest(component, request, access_token);
     }
 }
 
@@ -228,10 +313,20 @@ async function joinRequest(component, request, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`POST /api/request/${request.request_id}\tJoinRequest`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度リクエストへの参加をリクエストする
+        await joinRequest(component, request, access_token);
     }
 }
 
@@ -248,10 +343,20 @@ async function submitSubmission(component, submission, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`POST /api/submission/${submission.request_id}\tNewSubmission`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度ユーザプロフィールの編集をリクエストする
+        await submitSubmission(component, submission, access_token);
     }
 }
 
@@ -261,6 +366,7 @@ async function getsubmission(submission_id) {
     const response = await fetch(`${process.env.API}/submission/${submission_id}`);
     let submission = await response.json();
     if (process.env.NODE_ENV === "development") {
+        console.log(`GET /api/submission/${submission_id}\tShwowSubmission`);
         console.log(`Submission #${submission.submission_id}:`);
         console.log(submission);
     }
@@ -282,10 +388,20 @@ async function editSubmission(component, submission, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`PUT /api/submission/${submission.submission_id}\tEditSubmission`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度サブミッションの編集をリクエストする
+        await editSubmission(component, submission, access_token);
     }
 }
 
@@ -295,7 +411,7 @@ async function getComments(request_id) {
     const response = await fetch(`${process.env.API}/discussion/${request_id}`);
     const comments = await response.json();
     if (process.env.NODE_ENV === "development") {
-        console.log(`Discussion of Request #${request_id}:`);
+        console.log(`GET /api/discussion/${request_id}\tShowDiscussion`);
         console.log(comments.comments);
     }
     return comments.comments;
@@ -303,7 +419,7 @@ async function getComments(request_id) {
 
 
 // コメント投稿API
-async function addComment(comment, access_token) {
+async function addComment(component, comment, access_token) {
     const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
         method: "POST",
         headers: {
@@ -313,8 +429,18 @@ async function addComment(comment, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`POST /api/discussion/${comment.comment_id}\tNewComment`);
+        }
         // ユーザ登録成功メッセージを表示する
         return true;
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度コメントの投稿をリクエストする
+        await makeRequest(component, comment, access_token);
     }
 }
 
@@ -331,10 +457,20 @@ async function chooseWinner(component, request, access_token) {
     });
     // 登録成功時
     if (response.status === 200) {
+        if (process.env.NODE_ENV === "development") {
+            console.log(`POST /api/winner/${request.request_id}\tChooseWinner`);
+        }
         // 編集フォームを閉じる
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+        //アクセストークンの有効期限が切れている場合
+    } else if (response.status === 401) {
+        const refresh_token = component.$cookies.get("refresh_token");
+        // リフレッシュトークンを更新する
+        await refreshToken(component, access_token, refresh_token);
+        // 再度勝者の決定をリクエストする
+        await makeRequest(component, request, access_token);
     }
 }
 
@@ -342,6 +478,7 @@ async function chooseWinner(component, request, access_token) {
 export {
     register,
     login,
+    refreshToken,
     getProfile,
     editProfile,
     getRequests,
