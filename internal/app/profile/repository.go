@@ -9,7 +9,7 @@ import (
 
 
 type Repository interface {
-  Get(ctx context.Context, userId int) (typefile.Profile, error)
+  Get(ctx context.Context, userId int) (profile, error)
   Create(ctx context.Context, userProfile *typefile.Profile) error
   Update(ctx context.Context, userProfile *typefile.Profile) error
   Delete(ctx context.Context, userId int) error
@@ -31,11 +31,18 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 }
 
 
-func (r repository) Get(ctx context.Context, userId int) (typefile.Profile, error) {
-  var userProfile typefile.Profile
-  result := r.db.WithContext(ctx).Find(&userProfile, "ID = ?", userId)
+func (r repository) Get(ctx context.Context, userId int) (profile, error) {
+  var userProfile profile
+
+  result := r.db.WithContext(ctx).
+    Model(&typefile.Profile{}).
+    Select("profiles.id, profiles.bio, profiles.sns, profiles.icon, users.email").
+    Joins("INNER JOIN users ON profiles.id = users.id").
+    Where("profiles.id = ?", userId).
+    Scan(&userProfile)
+
   if result.Error != nil {
-    return typefile.Profile{}, result.Error
+    return profile{}, result.Error
   } else {
     return userProfile, nil
   }

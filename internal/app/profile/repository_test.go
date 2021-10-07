@@ -53,7 +53,7 @@ func (suite *ProfileRepositoryTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{})//.AddRow(newId)
       //suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`SELECT request.Finish, submission.UpdatedAt, request.ClientID, request.RequestName, request.Content, submissionID FROM "submissions" INNER JOIN "request" ON submission.RequestID = request.ID WHERE submission.EngineerID = $1`),
+        regexp.QuoteMeta(`SELECT requests.finish, submissions.updated_at, requests.client_id, requests.request_name, requests.content, submissions.id FROM "submissions" INNER JOIN requests ON submissions.request_id = requests.id WHERE submissions.engineer_id = $1`),
       ).
       WithArgs(1).
       WillReturnRows(rows)

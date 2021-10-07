@@ -21,12 +21,13 @@ type sns struct {
 
 
 type profile struct {
-  Id         int             `json:"userID"`
+  Id         int             `json:"user_id"`
   Bio        string          `json:"bio"`
   Sns        json.RawMessage `json:"sns"`
+  Icon       string          `json:"icon"`
+  Email      string          `json:"email"`
   Submission json.RawMessage `json:"submission"`
   Request    json.RawMessage `json:"request"`
-  Icon       string          `json:"icon"`
 }
 
 
@@ -78,7 +79,7 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
     return profile{}, err
   }
   //該当ユーザのプロフィールを取得
-  var userProfileWithRecords profile
+  //var userProfileWithRecords profile
 
   if userProfile, err := s.repo.Get(ctx, userId); err != nil {
     return profile{}, err
@@ -95,15 +96,11 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
           if participatedsText, err := json.Marshal(participateds); err != nil {
             return profile{}, err
           } else {
-            userProfileWithRecords = profile{
-              Id: userId,
-              Bio: userProfile.Bio,
-              Sns: userProfile.Sns,
-              Submission: participatedsText,
-              Request: requestedsText,
-              Icon: userProfile.Icon,
-            }
-            return userProfileWithRecords, nil
+            //#region as userProfileWithRecords
+            userProfile.Submission = participatedsText
+            userProfile.Request = requestedsText
+            //#endregion
+            return userProfile, nil
           }
         }
       }
