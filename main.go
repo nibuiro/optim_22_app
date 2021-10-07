@@ -108,7 +108,7 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   //#region 認証機能群
   authRepository := auth22.NewRepository(db, logger)
   authService := auth22.NewService(cfg, authRepository, logger)
-  auth := auth22.New(authService, logger, "localhost")
+  auth := auth22.New(authService, "localhost")
   //アクセストークンとリフレッシュトークンの発行
   e.POST("/auth", auth.Login())
   //トークンのリフレッシュ
