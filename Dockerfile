@@ -19,6 +19,18 @@ COPY ./typefile/type.go /usr/local/go/src/typefile/type.go
 # カレントディレクトリの内容をコピーする
 COPY . /go/src/optim_22_app/
 
+# npmを利用できるようにする。
+RUN apt-get update && apt-get -y install nodejs npm
+
+# コンテナ内で各種命令を実行するためのカレントディレクトリを指定
+WORKDIR /go/src/optim_22_app/view
+
+# 必要なパッケージをインストール
+RUN npm install
+
+# package-jsonに書かれたスクリプトを実行。
+RUN npm run dev
+
 # コンテナ内で各種命令を実行するためのカレントディレクトリを指定
 WORKDIR /go/src/optim_22_app/
 
