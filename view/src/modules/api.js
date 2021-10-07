@@ -10,6 +10,14 @@ async function hashPassword(password) {
 }
 
 
+// アクセストークンをJWTからデコード
+function accessToken(token) {
+    const jwt = require('jsonwebtoken');
+    const access_token = jwt.decode(token);
+    return access_token;
+}
+
+
 // ユーザ登録API
 async function register(component, user) {
     // パスワードのハッシュ化
@@ -125,12 +133,7 @@ async function refreshToken(component, access_token, refresh_token) {
             console.log("refresh_token:");
             console.log(refresh_token);
         }
-        // レスポンスのbodyをjsonに変換
-        const data = await response.json();
-        const user_id = data.user_id;
-        if (process.env.NODE_ENV === "development") {
-            console.log(`user_id: ${user_id}`);
-        }
+        const user_id = accessToken(access_token).userid;
         // localStorageにユーザIDを保存
         localStorage.setItem("user_id", user_id);
         // localStorageにアクセストークンを保存
