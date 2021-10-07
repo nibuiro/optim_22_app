@@ -1,9 +1,9 @@
-package user
+package app
+
 
 import (
 //  "context"
   "net/http"
-  "os"
   "testing"
   "regexp"
   "github.com/gin-gonic/gin"
@@ -14,7 +14,6 @@ import (
   "optim_22_app/pkg/log"
  // "optim_22_app/typefile"
   "optim_22_app/internal/app/user"
-  "optim_22_app/internal/pkg/config"
   "optim_22_app/internal/pkg/test/v2"
 )
 
@@ -44,13 +43,6 @@ func (suite *UserRepositoryTestSuite) SetupTest() {
 
   logger := log.New()
   suite.logger = logger
-  
-  // load application configurations
-  cfg, err := config.Load("/go/src/configs/app.yaml", logger)
-  if err != nil {
-    logger.Errorf("failed to load application configuration: %s", err)
-    os.Exit(-1)
-  }
 
   db, mock, _ := sqlmock.New()
   suite.mock = mock
@@ -66,7 +58,7 @@ func (suite *UserRepositoryTestSuite) SetupTest() {
   userService := user.NewService(userRepository, logger)
 
   router := gin.New()
-  user.RegisterHandlers(router.Group(""), cfg, userService, logger)
+  user.RegisterHandlers(router.Group(""), userService, logger)
   suite.router = router
 }
 
@@ -92,6 +84,20 @@ func (suite *UserRepositoryTestSuite) TestCreate() {
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
+
+      suite.mock.ExpectBegin()
+      suite.mock.ExpectQuery(
+        regexp.QuoteMeta(`INSERT INTO "clients" ("name","email","password","id") VALUES ($1,$2,$3,$4) RETURNING "id"`),
+      ).
+      WillReturnRows(rows)
+      suite.mock.ExpectCommit()
+
+      suite.mock.ExpectBegin()
+      suite.mock.ExpectQuery(
+        regexp.QuoteMeta(`INSERT INTO "engineers" ("name","email","password","id") VALUES ($1,$2,$3,$4) RETURNING "id"`),
+      ).
+      WillReturnRows(rows)
+      suite.mock.ExpectCommit()
       
       //var ctx context.Context
       //err := suite.userRepository.Create(ctx, insertValues)
@@ -101,7 +107,7 @@ func (suite *UserRepositoryTestSuite) TestCreate() {
         URL: "/api/user", 
         Header: nil, 
         Body: `{"name":"test", "email":"test@test.test", "password":"7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}`,
-        WantStatus: http.StatusCreated, 
+        WantStatus: http.StatusTemporaryRedirect, 
         WantResponse: "",
       }
   

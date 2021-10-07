@@ -67,6 +67,20 @@ func (suite *UserRepositoryTestSuite) TestCreate() {
       ).
       WillReturnRows(rows)
       suite.mock.ExpectCommit()
+
+      suite.mock.ExpectBegin()
+      suite.mock.ExpectQuery(
+        regexp.QuoteMeta(`INSERT INTO "clients" ("name","email","password","id") VALUES ($1,$2,$3,$4) RETURNING "id"`),
+      ).
+      WillReturnRows(rows)
+      suite.mock.ExpectCommit()
+
+      suite.mock.ExpectBegin()
+      suite.mock.ExpectQuery(
+        regexp.QuoteMeta(`INSERT INTO "engineers" ("name","email","password","id") VALUES ($1,$2,$3,$4) RETURNING "id"`),
+      ).
+      WillReturnRows(rows)
+      suite.mock.ExpectCommit()
       
       insertValues := &typefile.User{
         Name:      "test",

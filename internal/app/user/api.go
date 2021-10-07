@@ -39,6 +39,7 @@ func (rc resource) post() gin.HandlerFunc {
       c.Status(http.StatusBadRequest)
       return 
     }
+    rc.logger.Debug(input)
   
     //ユーザ作成及び認証情報取得 
     _, err := rc.service.Create(c.Request.Context(), input)

@@ -1,4 +1,4 @@
-package comment
+package app
 
 import (
 //  "context"
@@ -82,7 +82,7 @@ func (suite *CommentFuncIntegrationTestSuite) TestCreate() {
         Method: "POST", 
         URL: "/api/discussion/1", //requestID
         Header: nil, 
-        Body: `{"user_id":1, request_id":1, "title":"test", "text":"test", "reply_id":1}`,
+        Body: `{"user_id":1, "request_id":1, "title":"test", "text":"test", "reply_id":1}`,
         WantStatus: http.StatusCreated, 
         WantResponse: "",
       }
