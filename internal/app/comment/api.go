@@ -59,7 +59,7 @@ func (rc resource) get() gin.HandlerFunc {
       } else {
         //rc.logger.Debug(reflect.TypeOf(commentsText))
         c.Header("Content-Type", "application/json")
-        c.String(http.StatusOK, string(commentsText[:]))
+        c.String(http.StatusOK, Presenter(commentsText))
         return
       }
     }
