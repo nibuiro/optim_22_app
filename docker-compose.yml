@@ -22,6 +22,5 @@ services:
       MYSQL_DATABASE: optim_dev
       MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_PASSWORD: rootpass
     ports:
       - 13306:3306

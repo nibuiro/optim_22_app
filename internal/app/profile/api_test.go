@@ -1,0 +1,81 @@
+package profile
+
+import (
+  "net/http"
+  "testing"
+  "github.com/gin-gonic/gin"
+  "optim_22_app/internal/pkg/test"
+  "optim_22_app/pkg/log"
+)
+  
+/* 
+ * エンドポイントとして機能するか？
+ */
+
+func TestPostProfile(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
+  
+  tests := []test.APITestCase{
+    {
+      Name: "Nested json parsing test", 
+      Method: "POST", 
+      URL: "/api/profile", 
+      Header: nil, 
+      Body: `{"bio":"test", "sns":{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}, "icon":"test"}`,
+      WantStatus: http.StatusCreated, 
+      WantResponse: "",
+    }, 
+    {
+      Name: "Bad json parsing test", 
+      Method: "POST", 
+      URL: "/api/profile", 
+      Header: nil, 
+      Body: `"bio":"test", "sns":{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}, "icon":"test"`,
+      WantStatus: http.StatusBadRequest, 
+      WantResponse: "",
+    },
+  }
+  for _, tc := range tests {
+    test.Endpoint(t, router, tc)
+  }
+}
+
+
+func TestGetProfile(t *testing.T) {
+
+  logger := log.New()
+  router := gin.New()
+
+  repo := StubNewRepository()
+  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
+  
+  tests := []test.APITestCase{
+    {
+      Name: "dynamic url error", 
+      Method: "GET", 
+      URL: "/api/profile/", 
+      Header: nil, 
+      Body: "",
+      WantStatus: http.StatusNotFound, 
+      WantResponse: "",
+    }, 
+    {
+      Name: "No Json Marshal error", 
+      Method: "GET", 
+      URL: "/api/profile/test", 
+      Header: nil, 
+      Body: "",
+      WantStatus: http.StatusOK, 
+      WantResponse: "",
+    }, 
+  }
+  for _, tc := range tests {
+    test.Endpoint(t, router, tc)
+  }
+}
+

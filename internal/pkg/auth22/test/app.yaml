@@ -1,0 +1,6 @@
+server_port: 8080
+dsn: "root:rootpass@tcp(mysql_container:3306)/optim_dev"
+refresh_token_expiration: 5
+access_token_expiration: 5
+refresh_token_secret: "secret_key_for_refresh"
+access_token_secret: "secret_key"
