@@ -1,3 +1,5 @@
+<!-- リクエスト一覧ページ -->
+
 <template>
   <div class="container">
     <section class="hero is-small is-primary mb-3">
@@ -5,15 +7,13 @@
         <p class="title mb-0">
           リクエスト一覧
         </p>
-        <b-button class="is-light" label="新規リクエスト" outlined />
+        <request-form v-if="loggedin" class="is-light" />
       </div>
     </section>
     <section class="mb-3">
       <div class="is-flex is-justify-content-space-between">
         <div class="control is-flex">
-          <b-switch v-model="isAccepting" :disabled="!isAccepting"
-            >受付中のみ</b-switch
-          >
+          <b-switch v-model="onlyAccepting">受付中のみ</b-switch>
         </div>
         <b-field grouped group-multiline>
           <b-select v-model="perPage" :disabled="!isPaginated">
@@ -26,69 +26,109 @@
       </div>
 
       <b-table
-        :data="data"
-        :accepting="isAccepting"
+        :loading="loading"
+        :data="requests"
+        :accepting="onlyAccepting"
         :paginated="isPaginated"
         :per-page="perPage"
         :current-page.sync="currentPage"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
-        default-sort="user.first_name"
-        aria-next-label="Next page"
-        aria-previous-label="Previous page"
-        aria-page-label="Page"
-        aria-current-label="Current page"
+        :row-class="row => onlyAccepting && row.finish === true && 'is-hidden'"
+        :default-sort="defaultSort"
       >
         <b-table-column
-          field="id"
-          label="ID"
-          width="40"
-          sortable
-          numeric
+          cell-class="is-vcentered"
+          field="state"
+          label="状態"
+          width="10%"
+          centered
           v-slot="props"
         >
-          {{ props.row.id }}
+          <b-tag
+            :type="props.row.finish === false ? 'is-success' : 'is-danger'"
+          >
+            {{ props.row.finish === false ? "受付中" : "終了" }}
+          </b-tag>
         </b-table-column>
-
         <b-table-column
-          field="user.first_name"
-          label="First Name"
-          sortable
-          v-slot="props"
-        >
-          {{ props.row.user.first_name }}
-        </b-table-column>
-
-        <b-table-column
-          field="user.last_name"
-          label="Last Name"
-          sortable
-          v-slot="props"
-        >
-          {{ props.row.user.last_name }}
-        </b-table-column>
-
-        <b-table-column
+          cell-class="is-vcentered"
           field="date"
-          label="Date"
+          label="依頼日時"
+          width="10%"
           sortable
           centered
           v-slot="props"
         >
-          <span class="tag is-success">
-            {{ new Date(props.row.date).toLocaleDateString() }}
-          </span>
+          {{ new Date(props.row.createdat).toLocaleDateString() }}
+          <br />
+          {{ new Date(props.row.createdat).toLocaleTimeString() }}
         </b-table-column>
-
-        <b-table-column label="Gender" v-slot="props">
-          <span>
-            <b-icon
-              pack="fas"
-              :icon="props.row.gender === 'Male' ? 'mars' : 'venus'"
-            >
-            </b-icon>
-            {{ props.row.gender }}
-          </span>
+        <b-table-column
+          cell-class="is-vcentered"
+          field="client"
+          label="依頼者"
+          width="10%"
+          sortable
+          centered
+          v-slot="props"
+        >
+          <router-link
+            :to="{
+              name: 'MyPage',
+              params: { user_id: props.row.client.user_id }
+            }"
+          >
+            <b-tooltip :label="props.row.client.username">
+              <div :style="iconStyle(64, props.row.client.icon)" />
+            </b-tooltip>
+          </router-link>
+        </b-table-column>
+        <b-table-column
+          cell-class="is-vcentered"
+          field="request"
+          label="依頼名"
+          width="20%"
+          sortable
+          v-slot="props"
+        >
+          <router-link
+            :to="{
+              name: 'RequestPage',
+              params: { request_id: props.row.request_id }
+            }"
+          >
+            {{ props.row.requestname }}
+          </router-link>
+        </b-table-column>
+        <b-table-column
+          cell-class="is-vcentered"
+          field="detail"
+          label="詳細"
+          width="30%"
+          v-slot="props"
+        >
+          {{ props.row.content }}
+        </b-table-column>
+        <b-table-column
+          cell-class="is-vcentered"
+          field="engineer"
+          label="参加者"
+          width="20%"
+          v-slot="props"
+        >
+          <router-link
+            v-for="engineer in props.row.engineers"
+            :key="engineer.user_id"
+            :to="{
+              name: 'MyPage',
+              params: { user_id: engineer.user_id }
+            }"
+          >
+            <b-tooltip :label="engineer.username">
+              <div :style="iconStyle(48, engineer.icon)" />
+            </b-tooltip>
+          </router-link>
         </b-table-column>
       </b-table>
     </section>
@@ -96,19 +136,45 @@
 </template>
 
 <script>
-const data = require("../../src/assets/sample.json");
+import RequestForm from "@/components/RequestForm";
+import * as api from "@/modules/API";
 
 export default {
   data() {
     return {
-      data,
-      isAccepting: false,
+      loggedin: this.$cookies.get("refresh_token") !== null,
+      requests: [],
+      onlyAccepting: false,
       isPaginated: true,
+      defaultSort: ["date", "desc"],
       sortIcon: "chevron-up",
       sortIconSize: "",
       currentPage: 1,
-      perPage: 5
+      perPage: 10,
+      loading: false
     };
+  },
+  methods: {
+    iconStyle(size, image) {
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${image}")`,
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        borderRadius: "100%"
+      };
+    }
+  },
+  components: {
+    "request-form": RequestForm
+  },
+  async created() {
+    this.loading = true;
+    // リクエスト一覧の取得
+    this.requests = await api.getRequests();
+    this.loading = false;
   }
 };
 </script>
