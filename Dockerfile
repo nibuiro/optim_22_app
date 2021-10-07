@@ -25,8 +25,14 @@ RUN apt-get update && apt-get -y install nodejs npm
 # コンテナ内で各種命令を実行するためのカレントディレクトリを指定
 WORKDIR /go/src/optim_22_app/view
 
+# `package.json` と `package-lock.json` （あれば）を両方コピーする
+COPY package*.json ./
+
 # 必要なパッケージをインストール
 RUN npm install
+
+# カレントワーキングディレクトリ(つまり 'app' フォルダ)にプロジェクトのファイルやフォルダをコピーする
+COPY . .
 
 # package-jsonに書かれたスクリプトを実行。
 RUN npm run dev

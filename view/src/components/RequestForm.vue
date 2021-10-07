@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API.js";
+import * as api from "API";
 
 const ModalForm = {
   data() {
@@ -43,10 +43,10 @@ const ModalForm = {
       user_id: localStorage.getItem("user_id"),
       request: {
         title: "",
-        detail: ""
+        detail: "",
       },
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   watch: {
@@ -57,8 +57,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // 全項目入力されているかのチェック
@@ -75,7 +75,7 @@ const ModalForm = {
         this.invalid = true;
         this.errorMessage = "すべての項目を入力してください";
       }
-    }
+    },
   },
   /* html */
   template: `
@@ -117,18 +117,18 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   components: {
-    ModalForm
+    ModalForm,
   },
   watch: {
     // 新規リクエスト成功メッセージを閉じたら依頼一覧ページをリロードする
@@ -136,7 +136,7 @@ export default {
       if (newVal === false && oldVal === true) {
         this.$router.go("/");
       }
-    }
-  }
+    },
+  },
 };
 </script>

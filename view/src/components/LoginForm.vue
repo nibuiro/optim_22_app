@@ -26,17 +26,17 @@
 </template>
 
 <script>
-import * as api from "@/modules/API.js";
+import * as api from "API";
 
 const ModalForm = {
   data() {
     return {
       user: {
         email: "",
-        password: ""
+        password: "",
       },
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   watch: {
@@ -47,8 +47,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // 全項目入力されているかのチェック
@@ -64,7 +64,7 @@ const ModalForm = {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    }
+    },
   },
   /* html */
   template: `
@@ -110,17 +110,17 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   components: {
-    ModalForm
+    ModalForm,
   },
   data() {
     return {
-      isComponentModalActive: false
+      isComponentModalActive: false,
     };
-  }
+  },
 };
 </script>
