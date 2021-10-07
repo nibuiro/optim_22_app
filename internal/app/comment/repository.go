@@ -31,14 +31,17 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 
 
 func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
-  //sample: SELECT comments.ID, comments.request_id, comments.user_id, users.name, comments.created_at, comments.Title, comments.Body, comments.reply_id FROM comments INNER JOIN users ON comments.user_id = users.id WHERE comments.request_id = 1
+  //sample: SELECT comments.ID, comments.request_id, comments.user_id, users.name, comments.created_at, comments.Title, comments.Body, comments.reply_id, profiles.icon FROM comments INNER JOIN users ON comments.user_id = users.id INNER JOIN profiles ON profiles.id = users.id WHERE comments.request_id = 1
   var comments []comment
   result := r.db.WithContext(ctx).
     Model(&typefile.Comment{}).
-    Select("comments.id, comments.request_id, comments.user_id, users.name, comments.created_at, comments.title, comments.body, comments.reply_id").
+    Select("comments.id, comments.request_id, comments.user_id, users.name, comments.created_at, comments.title, comments.body, comments.reply_id, profiles.icon").
     Joins("INNER JOIN users ON comments.user_id = users.id").
+    Joins("INNER JOIN profiles ON profiles.id = users.id").
     Where("comments.request_id = ?", requestID).
     Scan(&comments)
+
+  //r.logger.Debug(comments)
 
   return comments, result.Error
 }

@@ -13,15 +13,16 @@ import (
 
 //#region コメント
 type comment struct {
-  Id         int       `json:"id"`
-  RequestID  int       `json:"requestID"`
-  UserID     int       `json:"userID"`
-  UserName   string    `json:"userName"`
-  Date       time.Time `json:"date"`
+  Id         int       `json:"comment_id"`
+  RequestID  int       `json:"request_id"`
+  UserID     int       `json:"user_id"`
+  UserName   string    `json:"username"`
+  Date       time.Time `json:"createdat"`
   Title      string    `json:"title"`
-  Body       string    `json:"body"`
-  ReplyID    int       `json:"replyID"`
+  Body       string    `json:"text"`
+  ReplyID    int       `json:"reply_id"`
   Attachment []byte    `json:"attachment"`
+  Icon       []byte    `json:"icon"`
 }
 
 
@@ -71,20 +72,7 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
     return make([]comment, 1), err
   } else {
     comments := pastComments
-    //nCommens := len(pastComments)
-    //comments := make([]comment, pastComments)
-    //for i := 0; i < nCommens; i++ {
-    //  comments[i] = comment{
-    //    Id: pastComments[i].ID
-    //    RequestID: pastComments[i].RequestID
-    //    UserID: pastComments[i].UserID
-    //    UserName: pastComments[i].UserName
-    //    Date: pastComments[i].Date
-    //    Title: pastComments[i].Title
-    //    Body: pastComments[i].Body
-    //    ReplyID: pastComments[i].ReplyID
-    //  }
-    //}
+
     return comments, nil
   }
 }
