@@ -36,11 +36,11 @@
               class="is-flex is-flex-direction-column"
               :to="{
                 name: 'MyPage',
-                params: { user_id: comment.user.user_id }
+                params: { user_id: comment.user_id }
               }"
             >
-              <div class="mx-auto" :style="iconStyle(32, comment.user.icon)" />
-              <span>{{ comment.user.username }}</span>
+              <div class="mx-auto" :style="iconStyle(32, comment.icon)" />
+              <span>{{ comment.username }}</span>
             </router-link>
             <div class="content pl-3">
               {{ comment.text }}
@@ -183,9 +183,6 @@ export default {
   },
   async created() {
     const request_id = this.$route.params.request_id;
-    this.comment.request_id = request_id;
-    const user_id = localStorage.getItem("user_id");
-    this.comment.user_id = user_id;
     this.comments = await api.getComments(request_id);
     const access_token = localStorage.getItem("access_token");
     const profile = await api.getProfile(user_id, access_token);
