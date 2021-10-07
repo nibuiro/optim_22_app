@@ -79,25 +79,30 @@
           <div class="mx-auto" :style="iconStyle(64, icon)" />
         </div>
         <div class="media-content">
-          <b-field label="タイトル">
+          <b-field label="コメント">
             <b-input
               v-model="comment.title"
               placeholder="タイトルを入力してください"
+              required
             />
           </b-field>
-          <b-field>
-            <div class="control">
-              <b-input
-                type="textarea"
-                v-model="comment.text"
-                placeholder="コメントを入力してください(500字以内)"
-                maxlength="500"
-              />
-              <div class="has-text-centered">
-                <b-button type="is-primary" label="送信" @click="addComment" />
-              </div>
+          <div>
+            <b-input
+              type="textarea"
+              v-model="comment.text"
+              placeholder="コメントを入力してください(500字以内)"
+              maxlength="500"
+              required
+            />
+            <b-input
+              type="text"
+              v-model="comment.attachment"
+              placeholder="添付ファイルのURL"
+            />
+            <div class="has-text-centered mt-4">
+              <b-button type="is-primary" label="送信" @click="addComment" />
             </div>
-          </b-field>
+          </div>
         </div>
       </article>
     </section>
@@ -183,6 +188,9 @@ export default {
   },
   async created() {
     const request_id = this.$route.params.request_id;
+    this.comment.request_id = request_id;
+    const user_id = localStorage.getItem("user_id");
+    this.comment.user_id = user_id;
     this.comments = await api.getComments(request_id);
     const access_token = localStorage.getItem("access_token");
     const profile = await api.getProfile(user_id, access_token);
