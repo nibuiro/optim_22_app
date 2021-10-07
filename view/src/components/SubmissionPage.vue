@@ -4,7 +4,7 @@
   <div class="container">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
-        style="position: absolute;"
+        style="position: absolute"
         :label="submission.content"
         type="is-light"
         position="is-right"
@@ -13,7 +13,7 @@
         <router-link
           :to="{
             name: 'MyPage',
-            params: { user_id: submission.engineer.user_id }
+            params: { user_id: submission.engineer.user_id },
           }"
         >
           <div
@@ -23,7 +23,7 @@
         </router-link>
       </b-tooltip>
       <div class="hero-body is-flex pt-0 pb-5">
-        <p class="title mb-0 pt-2" style="margin-left: 64px;">
+        <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ submission.engineer.username }}さんの提出物
         </p>
         <submission-editor
@@ -53,7 +53,7 @@
                 <router-link
                   :to="{
                     name: 'RequestPage',
-                    params: { request_id: submission.request.request_id }
+                    params: { request_id: submission.request.request_id },
                   }"
                 >
                   {{ submission.request.requestname }}
@@ -66,7 +66,7 @@
                     class="is-flex is-align-items-center"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: submission.engineer_id }
+                      params: { user_id: submission.engineer_id },
                     }"
                   >
                     <b-tooltip :label="submission.engineer.username">
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 import SubmissionEditor from "@/components/SubmissionEditor";
 
 export default {
@@ -114,7 +114,7 @@ export default {
           username: "",
           icon: "",
           comment: "",
-          SNS: {}
+          SNS: {},
         },
         content: "",
         url: "",
@@ -123,13 +123,13 @@ export default {
           finish: null,
           createdat: "",
           requestname: "",
-          client: {}
+          client: {},
         },
         engineers: [],
         content: "",
         submissions: [],
-        winner: null
-      }
+        winner: null,
+      },
     };
   },
   methods: {
@@ -141,17 +141,17 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   components: {
-    "submission-editor": SubmissionEditor
+    "submission-editor": SubmissionEditor,
   },
   async created() {
     const submission_id = this.$route.params.submission_id;
     this.submission = await api.getsubmission(submission_id);
-  }
+  },
 };
 </script>
 

@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 const ModalForm = {
   props: ["requestProps"],
@@ -44,11 +44,11 @@ const ModalForm = {
       request: {
         request_id: this.requestProps.request_id,
         client_id: this.requestProps.client.user_id,
-        engineer_id: ""
+        engineer_id: "",
       },
       submissions: this.requestProps.submissions,
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   methods: {
@@ -71,9 +71,9 @@ const ModalForm = {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   /* html */
   template: `
@@ -109,14 +109,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   watch: {
@@ -126,11 +126,11 @@ export default {
         const request_id = this.$route.params.request_id;
         this.$router.go({ name: "RequestPage", params: { request_id } });
       }
-    }
+    },
   },
   props: ["request"],
   components: {
-    ModalForm
-  }
+    ModalForm,
+  },
 };
 </script>

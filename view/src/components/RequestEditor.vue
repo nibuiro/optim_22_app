@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 const ModalForm = {
   props: ["requestProps"],
@@ -45,10 +45,10 @@ const ModalForm = {
       request: {
         request_id: this.requestProps.request_id,
         requestname: this.requestProps.requestname,
-        content: this.requestProps.content
+        content: this.requestProps.content,
       },
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   watch: {
@@ -59,8 +59,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // リクエストを編集する
@@ -73,7 +73,7 @@ const ModalForm = {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    }
+    },
   },
   /* html */
   template: `
@@ -115,14 +115,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   watch: {
@@ -132,11 +132,11 @@ export default {
         const request_id = this.$route.params.request_id;
         this.$router.go({ name: "RequestPage", params: { request_id } });
       }
-    }
+    },
   },
   props: ["request"],
   components: {
-    ModalForm
-  }
+    ModalForm,
+  },
 };
 </script>

@@ -35,13 +35,13 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 const ModalForm = {
   props: ["requestProps"],
   data() {
     return {
-      request: this.requestProps
+      request: this.requestProps,
     };
   },
   methods: {
@@ -59,9 +59,9 @@ const ModalForm = {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   /* html */
   template: `
@@ -80,7 +80,7 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
@@ -90,8 +90,8 @@ export default {
       isMessageModalActive: false,
       formProps: {
         request_id: this.$route.params.request_id,
-        client_id: this.client_id
-      }
+        client_id: this.client_id,
+      },
     };
   },
   watch: {
@@ -101,11 +101,11 @@ export default {
         const request_id = this.formProps.request_id;
         this.$router.go({ name: "RequestPage", params: { request_id } });
       }
-    }
+    },
   },
   props: ["client_id"],
   components: {
-    ModalForm
-  }
+    ModalForm,
+  },
 };
 </script>

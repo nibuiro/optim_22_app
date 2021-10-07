@@ -4,9 +4,7 @@
   <div class="container">
     <section class="hero is-small is-primary mb-3">
       <div class="hero-body is-flex is-justify-content-space-between">
-        <p class="title mb-0">
-          リクエスト一覧
-        </p>
+        <p class="title mb-0">リクエスト一覧</p>
         <request-form v-if="loggedin" class="is-light" />
       </div>
     </section>
@@ -34,7 +32,9 @@
         :current-page.sync="currentPage"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
-        :row-class="row => onlyAccepting && row.finish === true && 'is-hidden'"
+        :row-class="
+          (row) => onlyAccepting && row.finish === true && 'is-hidden'
+        "
         :default-sort="defaultSort"
       >
         <b-table-column
@@ -76,7 +76,7 @@
           <router-link
             :to="{
               name: 'MyPage',
-              params: { user_id: props.row.client.user_id }
+              params: { user_id: props.row.client.user_id },
             }"
           >
             <b-tooltip :label="props.row.client.username">
@@ -95,7 +95,7 @@
           <router-link
             :to="{
               name: 'RequestPage',
-              params: { request_id: props.row.request_id }
+              params: { request_id: props.row.request_id },
             }"
           >
             {{ props.row.requestname }}
@@ -122,7 +122,7 @@
             :key="engineer.user_id"
             :to="{
               name: 'MyPage',
-              params: { user_id: engineer.user_id }
+              params: { user_id: engineer.user_id },
             }"
           >
             <b-tooltip :label="engineer.username">
@@ -137,7 +137,7 @@
 
 <script>
 import RequestForm from "@/components/RequestForm";
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {
@@ -151,7 +151,7 @@ export default {
       sortIconSize: "",
       currentPage: 1,
       perPage: 10,
-      loading: false
+      loading: false,
     };
   },
   methods: {
@@ -163,19 +163,19 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   components: {
-    "request-form": RequestForm
+    "request-form": RequestForm,
   },
   async created() {
     this.loading = true;
     // リクエスト一覧の取得
     this.requests = await api.getRequests();
     this.loading = false;
-  }
+  },
 };
 </script>
 

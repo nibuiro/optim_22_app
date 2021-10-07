@@ -4,7 +4,7 @@
   <div class="container" :profile="profile">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
-        style="position: absolute;"
+        style="position: absolute"
         :label="profile.comment"
         type="is-light"
         position="is-right"
@@ -16,7 +16,7 @@
         class="hero-body is-flex pt-0 pb-5"
         :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
       >
-        <p class="title mb-0 pt-2" style="margin-left: 64px;">
+        <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ profile.username }}
         </p>
         <profile-editor
@@ -28,7 +28,7 @@
     </section>
     <section class="mb-3 is-flex is-justify-content-space-evenly">
       <b-taglist v-if="!!profile.SNS.Github" class="m-0" attached>
-        <b-tag style="background-color: #171516;">
+        <b-tag style="background-color: #171516">
           <b-icon icon="github" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
@@ -38,7 +38,7 @@
         </b-tag>
       </b-taglist>
       <b-taglist v-if="!!profile.SNS.Twitter" class="m-0" attached>
-        <b-tag style="background-color: #1D9BF0;">
+        <b-tag style="background-color: #1d9bf0">
           <b-icon icon="twitter" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
@@ -48,7 +48,7 @@
         </b-tag>
       </b-taglist>
       <b-taglist v-if="!!profile.SNS.Facebook" class="m-0" attached>
-        <b-tag style="background-color: #1877F2;">
+        <b-tag style="background-color: #1877f2">
           <b-icon icon="facebook" type="is-light" />
         </b-tag>
         <b-tag type="is-light">
@@ -111,7 +111,7 @@
               <router-link
                 :to="{
                   name: 'RequestPage',
-                  params: { request_id: props.row.request_id }
+                  params: { request_id: props.row.request_id },
                 }"
               >
                 {{ props.row.requestname }}
@@ -138,7 +138,7 @@
                 :key="engineer.user_id"
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: engineer.user_id }
+                  params: { user_id: engineer.user_id },
                 }"
               >
                 <b-tooltip :label="engineer.username">
@@ -199,7 +199,7 @@
               <router-link
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: props.row.request.client.user_id }
+                  params: { user_id: props.row.request.client.user_id },
                 }"
               >
                 <b-tooltip :label="props.row.request.client.username">
@@ -218,7 +218,7 @@
               <router-link
                 :to="{
                   name: 'RequestPage',
-                  params: { request_id: props.row.request_id }
+                  params: { request_id: props.row.request_id },
                 }"
               >
                 {{ props.row.request.requestname }}
@@ -243,7 +243,7 @@
               <router-link
                 :to="{
                   name: 'SubmissionPage',
-                  params: { submission_id: props.row.submission_id }
+                  params: { submission_id: props.row.submission_id },
                 }"
               >
                 提出物
@@ -261,7 +261,7 @@
 
 <script>
 import ProfileEditor from "@/components/ProfileEditor";
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {
@@ -271,12 +271,12 @@ export default {
         SNS: {
           Github: "",
           Twitter: "",
-          Facebook: ""
+          Facebook: "",
         },
         requests: [],
-        submissions: []
+        submissions: [],
       },
-      myself: false
+      myself: false,
     };
   },
   watch: {
@@ -292,7 +292,7 @@ export default {
         access_token
       );
       this.loading = false;
-    }
+    },
   },
   methods: {
     // ログアウトする
@@ -310,12 +310,12 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   components: {
-    "profile-editor": ProfileEditor
+    "profile-editor": ProfileEditor,
   },
   async created() {
     this.loading = true;
@@ -329,7 +329,7 @@ export default {
       access_token
     );
     this.loading = false;
-  }
+  },
 };
 </script>
 

@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 const ModalForm = {
   data() {
@@ -50,13 +50,13 @@ const ModalForm = {
         SNS: {
           Github: "",
           Twitter: "",
-          Facebook: ""
-        }
+          Facebook: "",
+        },
       },
       password: "",
       confirm_password: "",
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   watch: {
@@ -67,12 +67,12 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true
+      deep: true,
     },
     file() {
       // アイコン画像がアップロードされたらbase64で変換する
       this.convertIcon(this.file);
-    }
+    },
   },
   methods: {
     // 画像をbase64で変換
@@ -157,9 +157,9 @@ const ModalForm = {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   async created() {
     const user_id = localStorage.getItem("user_id");
@@ -291,14 +291,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   watch: {
@@ -308,10 +308,10 @@ export default {
         const user_id = localStorage.getItem("user_id");
         this.$router.go({ name: "MyPage", params: { user_id } });
       }
-    }
+    },
   },
   components: {
-    ModalForm
-  }
+    ModalForm,
+  },
 };
 </script>

@@ -36,7 +36,7 @@
               class="is-flex is-flex-direction-column"
               :to="{
                 name: 'MyPage',
-                params: { user_id: comment.user_id }
+                params: { user_id: comment.user_id },
               }"
             >
               <div class="mx-auto" :style="iconStyle(32, comment.icon)" />
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {
@@ -131,11 +131,11 @@ export default {
         reply_id: null,
         title: "",
         text: "",
-        attachment: ""
+        attachment: "",
       },
       invalid: false,
       errorMessage: "",
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   watch: {
@@ -146,7 +146,7 @@ export default {
           this.invalid = false;
         }
       },
-      deep: true
+      deep: true,
     },
     // コメント投稿成功メッセージを閉じたらディスカッションをリロードする
     async isMessageModalActive(newVal, oldVal) {
@@ -156,7 +156,7 @@ export default {
         this.comment.text = "";
         this.comments = await api.getComments(this.comment.request_id);
       }
-    }
+    },
   },
   methods: {
     // コメントを投稿する
@@ -182,9 +182,9 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   async created() {
     const request_id = this.$route.params.request_id;
@@ -195,7 +195,7 @@ export default {
     const access_token = localStorage.getItem("access_token");
     const profile = await api.getProfile(user_id, access_token);
     this.icon = profile.icon;
-  }
+  },
 };
 </script>
 

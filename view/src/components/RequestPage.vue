@@ -4,7 +4,7 @@
   <div class="container" :request="request">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
-        style="position: absolute;"
+        style="position: absolute"
         :label="request.requestname"
         type="is-light"
         position="is-right"
@@ -13,7 +13,7 @@
         <router-link
           :to="{
             name: 'MyPage',
-            params: { user_id: request.client.user_id }
+            params: { user_id: request.client.user_id },
           }"
         >
           <div
@@ -23,7 +23,7 @@
         </router-link>
       </b-tooltip>
       <div class="hero-body is-flex pt-0 pb-5">
-        <p class="title mb-0 pt-2" style="margin-left: 64px;">
+        <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ request.client.username }}さんの依頼
         </p>
         <request-editor class="is-light ml-auto mt-5" :request="request" />
@@ -34,9 +34,7 @@
         <b-tab-item>
           <template #header>
             <b-icon icon="account-question-outline"></b-icon>
-            <span>
-              依頼内容
-            </span>
+            <span> 依頼内容 </span>
           </template>
           <div class="content">
             <ul :request="request">
@@ -61,7 +59,7 @@
                     class="is-flex is-align-items-center"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: request.client.user_id }
+                      params: { user_id: request.client.user_id },
                     }"
                   >
                     <b-tooltip :label="request.client.username">
@@ -80,7 +78,7 @@
                     :key="engineer.user_id"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: engineer.user_id }
+                      params: { user_id: engineer.user_id },
                     }"
                   >
                     <b-tooltip :label="engineer.username">
@@ -98,7 +96,7 @@
                   :key="submission.submissionid"
                   :to="{
                     name: 'SubmissionPage',
-                    params: { submission_id: submission.submission_id }
+                    params: { submission_id: submission.submission_id },
                   }"
                 >
                   <b-icon icon="file-upload-outline" />
@@ -127,9 +125,7 @@
         <b-tab-item>
           <template #header>
             <b-icon icon="forum-outline"></b-icon>
-            <span>
-              ディスカッション
-            </span>
+            <span> ディスカッション </span>
           </template>
           <discussion-page />
         </b-tab-item>
@@ -139,7 +135,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 import RequestEditor from "@/components/RequestEditor";
 import DiscussionPage from "@/components/DiscussionPage";
 import WinnerChooser from "@/components/WinnerChooser.vue";
@@ -163,8 +159,8 @@ export default {
         engineers: [],
         content: "",
         submissions: [],
-        winner: null
-      }
+        winner: null,
+      },
     };
   },
   methods: {
@@ -176,16 +172,16 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%"
+        borderRadius: "100%",
       };
-    }
+    },
   },
   components: {
     "request-editor": RequestEditor,
     "discussion-page": DiscussionPage,
     "winner-chooser": WinnerChooser,
     "request-applier": RequestApplier,
-    "submission-submitter": SubmissionSubmitter
+    "submission-submitter": SubmissionSubmitter,
   },
   async created() {
     const refresh_token = this.$cookies.get("refresh_token");
@@ -196,10 +192,10 @@ export default {
     this.finish = this.request.finish;
     this.myself = this.request.client.user_id == this.user_id && this.loggedin;
     this.joined = this.request.engineers.some(
-      engineer => engineer.user_id == this.user_id
+      (engineer) => engineer.user_id == this.user_id
     );
     this.submitted = this.request.submissions.some(
-      submission => submission.engineer.user_id == this.user_id
+      (submission) => submission.engineer.user_id == this.user_id
     );
     if (process.env.NODE_ENV === "development") {
       if (this.myself) {
@@ -216,7 +212,7 @@ export default {
         );
       }
     }
-  }
+  },
 };
 </script>
 

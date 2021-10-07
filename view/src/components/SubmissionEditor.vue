@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 const ModalForm = {
   props: ["submissionProps"],
@@ -46,10 +46,10 @@ const ModalForm = {
         submission_id: this.submissionProps.submission_id,
         engineer_id: this.submissionProps.engineer.engineer_id,
         content: this.submissionProps.content,
-        url: this.submissionProps.url
+        url: this.submissionProps.url,
       },
       invalid: false,
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   watch: {
@@ -60,8 +60,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // 提出物を編集する
@@ -74,7 +74,7 @@ const ModalForm = {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    }
+    },
   },
   /* html */
   template: `
@@ -116,14 +116,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `
+  `,
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false
+      isMessageModalActive: false,
     };
   },
   watch: {
@@ -133,11 +133,11 @@ export default {
         const submission_id = this.$route.params.submission_id;
         this.$router.go({ name: "SubmissionPage", params: { submission_id } });
       }
-    }
+    },
   },
   props: ["submission"],
   components: {
-    ModalForm
-  }
+    ModalForm,
+  },
 };
 </script>
