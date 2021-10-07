@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API.js";
+import * as api from "API";
 
 const ModalForm = {
   data() {

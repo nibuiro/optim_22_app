@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {

@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
 

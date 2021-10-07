@@ -137,7 +137,7 @@
 
 <script>
 import RequestForm from "@/components/RequestForm";
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {

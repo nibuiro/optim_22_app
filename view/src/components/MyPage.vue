@@ -261,7 +261,7 @@
 
 <script>
 import ProfileEditor from "@/components/ProfileEditor";
-import * as api from "@/modules/API";
+import * as api from "API";
 
 export default {
   data() {

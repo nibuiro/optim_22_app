@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import * as api from "@/modules/API";
+import * as api from "API";
 import SubmissionEditor from "@/components/SubmissionEditor";
 
 export default {
