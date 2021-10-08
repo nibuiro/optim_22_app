@@ -219,7 +219,9 @@ async function editProfile(component, user, access_token) {
 
 // リクエスト一覧取得API
 async function getRequests() {
-    const response = await fetch(`${process.env.API}/requests`);
+    const response = await fetch(`${process.env.API}/requests`, {
+        mode: 'no-cors'
+    });
     const requests = await response.json();
     if (process.env.NODE_ENV === "development") {
         console.log('GET /api/requests\tAllRequests');
