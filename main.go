@@ -10,6 +10,7 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
   "golang.org/x/sync/errgroup"
+  "github.com/gin-contrib/cors"
   "optim_22_app/model"
   "optim_22_app/typefile"
   "optim_22_app/pkg/log"
@@ -100,6 +101,7 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
   e := gin.New()
+  e.Use(CORS())
   //ginのログをloggerでとる //フォーマット形式はloggerに依存する
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出
@@ -163,4 +165,35 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
 //  )
 
   return e
+}
+
+
+func CORS() gin.HandlerFunc {
+  return cors.New(cors.Config{
+    // アクセスを許可したいHTTPメソッド
+    AllowMethods: []string{
+      "*",
+    },
+    // 許可したいHTTPリクエストヘッダ
+    AllowHeaders: []string{
+      "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Headers",
+      "Content-Type",
+      "Content-Length",
+      "Accept-Encoding",
+      "Authorization",
+      "Refresh-Token",
+    },
+    ExposeHeaders: []string{
+      "Authorization",
+      "Refresh-Token",
+    },
+    AllowOrigins: []string{
+      "*",
+    },
+    // cookieなどの情報を必要とするかどうか
+    AllowCredentials: true, //2021/10/08-21:29現時点では必要ない
+    // preflightリクエストの結果をキャッシュする時間
+    MaxAge: 24 * time.Hour,
+  })
 }
