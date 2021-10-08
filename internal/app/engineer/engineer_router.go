@@ -51,7 +51,7 @@ func CreateEngineerJoin(c *gin.Context) {
 	model.Db.Model(&request).Association("Engineers").Append(&engineer)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
 }
 
 // NewSubmissionで得たデータによって、エンジニアが提出した提出物をデータベースに登録する。
@@ -78,7 +78,7 @@ func CreateSubmission(c *gin.Context) {
     model.Db.Create(&submission)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
 }
 
 // エンジニアが編集済みのsubmissionを提出する。
@@ -109,7 +109,7 @@ func UpdateSubmission(c *gin.Context) {
 	model.Db.Save(&submission)
 
 	// redirect先を追加している。
-	redirect_url := "//localhost:8080/submission/" + submission_id_string
+	redirect_url := "//localhost:8080/api/submission/" + submission_id_string
     // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, redirect_url)
 }

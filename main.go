@@ -118,25 +118,25 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   //#endregion
 
   // homepageを表示するハンドラ
-  e.GET("/requests",home.ShowHomepage)
+  e.GET("/api/requests",home.ShowHomepage)
   // NewRequestで得たengineer_idとrequest_idによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
-  e.POST("/request",client.CreateRequest)
+  e.POST("/api/request",client.CreateRequest)
   // request_idをparamにして特定リクエストの詳細を表示する。
-  e.GET("/request/:request_id",request.ShowRequest)
+  e.GET("/api/request/:request_id",request.ShowRequest)
   // クライアントが編集したリクエストを更新できるようにするハンドラ
-  e.PUT("/request/:request_id",client.UpdateRequest)
+  e.PUT("/api/request/:request_id",client.UpdateRequest)
   // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録するためのハンドラ
-  e.POST("/request/:request_id",engineer.CreateEngineerJoin)
+  e.POST("/api/request/:request_id",engineer.CreateEngineerJoin)
 
   // 特定リクエストのサブミッション一覧ページから勝者を選択できるようにするハンドラ
-  e.POST("/winner/:request_id",client.DecideWinner)
+  e.POST("/api/winner/:request_id",client.DecideWinner)
 
   // submission_idをparamにして特定サブミッションの詳細を表示する。
-  e.GET("/submission/:submission_id",submission.ShowSubmission)
+  e.GET("/api/submission/:submission_id",submission.ShowSubmission)
   // エンジニアが編集したsubmissionを更新できるようにするハンドラ
-  e.PUT("/submission/:submission_id",engineer.UpdateSubmission)
+  e.PUT("/api/submission/:submission_id",engineer.UpdateSubmission)
   // NewSubmissionで得たデータによって、エンジニアがsubmissionを提出したことをデータベースに登録するためのハンドラ
-  e.POST("/submission/:request_id",engineer.CreateSubmission)
+  e.POST("/api/submission/:request_id",engineer.CreateSubmission)
 
   
   userRepository := user.NewRepository(db, logger)

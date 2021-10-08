@@ -19,7 +19,7 @@ import (
 func TestSuccessShowSubmission(t *testing.T) {
 	router := gin.New()
 
-	router.GET("submission/:submission_id",submission.ShowSubmission)
+	router.GET("/api/submission/:submission_id",submission.ShowSubmission)
 
 	model.InitDB()
 
@@ -41,7 +41,7 @@ func TestSuccessShowSubmission(t *testing.T) {
 func TestFailureShowSubmission(t *testing.T) {
 	router := gin.New()
 
-	router.GET("submission/:submission_id",submission.ShowSubmission)
+	router.GET("/api/submission/:submission_id",submission.ShowSubmission)
 
 	model.InitDB()
 
@@ -49,7 +49,7 @@ func TestFailureShowSubmission(t *testing.T) {
 	test_ids := []int{1001,1002,1003}
 	for _, test_id := range test_ids{
 		w := httptest.NewRecorder()
-		url := "/submission/" + strconv.Itoa(test_id)
+		url := "/api/submission/" + strconv.Itoa(test_id)
 		req, _ := http.NewRequest("GET", url, nil)
 		// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。
