@@ -19,7 +19,7 @@ import (
 func TestSuccessShowRequest(t *testing.T) {
 	router := gin.New()
 
-	router.GET("request/:request_id",request.ShowRequest)
+	router.GET("/api/request/:request_id",request.ShowRequest)
 
 	model.InitDB()
 
@@ -27,7 +27,7 @@ func TestSuccessShowRequest(t *testing.T) {
 	test_ids := []int{1,2,3}
 	for _, test_id := range test_ids{
 		w := httptest.NewRecorder()
-		url := "/request/" + strconv.Itoa(test_id)
+		url := "/api/request/" + strconv.Itoa(test_id)
 		req, _ := http.NewRequest("GET", url, nil)
 		// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。
@@ -41,7 +41,7 @@ func TestSuccessShowRequest(t *testing.T) {
 func TestFailureShowRequest(t *testing.T) {
 	router := gin.New()
 
-	router.GET("request/:request_id",request.ShowRequest)
+	router.GET("/api/request/:request_id",request.ShowRequest)
 
 	model.InitDB()
 
@@ -49,7 +49,7 @@ func TestFailureShowRequest(t *testing.T) {
 	test_ids := []int{1001,1002,1003}
 	for _, test_id := range test_ids{
 		w := httptest.NewRecorder()
-		url := "/request/" + strconv.Itoa(test_id)
+		url := "/api/request/" + strconv.Itoa(test_id)
 		req, _ := http.NewRequest("GET", url, nil)
 		// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 		// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。

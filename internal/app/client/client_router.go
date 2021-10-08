@@ -103,7 +103,7 @@ func UpdateRequest(c *gin.Context) {
     // }
 
     // redirect先を追加している。
-    redirect_url := "//localhost:8080/request/" + request_id_string
+    redirect_url := "//localhost:8080/api/request/" + request_id_string
     // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
     c.Redirect(http.StatusSeeOther, redirect_url)
 }
@@ -150,5 +150,5 @@ func DecideWinner(c *gin.Context) {
     // }
 
     // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/")
+    c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
 }

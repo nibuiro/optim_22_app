@@ -18,12 +18,12 @@ import (
 func TestSuccesshomeShowHomepage(t *testing.T) {
 	router := gin.New()
 
-	router.GET("/requests",home.ShowHomepage)
+	router.GET("/api/requests",home.ShowHomepage)
 
 	model.InitDB()
 
 	w := httptest.NewRecorder()
-	url := "/requests"
+	url := "/api/requests"
 	req, _ := http.NewRequest("GET", url, nil)
 	// HandlerFuncに対して、ServeHTTP(w ResponceWriter,r *Request)を使うことで、
 	// 実際にサーバーを立ち上げずにリクエストをシミュレートすることができる。
