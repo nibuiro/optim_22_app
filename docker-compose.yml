@@ -1,5 +1,21 @@
-version: '3'
+version: "3"
 services:
+  vue:
+    image: node:lts-alpine
+    build:
+      context: ./view
+      dockerfile: Dockerfile
+    container_name: vue_container
+    ports:
+      - "8081:8081"
+    volumes:
+      #node_moduleを入れるボリューム
+      - /app/view/node_modules
+      #コンテナ内の指定ディレクトリをホスト側と同期
+      - .:/app/
+    #-it
+    stdin_open: true
+    tty: true
   app:
     build:
       context: .
@@ -11,6 +27,9 @@ services:
       - 8080:8080
     volumes:
       - .:/go/src/optim_22_app/
+    tty: true
+    stdin_open: true
+    command: /bin/sh
   db:
     build:
       context: ./mysql
