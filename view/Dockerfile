@@ -3,20 +3,22 @@ FROM node:lts-alpine
 # 静的コンテンツを配信するシンプルな http サーバをインストールする
 RUN npm install -g http-server
 
-# カレントワーキングディレクトリとして 'app' フォルダを指定する
-WORKDIR /app
+# ワーキングディレクトリを作成する
+RUN mkdir -p /vue/
 
-# `package.json` と `package-lock.json` （あれば）を両方コピーする
-COPY package*.json ./
+# プロジェクトのファイルやフォルダをワーキングディレクトリにコピーする
+COPY . /vue/
+
+# カレントワーキングディレクトリとして '/vue/view' フォルダを指定する
+WORKDIR /vue/view/
 
 # プロジェクトの依存ライブラリをインストールする
 RUN npm install
 
-# カレントワーキングディレクトリ(つまり 'app' フォルダ)にプロジェクトのファイルやフォルダをコピーする
-COPY . .
-
 # 本番向けに圧縮しながらアプリケーションをビルドする
 RUN npm run build
 
+# 8081番ポートを解放する
 EXPOSE 8081
-CMD [ "http-server", "--cors", "-p8081", "view/dist" ]
+
+CMD [ "http-server","--cors","-p8081","dist" ]
