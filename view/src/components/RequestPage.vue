@@ -13,7 +13,7 @@
         <router-link
           :to="{
             name: 'MyPage',
-            params: { user_id: request.client.user_id },
+            params: { user_id: request.client.user_id }
           }"
         >
           <div
@@ -59,7 +59,7 @@
                     class="is-flex is-align-items-center"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: request.client.user_id },
+                      params: { user_id: request.client.user_id }
                     }"
                   >
                     <b-tooltip :label="request.client.username">
@@ -78,7 +78,7 @@
                     :key="engineer.user_id"
                     :to="{
                       name: 'MyPage',
-                      params: { user_id: engineer.user_id },
+                      params: { user_id: engineer.user_id }
                     }"
                   >
                     <b-tooltip :label="engineer.username">
@@ -96,7 +96,7 @@
                   :key="submission.submissionid"
                   :to="{
                     name: 'SubmissionPage',
-                    params: { submission_id: submission.submission_id },
+                    params: { submission_id: submission.submission_id }
                   }"
                 >
                   <b-icon icon="file-upload-outline" />
@@ -159,8 +159,8 @@ export default {
         engineers: [],
         content: "",
         submissions: [],
-        winner: null,
-      },
+        winner: null
+      }
     };
   },
   methods: {
@@ -172,16 +172,16 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%",
+        borderRadius: "100%"
       };
-    },
+    }
   },
   components: {
     "request-editor": RequestEditor,
     "discussion-page": DiscussionPage,
     "winner-chooser": WinnerChooser,
     "request-applier": RequestApplier,
-    "submission-submitter": SubmissionSubmitter,
+    "submission-submitter": SubmissionSubmitter
   },
   async created() {
     const refresh_token = this.$cookies.get("refresh_token");
@@ -192,10 +192,10 @@ export default {
     this.finish = this.request.finish;
     this.myself = this.request.client.user_id == this.user_id && this.loggedin;
     this.joined = this.request.engineers.some(
-      (engineer) => engineer.user_id == this.user_id
+      engineer => engineer.user_id == this.user_id
     );
     this.submitted = this.request.submissions.some(
-      (submission) => submission.engineer.user_id == this.user_id
+      submission => submission.engineer.user_id == this.user_id
     );
     if (process.env.NODE_ENV === "development") {
       if (this.myself) {
@@ -212,7 +212,7 @@ export default {
         );
       }
     }
-  },
+  }
 };
 </script>
 

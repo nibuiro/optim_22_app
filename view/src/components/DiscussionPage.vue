@@ -36,7 +36,7 @@
               class="is-flex is-flex-direction-column"
               :to="{
                 name: 'MyPage',
-                params: { user_id: comment.user_id },
+                params: { user_id: comment.user_id }
               }"
             >
               <div class="mx-auto" :style="iconStyle(32, comment.icon)" />
@@ -58,7 +58,7 @@
         </div>
       </div>
     </section>
-    <section v-show="refresh_token !== null" class="mt-5">
+    <section v-show="loggedin" class="mt-5">
       <b-message v-show="invalid" type="is-danger">
         {{ errorMessage }}
       </b-message>
@@ -122,6 +122,7 @@ import * as api from "API";
 export default {
   data() {
     return {
+      loggedin: false,
       refresh_token: this.$cookies.get("refresh_token"),
       icon: "",
       comments: [],
@@ -131,11 +132,11 @@ export default {
         reply_id: null,
         title: "",
         text: "",
-        attachment: "",
+        attachment: ""
       },
       invalid: false,
       errorMessage: "",
-      isMessageModalActive: false,
+      isMessageModalActive: false
     };
   },
   watch: {
@@ -146,7 +147,7 @@ export default {
           this.invalid = false;
         }
       },
-      deep: true,
+      deep: true
     },
     // コメント投稿成功メッセージを閉じたらディスカッションをリロードする
     async isMessageModalActive(newVal, oldVal) {
@@ -156,7 +157,7 @@ export default {
         this.comment.text = "";
         this.comments = await api.getComments(this.comment.request_id);
       }
-    },
+    }
   },
   methods: {
     // コメントを投稿する
@@ -182,20 +183,23 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%",
+        borderRadius: "100%"
       };
-    },
+    }
   },
   async created() {
     const request_id = this.$route.params.request_id;
-    this.comment.request_id = request_id;
-    const user_id = localStorage.getItem("user_id");
-    this.comment.user_id = user_id;
     this.comments = await api.getComments(request_id);
-    const access_token = localStorage.getItem("access_token");
-    const profile = await api.getProfile(user_id, access_token);
-    this.icon = profile.icon;
-  },
+    this.comment.request_id = request_id;
+    this.loggedin = this.refresh_token !== null ? true : false;
+    if (this.loggedin) {
+      const user_id = localStorage.getItem("user_id");
+      this.comment.user_id = user_id;
+      const access_token = localStorage.getItem("access_token");
+      const profile = await api.getProfile(user_id, access_token);
+      this.icon = profile.icon;
+    }
+  }
 };
 </script>
 
