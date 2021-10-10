@@ -7,10 +7,10 @@ RUN npm install -g http-server
 RUN mkdir -p /vue/
 
 # プロジェクトのファイルやフォルダをワーキングディレクトリにコピーする
-COPY . /vue/
+COPY ./view/ /vue/
 
 # カレントワーキングディレクトリとして '/vue/view' フォルダを指定する
-WORKDIR /vue/view/
+WORKDIR /vue/
 
 # プロジェクトの依存ライブラリをインストールする
 RUN npm install
