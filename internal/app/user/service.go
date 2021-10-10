@@ -12,7 +12,7 @@ import (
 //#region 登録情報
 //`POST /api/user`が要求する情報
 type RegistrationInformation struct {
-  Name     string `json:"name"`
+  Name     string `json:"username"`
   Email    string `json:"email"`
   Password string `json:"password"`
 }
