@@ -111,7 +111,7 @@
               <router-link
                 :to="{
                   name: 'RequestPage',
-                  params: { request_id: props.row.request_id },
+                  params: { request_id: props.row.request_id }
                 }"
               >
                 {{ props.row.requestname }}
@@ -138,7 +138,7 @@
                 :key="engineer.user_id"
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: engineer.user_id },
+                  params: { user_id: engineer.user_id }
                 }"
               >
                 <b-tooltip :label="engineer.username">
@@ -199,7 +199,7 @@
               <router-link
                 :to="{
                   name: 'MyPage',
-                  params: { user_id: props.row.request.client.user_id },
+                  params: { user_id: props.row.request.client.user_id }
                 }"
               >
                 <b-tooltip :label="props.row.request.client.username">
@@ -218,7 +218,7 @@
               <router-link
                 :to="{
                   name: 'RequestPage',
-                  params: { request_id: props.row.request_id },
+                  params: { request_id: props.row.request_id }
                 }"
               >
                 {{ props.row.request.requestname }}
@@ -243,7 +243,7 @@
               <router-link
                 :to="{
                   name: 'SubmissionPage',
-                  params: { submission_id: props.row.submission_id },
+                  params: { submission_id: props.row.submission_id }
                 }"
               >
                 提出物
@@ -271,12 +271,12 @@ export default {
         SNS: {
           Github: "",
           Twitter: "",
-          Facebook: "",
+          Facebook: ""
         },
         requests: [],
-        submissions: [],
+        submissions: []
       },
-      myself: false,
+      myself: false
     };
   },
   watch: {
@@ -292,7 +292,7 @@ export default {
         access_token
       );
       this.loading = false;
-    },
+    }
   },
   methods: {
     // ログアウトする
@@ -310,12 +310,12 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%",
+        borderRadius: "100%"
       };
-    },
+    }
   },
   components: {
-    "profile-editor": ProfileEditor,
+    "profile-editor": ProfileEditor
   },
   async created() {
     this.loading = true;
@@ -329,7 +329,7 @@ export default {
       access_token
     );
     this.loading = false;
-  },
+  }
 };
 </script>
 

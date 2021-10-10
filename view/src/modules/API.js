@@ -167,17 +167,17 @@ async function getProfile(user_id, access_token) {
     // 更新成功時
     if (response.status === 200) {
         const profile = await response.json();
-        if (process.env.NODE_ENV === "development") {
-            console.log(`GET /api/user/${user_id}\tUserProfile`);
-            console.log(`Profile of ${profile.username}:`);
-            console.log(profile);
-        }
         for (let i = 0; i < profile.submissions.length; i++) {
             const request = await getRequest(profile.submissions[i].request_id);
             profile.submissions[i].request = request;
             if (i === profile.submissions.length - 1) {
                 return profile;
             }
+        }
+        if (process.env.NODE_ENV === "development") {
+            console.log(`GET /api/user/${user_id}\tUserProfile`);
+            console.log(`Profile of ${profile.username}:`);
+            console.log(profile);
         }
     }
 }
@@ -265,10 +265,10 @@ async function makeRequest(component, user_id, request, access_token) {
 // リクエスト取得API
 async function getRequest(request_id) {
     const response = await fetch(`${process.env.API}/request/${request_id}`);
-    const request = await response.json();
+    // temporary
+    const request = (await response.json()).request;
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/request/${request_id}\tShowRequest`);
-        console.log(request);
     }
     return request;
 }
@@ -367,7 +367,8 @@ async function submitSubmission(component, submission, access_token) {
 // サブミッション取得API
 async function getsubmission(submission_id) {
     const response = await fetch(`${process.env.API}/submission/${submission_id}`);
-    let submission = await response.json();
+    // temporary
+    let submission = (await response.json()).submission;
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/submission/${submission_id}\tShwowSubmission`);
         console.log(`Submission #${submission.submission_id}:`);
