@@ -20,7 +20,7 @@ type RegistrationInformation struct {
 
 func (m RegistrationInformation) Validate() error {
   return validation.ValidateStruct(&m,
-    validation.Field(&m.Name, validation.Required, validation.Length(3, 128)),
+    validation.Field(&m.Name, validation.Required, validation.Length(1, 128)),
     //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
     //{'.','-'}の許可及びアットマークとTLDの強制のみ
     validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.\\-]+@[a-zA-Z\\-\\.]+\\.[a-zA-Z\\-\\.]+"))),
