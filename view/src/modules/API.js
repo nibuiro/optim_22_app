@@ -85,9 +85,7 @@ async function login(component, user) {
             console.log("refresh_token:");
             console.log(refresh_token);
         }
-        // レスポンスのbodyをjsonに変換
-        const data = await response.json();
-        const user_id = data.user_id;
+        const user_id = accessToken(access_token).userid;
         if (process.env.NODE_ENV === "development") {
             console.log(`user_id: ${user_id}`);
         }
