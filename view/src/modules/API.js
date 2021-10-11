@@ -163,6 +163,13 @@ async function getProfile(user_id, access_token) {
     // 更新成功時
     if (response.status === 200) {
         const profile = await response.json();
+        if (process.env.PATCH) {
+            profile.SNS = {};
+            profile.SNS.Github = profile.sns.github;
+            profile.SNS.Twitter = profile.sns.twitter;
+            profile.SNS.Facebook = profile.sns.facebook;
+            delete profile.sns;
+        }
         for (let i = 0; i < profile.submissions.length; i++) {
             const request = await getRequest(profile.submissions[i].request_id);
             profile.submissions[i].request = request;
@@ -261,8 +268,11 @@ async function makeRequest(component, user_id, request, access_token) {
 // リクエスト取得API
 async function getRequest(request_id) {
     const response = await fetch(`${process.env.API}/request/${request_id}`);
-    // temporary
-    const request = (await response.json()).request;
+    let request = await response.json();
+    if (process.env.PATCH) {
+        request = request.request;
+        delete request.request;
+    }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/request/${request_id}\tShowRequest`);
     }
@@ -363,8 +373,11 @@ async function submitSubmission(component, submission, access_token) {
 // サブミッション取得API
 async function getsubmission(submission_id) {
     const response = await fetch(`${process.env.API}/submission/${submission_id}`);
-    // temporary
-    let submission = (await response.json()).submission;
+    let submission = await response.json();
+    if (process.env.PATCH) {
+        submission = submission.submission;
+        delete submission.submission;
+    }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/submission/${submission_id}\tShwowSubmission`);
         console.log(`Submission #${submission.submission_id}:`);
