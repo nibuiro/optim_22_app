@@ -22,11 +22,15 @@
           />
         </router-link>
       </b-tooltip>
-      <div class="hero-body is-flex pt-0 pb-5">
+      <div
+        class="hero-body is-flex pt-0 pb-5"
+        :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
+      >
         <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ submission.engineer.username }}さんの提出物
         </p>
         <submission-editor
+          v-if="myself"
           class="is-light ml-auto mt-5"
           :submission="submission"
         />
@@ -106,6 +110,8 @@ import { iconStyle } from "iconStyle";
 export default {
   data() {
     return {
+      loggedin: false,
+      myself: false,
       submission: {
         submission_id: null,
         createdat: "",
@@ -140,6 +146,13 @@ export default {
   async created() {
     const submission_id = this.$route.params.submission_id;
     this.submission = await api.getsubmission(submission_id);
+    const refresh_token = this.$cookies.get("refresh_token");
+    this.loggedin = refresh_token !== null ? true : false;
+    if (this.loggedin) {
+      const user_id = localStorage.getItem("user_id");
+      this.myself =
+        this.submission.engineer.user_id == user_id && this.loggedin;
+    }
   }
 };
 </script>
