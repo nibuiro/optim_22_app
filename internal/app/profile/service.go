@@ -22,12 +22,13 @@ type sns struct {
 
 type profile struct {
   Id         int             `json:"user_id"`
-  Bio        string          `json:"bio"`
+  Email      string          `json:"email"`
+  Name       string          `json:"username"`
+  Bio        string          `json:"comment"`
   Sns        json.RawMessage `json:"sns"`
   Icon       string          `json:"icon"`
-  Email      string          `json:"email"`
-  Submission json.RawMessage `json:"submission"`
-  Request    json.RawMessage `json:"request"`
+  Submission json.RawMessage `json:"submissions"`
+  Request    json.RawMessage `json:"requests"`
 }
 
 /*

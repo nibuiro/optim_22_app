@@ -36,7 +36,7 @@ func (r repository) Get(ctx context.Context, userId int) (profile, error) {
 
   result := r.db.WithContext(ctx).
     Model(&typefile.Profile{}).
-    Select("profiles.id, profiles.bio, profiles.sns, profiles.icon, users.email").
+    Select("profiles.id, users.name, users.email, profiles.bio, profiles.sns, profiles.icon").
     Joins("INNER JOIN users ON profiles.id = users.id").
     Where("profiles.id = ?", userId).
     Scan(&userProfile)
