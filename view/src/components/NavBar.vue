@@ -25,7 +25,7 @@
           <router-link
             :to="{
               name: 'MyPage',
-              params: { user_id: user.user_id },
+              params: { user_id: user.user_id }
             }"
           >
             <b-tooltip
@@ -55,8 +55,8 @@ export default {
       user: {
         user_id: null,
         username: "",
-        icon: "",
-      },
+        icon: ""
+      }
     };
   },
   watch: {
@@ -64,10 +64,10 @@ export default {
       this.refresh_token = this.$cookies.get("refresh_token");
       // ログイン済みであればプロフィールを取得
       if (this.refresh_token !== null) {
-        this.user_id = localStorage.getItem("user_id");
-        this.user = await api.getProfile(this.user_id);
+        this.user.user_id = localStorage.getItem("user_id");
+        this.user = await api.getProfile(this.user.user_id);
       }
-    },
+    }
   },
   methods: {
     iconStyle(size, image) {
@@ -78,21 +78,21 @@ export default {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        borderRadius: "100%",
+        borderRadius: "100%"
       };
-    },
+    }
   },
   components: {
     "register-form": RegisterForm,
-    "login-form": LoginForm,
+    "login-form": LoginForm
   },
   async created() {
     this.refresh_token = this.$cookies.get("refresh_token");
     // ログイン済みであればプロフィールを取得
     if (this.refresh_token !== null) {
-      this.user_id = localStorage.getItem("user_id");
-      this.user = await api.getProfile(this.user_id);
+      this.user.user_id = localStorage.getItem("user_id");
+      this.user = await api.getProfile(this.user.user_id);
     }
-  },
+  }
 };
 </script>

@@ -62,15 +62,13 @@ async function register(component, user) {
 
 // ログインAPI
 async function login(component, user) {
+    console.log(user);
     // パスワードのハッシュ化
     const hashHex = await hashPassword(user.password);
     // ログイン情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/auth`, {
         method: "POST",
-        body: JSON.stringify({
-            email: user.email,
-            password: hashHex
-        })
+        body: JSON.stringify(user)
     });
     // ログイン成功時
     if (response.status === 200) {
@@ -163,12 +161,31 @@ async function getProfile(user_id, access_token) {
     // 更新成功時
     if (response.status === 200) {
         const profile = await response.json();
+        console.log(profile);
         if (process.env.PATCH) {
-            profile.SNS = {};
-            profile.SNS.Github = profile.sns.github;
-            profile.SNS.Twitter = profile.sns.twitter;
-            profile.SNS.Facebook = profile.sns.facebook;
+            profile.SNS = profile.sns;
             delete profile.sns;
+            if (profile.SNS === null) {
+                profile.SNS = [];
+            }
+            if (profile.SNS.github) {
+                profile.SNS.Github = profile.SNS.github;
+            } else {
+                profile.SNS.Github = "";
+            }
+            delete profile.SNS.github;
+            if (profile.SNS.twitter) {
+                profile.SNS.Twitter = profile.SNS.twitter;
+            } else {
+                profile.SNS.Twitter = "";
+            }
+            delete profile.SNS.twitter;
+            if (profile.SNS.facebook) {
+                profile.SNS.Facebook = profile.SNS.facebook;
+            } else {
+                profile.SNS.Facebook = "";
+            }
+            delete profile.SNS.facebook;
         }
         for (let i = 0; i < profile.submissions.length; i++) {
             const request = await getRequest(profile.submissions[i].request_id);
