@@ -190,7 +190,6 @@ export default {
   async created() {
     const request_id = this.$route.params.request_id;
     this.comments = await api.getComments(request_id);
-    this.comment.request_id = request_id;
     this.loggedin = this.refresh_token !== null ? true : false;
     if (this.loggedin) {
       const user_id = localStorage.getItem("user_id");

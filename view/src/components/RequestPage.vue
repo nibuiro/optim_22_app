@@ -22,11 +22,18 @@
           />
         </router-link>
       </b-tooltip>
-      <div class="hero-body is-flex pt-0 pb-5">
+      <div
+        class="hero-body is-flex pt-0 pb-5"
+        :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
+      >
         <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ request.client.username }}さんの依頼
         </p>
-        <request-editor class="is-light ml-auto mt-5" :request="request" />
+        <request-editor
+          v-if="!finish && myself"
+          class="is-light ml-auto mt-5"
+          :request="request"
+        />
       </div>
     </section>
     <section class="mb-3">
