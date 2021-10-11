@@ -1,7 +1,7 @@
 package profile
 
 import (
-  "regexp"
+//  "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
   "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/log"
@@ -30,7 +30,7 @@ type profile struct {
   Request    json.RawMessage `json:"request"`
 }
 
-
+/*
 func (m sns) Validate() error {
   return validation.ValidateStruct(&m,
     validation.Field(&m.Github, is.URL, validation.Match(regexp.MustCompile("https://github\\.com/.*"))),
@@ -38,7 +38,7 @@ func (m sns) Validate() error {
     validation.Field(&m.Facebook, is.URL, validation.Match(regexp.MustCompile("https://.*\\.facebook\\.com/.*"))),
   )
 }
-
+*/
 
 func (m profile) Validate() error {
   return validation.ValidateStruct(&m,
@@ -113,10 +113,6 @@ func (s service) Post(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   sns := sns{}
   json.Unmarshal(req.Sns, &sns)
-  //SNS登録情報を検証
-  if err := sns.Validate(); err != nil {
-    return err
-  }
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     return err
@@ -141,10 +137,6 @@ func (s service) Patch(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   snsUrl := sns{}
   json.Unmarshal(req.Sns, &snsUrl)
-  //SNS登録情報を検証
-  if err := snsUrl.Validate(); err != nil {
-    return err
-  }
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
     return err
