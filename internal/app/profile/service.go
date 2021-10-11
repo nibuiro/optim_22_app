@@ -10,6 +10,7 @@ import (
   "strconv"
   "context"
   "errors"
+  "optim_22_app/internal/app/profile/repository"
 //  "optim_22_app/internal/app/profile/repository"
 )
 
@@ -89,20 +90,54 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
     if requesteds, err := s.repo.GetRequested(ctx, userId); err != nil {
       return profile{}, err
     } else {
-      if requestedsText, err := json.Marshal(requesteds); err != nil {
+      //s.logger.Debug(userIds)
+      nRequesteds := len(requesteds)
+      var userIds []int
+      s.logger.Debug(nRequesteds)
+
+      //参照されるuserIdを抽出
+      for _, requested := range requesteds {
+        for _, engineer := range requested.Engineers {
+          userIds = append(userIds, engineer.ID)
+        }
+      }//
+      //参照されたuserIdのプロフィールを取得
+      if engineerProfiles, err := s.repo.GetProfiles(ctx, userIds); err != nil {
         return profile{}, err
       } else {
-        if participateds, err := s.repo.GetParticipated(ctx, userId); err != nil {
+        //取得したプロフィールをuserIdをキーとするハッシュテーブルに落とし込む
+        engineerProfilesTable := make(map[int]roundary.Profile)
+        for _, engineerProfile := range engineerProfiles {
+          engineerProfilesTable[engineerProfile.ID] = engineerProfile
+        }
+        //#region 依頼参加者のプロフィール項目を埋める
+        for iRequested := 0; iRequested < nRequesteds; iRequested++ {
+          requested := &requesteds[iRequested]
+          nEngineers  := len(requested.Engineers)
+          for iEngineer := 0; iEngineer < nEngineers; iEngineer++ {
+            Engineer := &requested.Engineers[iEngineer]
+            //requesteds[iRequested].Engineers[iEngineer]
+            Engineer.Bio = engineerProfilesTable[Engineer.ID].Bio
+            Engineer.Sns = string(engineerProfilesTable[Engineer.ID].Sns[:])
+            Engineer.Icon = engineerProfilesTable[Engineer.ID].Icon
+          }
+        }
+        //#endregion
+        if requestedsText, err := json.Marshal(requesteds); err != nil {
           return profile{}, err
         } else {
-          if participatedsText, err := json.Marshal(participateds); err != nil {
+          if submitteds, err := s.repo.GetSubmitted(ctx, userId); err != nil {
             return profile{}, err
           } else {
-            //#region as userProfileWithRecords
-            userProfile.Submission = participatedsText
-            userProfile.Request = requestedsText
-            //#endregion
-            return userProfile, nil
+            if submittedsText, err := json.Marshal(submitteds); err != nil {
+              return profile{}, err
+            } else {
+              //#region as userProfileWithRecords
+              userProfile.Submission = submittedsText
+              userProfile.Request = requestedsText
+              //#endregion
+              return userProfile, nil
+            }
           }
         }
       }

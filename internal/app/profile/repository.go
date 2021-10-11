@@ -35,8 +35,10 @@ type Repository interface {
   Update(ctx context.Context, userProfile *typefile.Profile) error
   Delete(ctx context.Context, userId int) error
 
+  GetProfiles(ctx context.Context, userIds []int) ([]roundary.Profile, error)
   GetRequested(ctx context.Context, userId int) ([]roundary.Request, error)
   GetParticipated(ctx context.Context, userId int) ([]roundary.Request, error)
+  GetSubmitted(ctx context.Context, userId int) ([]roundary.Submission, error)
 }
 
 
@@ -70,6 +72,9 @@ func (r repository) Get(ctx context.Context, userId int) (profile, error) {
 }
 
 
+
+
+
 func (r repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
   result := r.db.WithContext(ctx).Create(userProfile)
   return result.Error
@@ -92,13 +97,27 @@ func (r repository) Delete(ctx context.Context, userId int) error {
   return result.Error
 }
 
+
+func (r repository) GetProfiles(ctx context.Context, userIds []int) ([]roundary.Profile, error) {
+  var userProfiles []roundary.Profile
+
+  result := r.db.WithContext(ctx).
+    Find(&userProfiles, "id IN ?", userIds)
+
+  if result.Error != nil {
+    return make([]roundary.Profile, 1), result.Error
+  } else {
+    return userProfiles, nil
+  }
+}
+
 //#region 実績を取得
 func (r repository) GetRequested(ctx context.Context, userId int) ([]roundary.Request, error) {
   var requesteds []roundary.Request
   result := r.db.WithContext(ctx).
     Preload("Engineers").
-    Preload("Client").
     Preload("Winner").
+    Preload("Submission").
     Find(&requesteds, "client_id = ?", userId)
   return requesteds, result.Error
 }
@@ -121,6 +140,15 @@ func (r repository) GetParticipated(ctx context.Context, userId int) ([]roundary
 
   return participateds, result.Error
 }
+
+
+func (r repository) GetSubmitted(ctx context.Context, userId int) ([]roundary.Submission, error) {
+  var submissions []roundary.Submission
+  result := r.db.WithContext(ctx).
+    Find(&submissions, "submissions.engineer_id = ?", userId)
+  return submissions, result.Error
+}
+
 //#endregion
 
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
