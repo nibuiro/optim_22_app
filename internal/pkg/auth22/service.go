@@ -153,7 +153,7 @@ func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, r
     if isInvalidCredential := 0 == userId; isInvalidCredential {
       return false, nil
     } else {
-      writer["userID"] = userId
+      writer["userid"] = userId
       return true, nil
     }
   }
