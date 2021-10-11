@@ -1,7 +1,7 @@
 <!-- ディスカッションページ -->
 
 <template>
-  <div class="container">
+  <div class="content">
     <section class="mb-3">
       <div v-for="comment in comments" :key="comment.comment_id" class="card">
         <div class="card-content">
