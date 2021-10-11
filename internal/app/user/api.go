@@ -59,12 +59,30 @@ func (rc resource) post() gin.HandlerFunc {
         return
       } else {
         rc.logger.Debug(string(credentialJSON))
-        c.Writer = &utils.HttpBodyWriter{
-          Body: bytes.NewBuffer(credentialJSON), 
-          ResponseWriter: c.Writer,
+        //c.Redirect(http.StatusTemporaryRedirect, "/auth")
+        
+        //トークン取得
+        resp, err := http.Post("http://localhost:8080/auth", "application/json", bytes.NewBuffer(credentialJSON))
+        defer resp.Body.Close()
+        if err != nil {
+          rc.logger.Debug(err)
+          c.Status(http.StatusInternalServerError)
+          return
+        } else {
+          //rc.logger.Debug(resp.Header.Get("Authorization"))
+          //rc.logger.Debug(resp.Header.Get("Refresh-Token"))
+          c.Header("Authorization", resp.Header.Get("Authorization"))
+          c.Header("Refresh-Token", resp.Header.Get("Refresh-Token"))
+          //CORSによる設定のため不要？
+          c.Header("Access-Control-Allow-Origin", "*")
+          c.Header("Access-Control-Allow-Methods", "GET,POST,PUT,HEAD,OPTION")
+          c.Header("Access-Control-Request-Headers", "Authorization,Refresh-Token")
+          c.Header("Access-Control-Expose-Headers", "Authorization,Refresh-Token")
+          //
+          c.Status(http.StatusOK)
+          //body, err := io.ReadAll(resp.Body) //不要
+          return
         }
-        c.Redirect(http.StatusTemporaryRedirect, "/auth")
-        return
       }
     }
   }

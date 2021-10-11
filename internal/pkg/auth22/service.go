@@ -36,7 +36,7 @@ type Credential struct {
 func (m Credential) Validate() error {
   return validation.ValidateStruct(&m,
     //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
-    validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.]@[a-zA-Z]+((\\.[a-zA-Z0-9\\-])+[a-zA-Z0-9]+)+"))),
+    validation.Field(&m.Email, validation.Required, validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.\\-]+@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+"))),
     //is SHA256
     validation.Field(&m.Password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
   )
@@ -153,7 +153,7 @@ func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, r
     if isInvalidCredential := 0 == userId; isInvalidCredential {
       return false, nil
     } else {
-      writer["userID"] = userId
+      writer["userid"] = userId
       return true, nil
     }
   }
