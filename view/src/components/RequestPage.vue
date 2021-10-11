@@ -142,12 +142,13 @@
 </template>
 
 <script>
-import * as api from "API";
 import RequestEditor from "@/components/RequestEditor";
 import DiscussionPage from "@/components/DiscussionPage";
 import WinnerChooser from "@/components/WinnerChooser.vue";
 import RequestApplier from "@/components/RequestApplier.vue";
 import SubmissionSubmitter from "@/components/SubmissionSubmitter.vue";
+import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   data() {
@@ -167,21 +168,9 @@ export default {
         content: "",
         submissions: [],
         winner: null
-      }
+      },
+      iconStyle
     };
-  },
-  methods: {
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%"
-      };
-    }
   },
   components: {
     "request-editor": RequestEditor,

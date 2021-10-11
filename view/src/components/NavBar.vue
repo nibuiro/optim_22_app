@@ -43,9 +43,10 @@
 </template>
 
 <script>
-import * as api from "API";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
+import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   name: "NavBar",
@@ -56,7 +57,8 @@ export default {
         user_id: null,
         username: "",
         icon: ""
-      }
+      },
+      iconStyle
     };
   },
   watch: {
@@ -67,19 +69,6 @@ export default {
         this.user.user_id = localStorage.getItem("user_id");
         this.user = await api.getProfile(this.user.user_id);
       }
-    }
-  },
-  methods: {
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%"
-      };
     }
   },
   components: {

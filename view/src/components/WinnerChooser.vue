@@ -36,6 +36,7 @@
 
 <script>
 import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 const ModalForm = {
   props: ["requestProps"],
@@ -44,11 +45,12 @@ const ModalForm = {
       request: {
         request_id: this.requestProps.request_id,
         client_id: this.requestProps.client.user_id,
-        engineer_id: "",
+        engineer_id: ""
       },
       submissions: this.requestProps.submissions,
       invalid: false,
       errorMessage: "",
+      iconStyle
     };
   },
   methods: {
@@ -62,18 +64,7 @@ const ModalForm = {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    },
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%",
-      };
-    },
+    }
   },
   /* html */
   template: `
@@ -109,14 +100,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `,
+  `
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false,
+      isMessageModalActive: false
     };
   },
   watch: {
@@ -126,11 +117,11 @@ export default {
         const request_id = this.$route.params.request_id;
         this.$router.go({ name: "RequestPage", params: { request_id } });
       }
-    },
+    }
   },
   props: ["request"],
   components: {
-    ModalForm,
-  },
+    ModalForm
+  }
 };
 </script>

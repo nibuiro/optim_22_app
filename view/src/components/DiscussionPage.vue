@@ -118,6 +118,7 @@
 
 <script>
 import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   data() {
@@ -136,7 +137,8 @@ export default {
       },
       invalid: false,
       errorMessage: "",
-      isMessageModalActive: false
+      isMessageModalActive: false,
+      iconStyle
     };
   },
   watch: {
@@ -174,17 +176,6 @@ export default {
         this.errorMessage = "タイトルとコメントを入力してください";
         this.invalid = true;
       }
-    },
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%"
-      };
     }
   },
   async created() {

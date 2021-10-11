@@ -262,6 +262,7 @@
 <script>
 import ProfileEditor from "@/components/ProfileEditor";
 import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   data() {
@@ -276,7 +277,8 @@ export default {
         requests: [],
         submissions: []
       },
-      myself: false
+      myself: false,
+      iconStyle
     };
   },
   watch: {
@@ -301,17 +303,6 @@ export default {
       this.$cookies.remove("refresh_token");
       // ホームページに移動する
       this.$router.push("/");
-    },
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%"
-      };
     }
   },
   components: {

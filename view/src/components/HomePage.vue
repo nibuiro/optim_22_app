@@ -32,9 +32,7 @@
         :current-page.sync="currentPage"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
-        :row-class="
-          (row) => onlyAccepting && row.finish === true && 'is-hidden'
-        "
+        :row-class="row => onlyAccepting && row.finish === true && 'is-hidden'"
         :default-sort="defaultSort"
       >
         <b-table-column
@@ -76,7 +74,7 @@
           <router-link
             :to="{
               name: 'MyPage',
-              params: { user_id: props.row.client.user_id },
+              params: { user_id: props.row.client.user_id }
             }"
           >
             <b-tooltip :label="props.row.client.username">
@@ -95,7 +93,7 @@
           <router-link
             :to="{
               name: 'RequestPage',
-              params: { request_id: props.row.request_id },
+              params: { request_id: props.row.request_id }
             }"
           >
             {{ props.row.requestname }}
@@ -122,7 +120,7 @@
             :key="engineer.user_id"
             :to="{
               name: 'MyPage',
-              params: { user_id: engineer.user_id },
+              params: { user_id: engineer.user_id }
             }"
           >
             <b-tooltip :label="engineer.username">
@@ -138,6 +136,7 @@
 <script>
 import RequestForm from "@/components/RequestForm";
 import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   data() {
@@ -152,30 +151,18 @@ export default {
       currentPage: 1,
       perPage: 10,
       loading: false,
+      iconStyle
     };
   },
-  methods: {
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%",
-      };
-    },
-  },
   components: {
-    "request-form": RequestForm,
+    "request-form": RequestForm
   },
   async created() {
     this.loading = true;
     // リクエスト一覧の取得
     this.requests = await api.getRequests();
     this.loading = false;
-  },
+  }
 };
 </script>
 

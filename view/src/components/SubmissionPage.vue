@@ -99,8 +99,9 @@
 </template>
 
 <script>
-import * as api from "API";
 import SubmissionEditor from "@/components/SubmissionEditor";
+import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 export default {
   data() {
@@ -129,21 +130,9 @@ export default {
         content: "",
         submissions: [],
         winner: null
-      }
+      },
+      iconStyle
     };
-  },
-  methods: {
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%"
-      };
-    }
   },
   components: {
     "submission-editor": SubmissionEditor

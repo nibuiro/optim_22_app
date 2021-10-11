@@ -36,12 +36,14 @@
 
 <script>
 import * as api from "API";
+import { iconStyle } from "iconStyle";
 
 const ModalForm = {
   props: ["requestProps"],
   data() {
     return {
       request: this.requestProps,
+      iconStyle
     };
   },
   methods: {
@@ -50,18 +52,7 @@ const ModalForm = {
       console.log(this.request);
       const access_token = localStorage.getItem("access_token");
       api.joinRequest(this, this.request, access_token);
-    },
-    iconStyle(size, image) {
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundImage: `url("${image}")`,
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        borderRadius: "100%",
-      };
-    },
+    }
   },
   /* html */
   template: `
@@ -80,7 +71,7 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `,
+  `
 };
 
 export default {
@@ -90,8 +81,8 @@ export default {
       isMessageModalActive: false,
       formProps: {
         request_id: this.$route.params.request_id,
-        client_id: this.client_id,
-      },
+        client_id: this.client_id
+      }
     };
   },
   watch: {
@@ -101,11 +92,11 @@ export default {
         const request_id = this.formProps.request_id;
         this.$router.go({ name: "RequestPage", params: { request_id } });
       }
-    },
+    }
   },
   props: ["client_id"],
   components: {
-    ModalForm,
-  },
+    ModalForm
+  }
 };
 </script>
