@@ -65,7 +65,7 @@ async function login(component, user) {
     // パスワードのハッシュ化
     const hashHex = await hashPassword(user.password);
     // ログイン情報をサーバに送信し，レスポンスを得る
-    const response = await fetch(`${process.env.API}/auth`, {
+    const response = await fetch(`${process.env.API.slice(0, -4)}/auth`, {
         method: "POST",
         body: JSON.stringify({
             email: user.email,
@@ -111,7 +111,7 @@ async function login(component, user) {
 // トークンの更新
 async function refreshToken(component, access_token, refresh_token) {
     // トークン情報をサーバに送信し，レスポンスを得る
-    const response = await fetch(`${process.env.API}/refresh_token`, {
+    const response = await fetch(`${process.env.API.slice(0, -4)}/auth/refresh_token`, {
         method: "GET",
         body: JSON.stringify({
             "Authorization": access_token,
