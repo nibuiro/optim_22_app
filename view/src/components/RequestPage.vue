@@ -110,6 +110,23 @@
                   {{ submission.engineer.username }}さんの提出
                 </router-link>
               </li>
+              <li>
+                <div v-if="finish" class="is-flex is-align-items-center">
+                  勝者　　：
+                  <router-link
+                    class="is-flex is-align-items-center"
+                    :to="{
+                      name: 'MyPage',
+                      params: { user_id: request.winner.user_id }
+                    }"
+                  >
+                    <b-tooltip :label="request.winner.username">
+                      <div :style="iconStyle(32, request.winner.icon)" />
+                    </b-tooltip>
+                    {{ request.winner.username }}
+                  </router-link>
+                </div>
+              </li>
             </ul>
           </div>
           <section class="is-flex is-justify-content-center">
