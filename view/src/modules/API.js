@@ -462,8 +462,11 @@ async function editSubmission(component, submission, access_token) {
 // ディスカッション取得API
 async function getComments(request_id) {
     const response = await fetch(`${process.env.API}/discussion/${request_id}`);
-    const comments = (await response.json()).comments;
+    let comments = (await response.json()).comments;
     if (process.env.PATCH) {
+        if (comments === null) {
+            comments = [];
+        }
         comments.forEach(comment => {
             if (comment.reply_id === 0) {
                 comment.reply_id = null;
