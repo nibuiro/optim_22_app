@@ -15,7 +15,10 @@ var Db *gorm.DB
 
 func InitDB() {
 	var err error
-	// maikl"root:rootpass@tcp(mysql_container:3306)/optim_dev?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
+	// https://github.com/go-sql-driver/mysql#dsn-data-source-name に詳細が記載されている。
+	// DSN(データソース名)の作成。
+	// 開発用のデータベース名はoptim_dev,テスト用のデータベース名はotpim_testである。
+	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -26,6 +29,7 @@ func InitDB() {
 	// 接続したdbをパッケージ変数Dbに代入している。
 	Db = db
 }
+
 
 // Insert
 // db.Create(&request)
