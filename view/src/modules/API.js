@@ -252,12 +252,16 @@ async function editProfile(component, user, access_token) {
 // リクエスト一覧取得API
 async function getRequests() {
     const response = await fetch(`${process.env.API}/requests`);
-    const requests = await response.json();
+    let requests = await response.json();
+    if (process.env.PATCH) {
+        requests = requests.requests;
+        delete requests.requests;
+    }
     if (process.env.NODE_ENV === "development") {
         console.log('GET /api/requests\tAllRequests');
-        console.log(requests.requests);
+        console.log(requests);
     }
-    return requests.requests;
+    return requests;
 }
 
 
@@ -301,6 +305,12 @@ async function getRequest(request_id) {
     if (process.env.PATCH) {
         request = request.request;
         delete request.request;
+        if (request.engineers === null) {
+            request.engineers = [];
+        }
+        if (request.submissions === null) {
+            request.submissions = [];
+        }
     }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/request/${request_id}\tShowRequest`);
