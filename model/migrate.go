@@ -1,11 +1,5 @@
-// https://gorm.io/docs/connecting_to_the_database.html#Clickhouse に詳細が記載されている。
-
-package model
-
-import (
-	"os"
+// maikl"os"
 	"fmt"
-	"strings"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"typefile"
@@ -16,10 +10,7 @@ var Db *gorm.DB
 
 func InitDB() {
 	var err error
-	// https://github.com/go-sql-driver/mysql#dsn-data-source-name に詳細が記載されている。
-	// DSN(データソース名)の作成。
-	// 開発用のデータベース名はoptim_dev,テスト用のデータベース名はotpim_testである。
-	dsn := "root:rootpass@tcp(mysql_container:3306)/optim_dev?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
+	// maikl"root:rootpass@tcp(mysql_container:3306)/optim_dev?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -50,38 +41,38 @@ func CreateTestData() {
 	fmt.Println(err)
 
 	var users = []typefile.User{
-		{Name: "user1", Email: "test@test.test", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
-		{Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
-		{Name: "user3", Email: "test.test@test.com", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
-		{Name: "user4", Email: "test@test.test", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"},
-		{Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}
+		{Name: "user1", Email: "test@test.test", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
+		{Name: "user2", Email: "test@inc.test-ac.jp", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
+		{Name: "user3", Email: "test.test@test.com", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
+		{Name: "user4", Email: "test@test.test", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
+		{Name: "user5", Email: "test@inc.test-ac.jp", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"}}
 	Db.Create(&users)
 
 	var profile = []typefile.Profile{
-		{ID: 1,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
-		{ID: 2,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
-		{ID: 3,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
-		{ID: 4,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
-		{ID: 5,Bio: "ほげほげ", Sns: []byte(`{"github": "https://github.com/pole", "twitter": "https://twitter.com/pole", "facebook": "https://ja.facebook.com/pole"}`), Icon: string(icon)},
+		{ID: 1,Bio: "C#", Sns: []byte(`{"github": "pole", "twitter": "pole", "facebook": "pole"}`), Icon: string(icon)},
+		{ID: 2,Bio: "C++", Sns: []byte(`{"github": "maikl", "twitter": "maikl", "facebook": "maikl"}`), Icon: string(icon)},
+		{ID: 3,Bio: "C", Sns: []byte(`{"github": "suzuki", "twitter": "suzuki", "facebook": "suzuki"}`), Icon: string(icon)},
+		{ID: 4,Bio: "haskell", Sns: []byte(`{"github": "siraisi", "twitter": "siraisi", "facebook": "siraisi"}`), Icon: string(icon)},
+		{ID: 5,Bio: "golang", Sns: []byte(`{"github": "tom", "twitter": "tom", "facebook": "tom"}`), Icon: string(icon)},
 	}
 	Db.Create(&profile)
 
 	// userが作成された直後にengineerも作成する。
 	var engineers = []typefile.Engineer{
-		{User: typefile.User{ID: 1,Name: "user1", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 3,Name: "user3", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 4,Name: "user4", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}}
+		{User: typefile.User{ID: 1,Name: "user1", Email: "test@test.test"}},
+		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp"}},
+		{User: typefile.User{ID: 3,Name: "user3", Email: "test.test@test.com"}},
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test@test.test"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp"}}}
 	Db.Create(&engineers)
 
 	//userが作成された直後にclientも作成する。
 	var clients = []typefile.Client{
-		{User: typefile.User{ID: 1,Name: "user1", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 3,Name: "user3", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 4,Name: "user4", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}},
-		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp", Password: "7f83b1657ff1fc53b92dc18148a1d6fffffd4b1fa3d677284addd200126d9069"}}}
+		{User: typefile.User{ID: 1,Name: "user1", Email: "test@test.test"}},
+		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp"}},
+		{User: typefile.User{ID: 3,Name: "user3", Email: "test.test@test.com"}},
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test@test.test"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp"}}}
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
@@ -235,11 +226,11 @@ func CreateTestData() {
 	Db.Model(&engineer5).Association("Requests").Append(&engineer5_requests_association)
 
 	var comments = []typefile.Comment{
-		{UserID: 1,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 0,},
-		{UserID: 2,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 1,},
-		{UserID: 1,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 2,},
-		{UserID: 3,RequestID: 1,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 3,},
-		{UserID: 1,RequestID: 2,Title: strings.Repeat("あ", 210),Body: strings.Repeat("あ", 400),ReplyID: 0,},
+		{UserID: 1,RequestID: 1,Title: "サンプルコメントタイトル1",Body: "サンプルコメント本文1",ReplyID: 0,},
+		{UserID: 2,RequestID: 1,Title: "サンプルコメントタイトル2",Body: "サンプルコメント本文2",ReplyID: 1,},
+		{UserID: 1,RequestID: 1,Title: "サンプルコメントタイトル3",Body: "サンプルコメント本文3",ReplyID: 2,},
+		{UserID: 3,RequestID: 1,Title: "サンプルコメントタイトル4",Body: "サンプルコメント本文4",ReplyID: 3,},
+		{UserID: 1,RequestID: 2,Title: "サンプルコメントタイトル5",Body: "サンプルコメント本文5",ReplyID: 0,},
 	}
 	Db.Create(&comments)
 }
