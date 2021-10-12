@@ -30,10 +30,12 @@ type RequestJson struct{
 	ID                int                 `json:"request_id"`
 	RequestName       string              `json:"requestname"`
 	CreatedAt         time.Time           `json:"createdat"`
+	Finish            bool                `json:"finish"`
 	ClientProfile     UserProfileJson     `json:"client"`
 	EngineersProfile  []UserProfileJson   `json:"engineers"`
 	Content           string              `json:"content"`
 	Submissions       []SubmissionJson    `json:"submissions"`
+	WinnerProfile     UserProfileJson     `json:"winner"`
 }
 
 type RequestsJson struct{
@@ -47,9 +49,9 @@ func ShowHomepage(c *gin.Context) {
 	// RequestJson構造体データを格納するためのインスタンスを生成
 	requests_json := RequestsJson{}
 
-	//　受付中のリクエストを格納する。(Winnerを持たないリクエストを抽出する)
-	model.Db.Find(&requests,"finish = ?",0)
-	// SELECT * FROM `requests` WHERE finish = ?
+	//　リクエストデータを全て抽出する。
+	model.Db.Find(&requests)
+	// SELECT * FROM `requests`;
 
 	for _, request := range requests{
 		// RequestJson構造体データを格納するためのインスタンスを生成
@@ -62,6 +64,8 @@ func ShowHomepage(c *gin.Context) {
 		submissions := []typefile.Submission{}
 		// Engineer構造体を複数格納するためのインスタンスを生成
 		engineers := []typefile.Engineer{}
+		// Winner構造体を格納するためのインスタンスを生成
+		winner := typefile.Winner{}
 
 		//　特定リクエストのidを持つsubmissionを格納する。
 		model.Db.Find(&submissions,"request_id = ?",request.ID)
@@ -74,11 +78,15 @@ func ShowHomepage(c *gin.Context) {
 		// SELECT * FROM `profiles` WHERE id = ?
 		// Associationによって、engineerデータを取り出す。
 		model.Db.Model(&request).Association("Engineers").Find(&engineers)
+		// 特定のrequest_idを持つwinnerを抽出する。
+		model.Db.Find(&winner,"request_id = ?",request.ID)
+		// SELECT * FROM `winners` WHERE request_id = ?
 
 		// requestが持つデータをrequest_jsonのそれぞれの対応する属性に格納する。
 		request_json.ID = request.ID
 		request_json.RequestName = request.RequestName
 		request_json.CreatedAt = request.CreatedAt
+		request_json.Finish = request.Finish
 		request_json.Content = request.Content
 		request_json.ClientProfile.UserID = request.ClientID
 		request_json.ClientProfile.UserName = client.User.Name
@@ -136,6 +144,28 @@ func ShowHomepage(c *gin.Context) {
 
 			request_json.Submissions = append(request_json.Submissions,submission_json)
 		}
+
+		// 勝者が存在した場合、winnerに対応するデータを格納する。
+		if winner.EngineerID != 0{
+			// winnerのEngineer構造体を格納するためのインスタンスを生成
+			winner_engineer := typefile.Engineer{}
+			// WinnerのProfile構造体を格納するためのインスタンスを生成
+			winner_profile := typefile.Profile{}
+			
+			// winnerに該当する特定のidを持つEngineerを抽出する。
+			model.Db.Find(&winner_engineer,"id = ?",winner.EngineerID)
+			// SELECT * FROM `engineers` WHERE id = ?
+			// 特定のidを持つprofileを抽出する。
+			model.Db.Find(&winner_profile,"id = ?",winner.EngineerID)
+			// SELECT * FROM `profiles` WHERE id = ?
+			// 抽出したデータをrequest_jsonのそれぞれの対応する属性に格納する。
+			request_json.WinnerProfile.UserID = winner.EngineerID
+			request_json.WinnerProfile.UserName = winner_engineer.User.Name
+			request_json.WinnerProfile.Icon = winner_profile.Icon
+			request_json.WinnerProfile.Bio = winner_profile.Bio
+			request_json.WinnerProfile.Sns = string(winner_profile.Sns)
+		}
+
 		requests_json.Requests = append(requests_json.Requests,request_json)
 	}
 
