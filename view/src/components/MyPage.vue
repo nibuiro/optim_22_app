@@ -1,7 +1,7 @@
 <!-- マイページ -->
 
 <template>
-  <div class="container" :profile="profile">
+  <div class="container">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute"
