@@ -167,11 +167,7 @@ export default {
       // タイトルとコメントが入力されていれば
       if (this.comment.title.length * this.comment.text.length > 0) {
         const access_token = localStorage.getItem("access_token");
-        this.isMessageModalActive = await api.addComment(
-          this,
-          this.comment,
-          access_token
-        );
+        await api.addComment(this, this.comment, access_token);
       } else {
         this.errorMessage = "タイトルとコメントを入力してください";
         this.invalid = true;

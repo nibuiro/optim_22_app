@@ -110,8 +110,8 @@
                   {{ submission.engineer.username }}さんの提出
                 </router-link>
               </li>
-              <li class="pt-3">
-                <div v-if="finish" class="is-flex is-align-items-center">
+              <li v-if="finish" class="pt-3">
+                <div class="is-flex is-align-items-center">
                   勝者　　：
                   <router-link
                     class="is-flex is-align-items-center"

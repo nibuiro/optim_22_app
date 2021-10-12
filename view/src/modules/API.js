@@ -314,6 +314,7 @@ async function getRequest(request_id) {
     }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/request/${request_id}\tShowRequest`);
+        console.log(request);
     }
     return request;
 }
@@ -461,17 +462,28 @@ async function editSubmission(component, submission, access_token) {
 // ディスカッション取得API
 async function getComments(request_id) {
     const response = await fetch(`${process.env.API}/discussion/${request_id}`);
-    const comments = await response.json();
+    const comments = (await response.json()).comments;
+    if (process.env.PATCH) {
+        comments.forEach(comment => {
+            if (comment.reply_id === 0) {
+                comment.reply_id = null;
+            }
+        });
+    }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/discussion/${request_id}\tShowDiscussion`);
-        console.log(comments.comments);
+        console.log(comments);
     }
-    return comments.comments;
+    return comments;
 }
 
 
 // コメント投稿API
 async function addComment(component, comment, access_token) {
+    if (process.env.PATCH) {
+        comment.request_id = Number(comment.request_id);
+        comment.user_id = Number(comment.user_id);
+    }
     const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
         method: "POST",
         headers: {
@@ -480,12 +492,12 @@ async function addComment(component, comment, access_token) {
         body: JSON.stringify(comment)
     });
     // 登録成功時
-    if (response.status === 200) {
+    if (response.status === 201) {
         if (process.env.NODE_ENV === "development") {
             console.log(`POST /api/discussion/${comment.comment_id}\tNewComment`);
         }
-        // ユーザ登録成功メッセージを表示する
-        return true;
+        // コメント投稿成功メッセージを表示する
+        component.isMessageModalActive = true;
         //アクセストークンの有効期限が切れている場合
     } else if (response.status === 401) {
         const refresh_token = component.$cookies.get("refresh_token");
