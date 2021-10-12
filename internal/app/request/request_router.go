@@ -31,10 +31,12 @@ type RequestJson struct{
 	ID                int                   `json:"request_id"`
 	RequestName       string                `json:"requestname"`
 	CreatedAt         time.Time             `json:"createdat"`
+	Finish            bool                  `json:"finish"`
 	ClientProfile     UserProfileJson       `json:"client"`
 	EngineersProfile  []UserProfileJson     `json:"engineers"`
 	Content           string                `json:"content"`
 	Submissions       []SubmissionJson      `json:"submissions"`
+	WinnerProfile     UserProfileJson       `json:"winner"`
 }
 
 // 特定リクエストの詳細を表示する
@@ -81,6 +83,7 @@ func ShowRequest(c *gin.Context) {
 	request_json.ID = request.ID
 	request_json.RequestName = request.RequestName
 	request_json.CreatedAt = request.CreatedAt
+	request_json.Finish = request.Finish
 	request_json.ClientProfile.UserID = request.ClientID
 	request_json.ClientProfile.UserName = client.User.Name
 	request_json.ClientProfile.Icon = client_profile.Icon
@@ -137,6 +140,28 @@ func ShowRequest(c *gin.Context) {
 		submission_json.EngineerProfile.Sns = string(engineer_profile.Sns)
 		submission_json.Content = submission.Content
 		request_json.Submissions = append(request_json.Submissions,submission_json)
+	}
+
+	// 勝者が存在した場合、winnerに対応するデータを格納する。
+	if winner.EngineerID != 0{
+		// winnerのEngineer構造体を格納するためのインスタンスを生成
+		winner_engineer := typefile.Engineer{}
+		// WinnerのProfile構造体を格納するためのインスタンスを生成
+		winner_profile := typefile.Profile{}
+		
+		// winnerに該当する特定のidを持つEngineerを抽出する。
+		model.Db.Find(&winner_engineer,"id = ?",winner.EngineerID)
+		// SELECT * FROM `engineers` WHERE id = ?
+		// 特定のidを持つprofileを抽出する。
+		model.Db.Find(&winner_profile,"id = ?",winner.EngineerID)
+		// SELECT * FROM `profiles` WHERE id = ?
+		
+		// 抽出したデータをrequest_jsonのそれぞれの対応する属性に格納する。
+		request_json.WinnerProfile.UserID = winner.EngineerID
+		request_json.WinnerProfile.UserName = winner_engineer.User.Name
+		request_json.WinnerProfile.Icon = winner_profile.Icon
+		request_json.WinnerProfile.Bio = winner_profile.Bio
+		request_json.WinnerProfile.Sns = string(winner_profile.Sns)
 	}
 
 	if request.ID == 0{
