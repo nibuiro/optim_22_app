@@ -24,7 +24,7 @@
       </b-tooltip>
       <div
         class="hero-body is-flex pt-0 pb-5"
-        :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
+        :style="{ 'margin-bottom': !myself || finish ? '20px' : 0 }"
       >
         <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ request.client.username }}さんの依頼
