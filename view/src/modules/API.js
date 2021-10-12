@@ -62,13 +62,15 @@ async function register(component, user) {
 
 // ログインAPI
 async function login(component, user) {
-    console.log(user);
     // パスワードのハッシュ化
     const hashHex = await hashPassword(user.password);
     // ログイン情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/auth`, {
         method: "POST",
-        body: JSON.stringify(user)
+        body: JSON.stringify({
+            email: user.email,
+            password: hashHex
+        })
     });
     // ログイン成功時
     if (response.status === 200) {
