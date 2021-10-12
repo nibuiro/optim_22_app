@@ -230,7 +230,7 @@ async function editProfile(component, user, access_token) {
         body: JSON.stringify(profile)
     });
     // 登録成功時
-    if (response.status === 200) {
+    if (response.status === 201) {
         if (process.env.NODE_ENV === "development") {
             console.log(`PUT /api/user/${user.user_id}\tEditProfile`);
         }
