@@ -62,8 +62,8 @@ const ModalForm = {
     };
   },
   watch: {
-    user: {
-      handler() {
+    profile: {
+      handler(newVal, oldVal) {
         // 少なくともユーザ名、メールアドレス、パスワードが入力されていればアラートを消す
         if (this.isNeedsEntered()) {
           this.invalid = false;
@@ -82,8 +82,8 @@ const ModalForm = {
       const ICON_WIDTH = 500; // リサイズ後のアイコンの幅
       const ICON_HEIGHT = 500; // リサイズ後のアイコンの高さ
 
-      // jpg画像もしくはpng画像でなければ中止
-      if (file.type !== "image/jpg" && file.type !== "image/png") {
+      // png画像でなければ中止
+      if (file.type !== "image/png") {
         return;
       }
 
@@ -180,7 +180,7 @@ const ModalForm = {
               />
             </div>
           </b-field>
-          <b-field label="アイコン画像（.jpgまたは.png）">
+          <b-field label="アイコン画像（.png形式）">
             <p class="control">
               <div v-show="!!profile.icon" class="mr-3" :style="iconStyle(48, profile.icon)" />
               <div class="control has-icons-left">
@@ -189,7 +189,7 @@ const ModalForm = {
               </div>
             </p>
             <b-field class="file is-primary">
-              <b-upload class="file-label" v-model="file" accept=".jpg,.png">
+              <b-upload class="file-label" v-model="file" accept=".png">
                 <span class="file-cta">
                   <b-icon class="file-icon" icon="upload" />
                   <span class="file-label">アップロード</span>
