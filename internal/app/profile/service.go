@@ -3,7 +3,7 @@ package profile
 import (
 //  "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
-  "github.com/go-ozzo/ozzo-validation/v4/is"
+//  "github.com/go-ozzo/ozzo-validation/v4/is"
   "optim_22_app/pkg/log"
   "optim_22_app/typefile"
   "encoding/json"
@@ -50,7 +50,7 @@ func (m profile) Validate() error {
     //is BIO
     validation.Field(&m.Bio, validation.Length(0, 4000)),
     //is BASE64 encoded image, limited to 2MB ([MB] 2 * 1.33 ~ 2.67) 
-    validation.Field(&m.Icon, validation.Length(0, 2.67e+6), is.Base64),
+    validation.Field(&m.Icon, validation.Length(0, 2.67e+6)),
   )
 }
 
@@ -58,7 +58,7 @@ func (m profile) Validate() error {
 type Service interface {
   Get(ctx context.Context, req string) (profile, error)
   Post(ctx context.Context, req profile) error
-  Patch(ctx context.Context, req profile) error
+  Put(ctx context.Context, req profile) error
   Delete(ctx context.Context, req string) error
 }
 
@@ -146,7 +146,7 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 }
 
 
-func (s service) Post(ctx context.Context, req profile) error {
+func (s service) Put(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   sns := sns{}
   json.Unmarshal(req.Sns, &sns)
@@ -162,7 +162,7 @@ func (s service) Post(ctx context.Context, req profile) error {
     Icon:    req.Icon,
   }
   //INSERT
-  if err := s.repo.Create(ctx, &insertValues); err != nil {
+  if err := s.repo.Update(ctx, &insertValues); err != nil {
     return err
   } else {
     return nil
@@ -170,7 +170,7 @@ func (s service) Post(ctx context.Context, req profile) error {
 }
 
 
-func (s service) Patch(ctx context.Context, req profile) error {
+func (s service) Post(ctx context.Context, req profile) error {
   //SNS登録情報を読み込み
   snsUrl := sns{}
   json.Unmarshal(req.Sns, &snsUrl)
