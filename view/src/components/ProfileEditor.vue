@@ -63,7 +63,7 @@ const ModalForm = {
   },
   watch: {
     profile: {
-      handler(newVal, oldVal) {
+      handler() {
         // 少なくともユーザ名、メールアドレス、パスワードが入力されていればアラートを消す
         if (this.isNeedsEntered()) {
           this.invalid = false;
@@ -141,7 +141,20 @@ const ModalForm = {
       // すべての情報が正しく入力されていれば
       if (this.isNeedsEntered() && this.isPasswordsCorrect()) {
         const access_token = localStorage.getItem("access_token");
-        api.editProfile(this, this.profile, access_token);
+        const user = {
+          user_id: this.profile.user_id,
+          username: this.profile.username,
+          email: this.profile.email,
+          password: this.password,
+          icon: this.profile.icon,
+          comment: this.profile.comment,
+          SNS: {
+            Github: this.profile.SNS.Github,
+            Twitter: this.profile.SNS.Twitter,
+            Facebook: this.profile.SNS.Facebook
+          }
+        };
+        api.editProfile(this, user, access_token);
       } else {
         this.invalid = true;
         if (!this.isNeedsEntered()) {

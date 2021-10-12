@@ -211,6 +211,16 @@ async function editProfile(component, user, access_token) {
     const hashHex = await hashPassword(user.password);
     const profile = user;
     profile.password = hashHex;
+    if (process.env.PATCH) {
+        profile.sns = profile.SNS;
+        delete profile.SNS;
+        profile.sns.github = profile.sns.Github;
+        delete profile.sns.Github;
+        profile.sns.twitter = profile.sns.Twitter;
+        delete profile.sns.Twitter;
+        profile.sns.facebook = profile.sns.Facebook;
+        delete profile.sns.Facebook;
+    }
     // プロフィール情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/user/${profile.user_id}`, {
         method: "PUT",
