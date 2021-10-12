@@ -1,4 +1,9 @@
-// maikl"os"
+// https://gorm.io/docs/connecting_to_the_database.html#Clickhouse に詳細が記載されている。
+
+package model
+
+import (
+	"os"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
