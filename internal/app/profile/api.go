@@ -23,9 +23,9 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   //取得
   r.GET("/api/user/:userID", rc.get())
   //登録
-  //r.POST("/api/user", rc.post())
+  r.POST("/api/user/:userID", rc.put())
   //修正
-  r.PUT("/api/user", rc.put())
+  r.PUT("/api/user/:userID", rc.put())
   //削除
   //r.DELETE("/api/profile", rc.delete())
 
@@ -93,7 +93,7 @@ func (rc resource) put() gin.HandlerFunc {
     }
     
     //プロフィールを編集
-    err := rc.service.Post(c.Request.Context(), input)
+    err := rc.service.Put(c.Request.Context(), input)
     if err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
