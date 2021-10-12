@@ -6,6 +6,9 @@ func GetRule() Rule {
     "GET": map[string]bool{
       "*": true,
     },
+    "PUT": map[string]bool{
+      "*": true,
+    },
     "POST": map[string]bool{
       "*": true,
       "/auth": true,

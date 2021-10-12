@@ -87,7 +87,8 @@ func (r repository) Update(ctx context.Context, userProfile *typefile.Profile) e
    * [MySQL ：： MySQL 5.6 リファレンスマニュアル ：： 13.2.5.3 INSERT ... ON DUPLICATE KEY UPDATE 構文]
    * (https://dev.mysql.com/doc/refman/5.6/ja/insert-on-duplicate.html)
    */
-  result := r.db.WithContext(ctx).Create(userProfile)
+  result := r.db.WithContext(ctx).Model(userProfile).
+  Updates(map[string]interface{}{"bio": userProfile.Bio, "sns": userProfile.Sns, "icon": userProfile.Icon})
   return result.Error
 }
 
