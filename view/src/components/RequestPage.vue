@@ -110,7 +110,7 @@
                   {{ submission.engineer.username }}さんの提出
                 </router-link>
               </li>
-              <li>
+              <li class="pt-3">
                 <div v-if="finish" class="is-flex is-align-items-center">
                   勝者　　：
                   <router-link
@@ -120,10 +120,18 @@
                       params: { user_id: request.winner.user_id }
                     }"
                   >
-                    <b-tooltip :label="request.winner.username">
+                    <b-tooltip
+                      :label="request.winner.username"
+                      style="position: relative;"
+                    >
+                      <b-icon
+                        icon="crown"
+                        style="position: absolute; top: -18px; left: 4px;"
+                      />
                       <div :style="iconStyle(32, request.winner.icon)" />
                     </b-tooltip>
                     {{ request.winner.username }}
+                    <b-icon icon="sparkles" />
                   </router-link>
                 </div>
               </li>
