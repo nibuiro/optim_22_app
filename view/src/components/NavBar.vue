@@ -9,7 +9,7 @@
     </template>
     <template #start>
       <b-navbar-item href="/"> Home </b-navbar-item>
-      <b-navbar-item href="/"> About </b-navbar-item>
+      <b-navbar-item href="/about"> About </b-navbar-item>
     </template>
 
     <template #end>
