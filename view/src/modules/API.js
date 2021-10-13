@@ -163,7 +163,6 @@ async function getProfile(user_id, access_token) {
     // 更新成功時
     if (response.status === 200) {
         const profile = await response.json();
-        console.log(profile);
         if (process.env.PATCH) {
             profile.SNS = profile.sns;
             delete profile.sns;
@@ -192,15 +191,13 @@ async function getProfile(user_id, access_token) {
         for (let i = 0; i < profile.submissions.length; i++) {
             const request = await getRequest(profile.submissions[i].request_id);
             profile.submissions[i].request = request;
-            if (i === profile.submissions.length - 1) {
-                return profile;
-            }
         }
         if (process.env.NODE_ENV === "development") {
             console.log(`GET /api/user/${user_id}\tUserProfile`);
             console.log(`Profile of ${profile.username}:`);
             console.log(profile);
         }
+        return profile;
     }
 }
 
