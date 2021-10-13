@@ -521,6 +521,12 @@ async function addComment(component, comment, access_token) {
 
 // 勝者決定API
 async function chooseWinner(component, request, access_token) {
+    let patchedRequest = request;
+    if (process.env.PATCH) {
+        patchedRequest.request_id = String(patchedRequest.request_id);
+        patchedRequest.client_id = String(patchedRequest.client_id);
+        patchedRequest.engineer_id = String(patchedRequest.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/winner/${request.request_id}`, {
         method: "POST",
