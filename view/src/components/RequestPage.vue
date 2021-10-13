@@ -146,7 +146,7 @@
             <!-- 依頼主以外で未参加あれば -->
             <request-applier
               v-else-if="!finish && !myself && loggedin && !joined"
-              :client_id="user_id"
+              :engineer_id="user_id"
             />
             <!-- 依頼主以外で参加済みであり未提出であれば -->
             <submission-submitter
@@ -178,6 +178,7 @@ import { iconStyle } from "iconStyle";
 export default {
   data() {
     return {
+      user_id: null,
       finish: false,
       loggedin: false,
       myself: false,

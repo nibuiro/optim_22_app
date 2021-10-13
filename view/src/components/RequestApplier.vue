@@ -81,7 +81,7 @@ export default {
       isMessageModalActive: false,
       formProps: {
         request_id: this.$route.params.request_id,
-        client_id: this.client_id
+        engineer_id: this.engineer_id
       }
     };
   },
@@ -94,7 +94,7 @@ export default {
       }
     }
   },
-  props: ["client_id"],
+  props: ["engineer_id"],
   components: {
     ModalForm
   }

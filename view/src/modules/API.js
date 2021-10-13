@@ -352,13 +352,18 @@ async function editRequest(component, request, access_token) {
 
 // リクエスト参加API
 async function joinRequest(component, request, access_token) {
+    let patchedRequest = request;
+    if (process.env.PATCH) {
+        patchedRequest.request_id = String(patchedRequest.request_id);
+        patchedRequest.engineer_id = String(patchedRequest.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/request/${request.request_id}`, {
         method: "POST",
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(request)
+        body: JSON.stringify(patchedRequest)
     });
     // 登録成功時
     if (response.status === 200) {
@@ -431,13 +436,18 @@ async function getsubmission(submission_id) {
 
 // サブミッション編集API
 async function editSubmission(component, submission, access_token) {
+    let patchedSubmission = submission;
+    if (process.env.PATCH) {
+        patchedSubmission.request_id = String(patchedSubmission.request_id);
+        patchedSubmission.engineer_id = String(patchedSubmission.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/submission/${submission.submission_id}`, {
         method: "PUT",
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(submission)
+        body: JSON.stringify(patchedSubmission)
     });
     // 登録成功時
     if (response.status === 200) {
