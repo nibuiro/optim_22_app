@@ -95,7 +95,7 @@
                   </router-link>
                 </div>
               </li>
-              <li>
+              <li v-if="request.submissions.length > 0">
                 提出物　：
                 <router-link
                   class="mr-3 is-inline-flex is-align-items-center"
