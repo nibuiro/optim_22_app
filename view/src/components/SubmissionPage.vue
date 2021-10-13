@@ -84,10 +84,10 @@
                 提出物　：
                 <a
                   class="is-inline-flex is-align-items-center"
-                  :href="submission.url"
+                  :href="submission.URL"
                 >
                   <b-icon icon="attachment" />
-                  {{ submission.url }}
+                  {{ submission.URL }}
                 </a>
               </li>
               <li>
@@ -124,7 +124,7 @@ export default {
           SNS: {}
         },
         content: "",
-        url: "",
+        URL: "",
         request: {
           request_id: null,
           finish: null,
