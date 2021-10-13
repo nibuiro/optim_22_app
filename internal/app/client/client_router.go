@@ -16,13 +16,13 @@ type ReceiveRequestJson struct{
 	ClientID       string              `json:"client_id"`
 	// 要件はエンジニアのプロフィールデータであるが、プロフィール機能は担当外のため、EngineerIDを代用する。
 	Content        string              `json:"content"`
-	Finish         bool                `gorm:"not null",json:"finish"`
+	Finish         bool                `json:"finish"`
 }
 
 // フロントからサーバーサイドにwinnerのjsonデータが送られた際に利用する構造体
 type ReceiveWinnerJson struct{
-	EngineerID     string              `gorm:"not null",json:"engineer_id"`
-	RequestID      string              `gorm:"unique;not null",json:"request_id"`
+	EngineerID     string              `json:"engineer_id"`
+	RequestID      string              `json:"request_id"`
 }
 
 // クライアントがリクエストを依頼する。(入力内容をDBに格納)
