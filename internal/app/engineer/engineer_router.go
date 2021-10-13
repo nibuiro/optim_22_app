@@ -10,16 +10,16 @@ import (
 
 type ReceiveSubmissionJson struct{
 	ID             int
-	RequestID      string         `gorm:"not null",json:"request_id"`
-	EngineerID     string         `gorm:"not null",json:"engineer_id"`
-	URL            string         `gorm:"not null",json:"url"`
-	Content        string         `gorm:"not null",json:"content"`
+	RequestID      string         `json:"request_id"`
+	EngineerID     string         `json:"engineer_id"`
+	URL            string         `json:"url"`
+	Content        string         `json:"content"`
 }
 
 // フロントからサーバーサイドにrequest参加に関するjsonデータが送られた際に利用する構造体
 type ReceiveRequestJoinJson struct{
-	EngineerID     string              `gorm:"not null",json:"engineer_id"`
-	RequestID      string              `gorm:"unique;not null",json:"request_id"`
+	EngineerID     string         `json:"engineer_id"`
+	RequestID      string         `json:"request_id"`
 }
 
 // JoinRequestで得たデータによって、エンジニアが特定リクエストに参加することをデータベースに登録する。
@@ -51,7 +51,7 @@ func CreateEngineerJoin(c *gin.Context) {
 	model.Db.Model(&request).Association("Engineers").Append(&engineer)
 
 	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
+    // c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
 }
 
 // NewSubmissionで得たデータによって、エンジニアが提出した提出物をデータベースに登録する。
