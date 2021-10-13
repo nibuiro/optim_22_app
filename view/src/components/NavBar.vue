@@ -4,10 +4,7 @@
   <b-navbar>
     <template #brand>
       <b-navbar-item tag="router-link" :to="{ path: '/' }">
-        <img
-          src="https://raw.githubusercontent.com/buefy/buefy/dev/static/img/buefy-logo.png"
-          alt="Lightweight UI components for Vue.js based on Bulma"
-        />
+        <img src="../assets/logo.png" />
       </b-navbar-item>
     </template>
     <template #start>
@@ -66,8 +63,9 @@ export default {
       this.refresh_token = this.$cookies.get("refresh_token");
       // ログイン済みであればプロフィールを取得
       if (this.refresh_token !== null) {
-        this.user.user_id = localStorage.getItem("user_id");
-        this.user = await api.getProfile(this.user.user_id);
+        const user_id = localStorage.getItem("user_id");
+        this.user.user_id = user_id;
+        this.user = await api.getProfile(user_id);
       }
     }
   },
@@ -79,8 +77,9 @@ export default {
     this.refresh_token = this.$cookies.get("refresh_token");
     // ログイン済みであればプロフィールを取得
     if (this.refresh_token !== null) {
-      this.user.user_id = localStorage.getItem("user_id");
-      this.user = await api.getProfile(this.user.user_id);
+      const user_id = localStorage.getItem("user_id");
+      this.user.user_id = user_id;
+      this.user = await api.getProfile(user_id);
     }
   }
 };
