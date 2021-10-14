@@ -44,10 +44,10 @@ const ModalForm = {
         request_id: this.$route.params.request_id,
         engineer_id: localStorage.getItem("user_id"),
         content: "",
-        url: "",
+        url: ""
       },
       invalid: false,
-      errorMessage: "",
+      errorMessage: ""
     };
   },
   watch: {
@@ -58,8 +58,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   methods: {
     // 提出物を編集する
@@ -72,14 +72,14 @@ const ModalForm = {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    },
+    }
   },
   /* html */
   template: `
     <form action="">
       <div class="modal-card" style="width: auto">
         <header class="modal-card-head">
-          <p class="modal-card-title has-text-centered">提出物の編集</p>
+          <p class="modal-card-title has-text-centered">提出物の提出</p>
           <button type="button" class="delete" @click="$emit('close')" />
         </header>
         <section class="modal-card-body">
@@ -109,19 +109,19 @@ const ModalForm = {
           </b-field>
         </section>
         <footer class="modal-card-foot is-flex is-justify-content-center">
-          <b-button label="編集する" type="is-primary" @click="submitSubmission" />
+          <b-button label="提出する" type="is-primary" @click="submitSubmission" />
           <b-button label="キャンセル" @click="$emit('close')" />
         </footer>
       </div>
     </form>
-  `,
+  `
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false,
+      isMessageModalActive: false
     };
   },
   watch: {
@@ -131,13 +131,13 @@ export default {
         const request_id = this.$route.params.request_id;
         this.$router.go({
           name: "RequestPage",
-          params: { request_id },
+          params: { request_id }
         });
       }
-    },
+    }
   },
   components: {
-    ModalForm,
-  },
+    ModalForm
+  }
 };
 </script>
