@@ -15,8 +15,8 @@ type User struct{
 
 type Profile struct{
 	ID             int            `gorm:"primaryKey";autoIncrement:false`
-	Bio            string        
-	Sns            []byte   
+	Bio            string
+	Sns            []byte
 	Icon           string
 }
 
