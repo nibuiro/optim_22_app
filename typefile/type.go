@@ -9,15 +9,15 @@ import (
 type User struct{
 	ID             int            `gorm:"primaryKey",json:"user_id"`
 	Name           string         `gorm:"not null",json:"username"`
-	Email          string         `gorm:"not null",json:"email"`  
+	Email          string         `gorm:"type:varchar(100);unique",json:"email"`  
 	Password       string         `gorm:"not null",json:"password"`     
 }
 
 type Profile struct{
-	ID             int            `gorm:"primaryKey";autoIncrement:false`
-	Bio            string
-	Sns            []byte
-	Icon           string
+	ID             int            `gorm:"primaryKey"`//;autoIncrement:false`
+	Bio            string         
+	Sns            []byte         
+	Icon           string         
 }
 
 type Client struct{
