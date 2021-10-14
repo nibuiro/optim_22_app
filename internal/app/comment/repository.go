@@ -35,13 +35,10 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
   var comments []comment
   result := r.db.WithContext(ctx).
     Model(&typefile.Comment{}).
-    Select("comments.id, comments.request_id, comments.user_id, users.name, comments.created_at, comments.title, comments.body, comments.reply_id, profiles.icon").
+    Select("users.name, comments.title, comments.body, profiles.icon, comments.id, comments.request_id, comments.user_id, comments.reply_id, comments.created_at").
     Joins("INNER JOIN users ON comments.user_id = users.id").
     Joins("INNER JOIN profiles ON profiles.id = users.id").
-    Where("comments.request_id = ?", requestID).
-    Scan(&comments)
-
-  //r.logger.Debug(comments)
+    Find(&comments, "comments.request_id = ?", requestID)
 
   return comments, result.Error
 }
