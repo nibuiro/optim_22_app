@@ -13,18 +13,17 @@ import (
 
 //#region コメント
 type comment struct {
+  Name       string    `json:"username"`
+  Title      string    `json:"title"`
+  Body       string    `json:"text"`
+  Icon       string    `json:"icon"`
   Id         int       `json:"comment_id"`
   RequestID  int       `json:"request_id"`
   UserID     int       `json:"user_id"`
-  UserName   string    `json:"username"`
-  Date       time.Time `json:"createdat"`
-  Title      string    `json:"title"`
-  Body       string    `json:"text"`
   ReplyID    int       `json:"reply_id"`
-  Attachment []byte    `json:"attachment"`
-  Icon       []byte    `json:"icon"`
+  CreatedAt  time.Time `json:"createdat"`
+  Attachment string    `json:"attachment"`
 }
-
 
 func (m comment) Validate() error {
   //is.Int  validation.Date などozzo-validationの評価関数が受け取るのは文字列のみ
