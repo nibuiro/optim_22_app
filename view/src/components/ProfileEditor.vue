@@ -226,12 +226,11 @@ const ModalForm = {
               <b-icon icon="comment" size="is-small"></b-icon>
               <b-input
                 v-model="profile.comment"
-                placeholder="email@example.com"
-                required
+                placeholder="よろしくお願いします！"
               />
             </div>
           </b-field>
-          <b-field label="SNSアカウント" grouped group-multiline>
+          <b-field label="SNSアカウントのID" grouped group-multiline>
             <p class="control">
               <b-field>
                 <p class="control">
