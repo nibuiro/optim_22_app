@@ -43,10 +43,10 @@ const ModalForm = {
         username: "",
         email: "",
         password: "",
-        confirm_password: "",
+        confirm_password: ""
       },
       invalid: false,
-      errorMessage: "",
+      errorMessage: ""
     };
   },
   watch: {
@@ -57,8 +57,8 @@ const ModalForm = {
           this.invalid = false;
         }
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   methods: {
     // 全項目入力されているかのチェック
@@ -101,7 +101,7 @@ const ModalForm = {
           this.errorMessage = "パスワードが違います";
         }
       }
-    },
+    }
   },
   /* html */
   template: `
@@ -182,17 +182,17 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `,
+  `
 };
 
 export default {
   components: {
-    ModalForm,
+    ModalForm
   },
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false,
+      isMessageModalActive: false
     };
   },
   watch: {
@@ -206,7 +206,7 @@ export default {
           this.$router.go({ name: "MyPage", params: { user_id } });
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>

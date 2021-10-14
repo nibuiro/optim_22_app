@@ -83,4 +83,4 @@ step13 カレントディレクトリで以下のコマンドを実行する。
 ```
 go run main.go
 ```
-step14 ブラウザでhttp://localhost:8081/にアクセスする。
+step14 ブラウザで[http://localhost:8081](http://localhost:8081)にアクセスする。
