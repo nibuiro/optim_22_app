@@ -13,6 +13,7 @@ import (
 // 外部でdb操作をするためのパッケージ変数
 var Db *gorm.DB
 
+// 川田が担当
 func InitDB() {
 	var err error
 	// https://github.com/go-sql-driver/mysql#dsn-data-source-name に詳細が記載されている。
@@ -42,7 +43,7 @@ func InitDB() {
 // db.Create(&requests)
 
 
-// テストを実行するために前もって必要なデータを作成する。
+// テストを実行するために前もって必要なデータを作成する。川田が担当
 func CreateTestData() {
 
 	icon, err := os.ReadFile("/go/src/optim_22_app/model/icon")
@@ -88,8 +89,8 @@ func CreateTestData() {
 		{ClientID: 1,RequestName: "request1 from clientID 1",Content: "request1 content",Finish: false},
 		{ClientID: 1,RequestName: "request2 from clientID 1",Content: "request2 content",Finish: false},
 		{ClientID: 2,RequestName: "request3 from clientID 2",Content: "request3 content",Finish: true},
-		{ClientID: 3,RequestName: "request4 from clientID 1",Content: "request4 content",Finish: false},
-		{ClientID: 3,RequestName: "request5 from clientID 1",Content: "request5 content",Finish: true}}
+		{ClientID: 3,RequestName: "request4 from clientID 3",Content: "request4 content",Finish: false},
+		{ClientID: 3,RequestName: "request5 from clientID 3",Content: "request5 content",Finish: true}}
 	Db.Create(&requests)
 	
 	var winners = []typefile.Winner{
@@ -98,10 +99,10 @@ func CreateTestData() {
 	Db.Create(&winners)
 
 	var submissions = []typefile.Submission{
-		{RequestID: 1,EngineerID: 2,URL: "http://example.com/3",Content: "submission3 of engineerID 2"},
-		{RequestID: 4,EngineerID: 2,URL: "http://example.com/4",Content: "submission4 of engineerID 2"},
-		{RequestID: 3,EngineerID: 1,URL: "http://example.com/6",Content: "submission6 of engineerID 1"},
-		{RequestID: 5,EngineerID: 4,URL: "http://example.com/7",Content: "submission7 of engineerID 4"}}
+		{RequestID: 1,EngineerID: 2,URL: "http://example.com/1",Content: "submission1 of engineerID 2"},
+		{RequestID: 4,EngineerID: 2,URL: "http://example.com/2",Content: "submission2 of engineerID 2"},
+		{RequestID: 3,EngineerID: 1,URL: "http://example.com/3",Content: "submission3 of engineerID 1"},
+		{RequestID: 5,EngineerID: 4,URL: "http://example.com/4",Content: "submission4 of engineerID 4"}}
 	Db.Create(&submissions)
 
 	// id=1のRequest構造体データを格納するためのインスタンスを生成

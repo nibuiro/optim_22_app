@@ -1,3 +1,4 @@
+// 全て川田が担当
 package submission
 
 import (
