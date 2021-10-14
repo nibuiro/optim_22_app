@@ -53,8 +53,8 @@ func CreateTestData() {
 		{Name: "user1", Email: "test@test.test", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
 		{Name: "user2", Email: "test@inc.test-ac.jp", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
 		{Name: "user3", Email: "test.test@test.com", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
-		{Name: "user4", Email: "test@test.test", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
-		{Name: "user5", Email: "test@inc.test-ac.jp", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"}}
+		{Name: "user4", Email: "test2@test.test", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"},
+		{Name: "user5", Email: "test2@inc.test-ac.jp", Password: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"}}
 	Db.Create(&users)
 
 	var profile = []typefile.Profile{
@@ -71,8 +71,8 @@ func CreateTestData() {
 		{User: typefile.User{ID: 1,Name: "user1", Email: "test@test.test"}},
 		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp"}},
 		{User: typefile.User{ID: 3,Name: "user3", Email: "test.test@test.com"}},
-		{User: typefile.User{ID: 4,Name: "user4", Email: "test@test.test"}},
-		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp"}}}
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test2@test.test"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test2@inc.test-ac.jp"}}}
 	Db.Create(&engineers)
 
 	//userが作成された直後にclientも作成する。
@@ -80,8 +80,8 @@ func CreateTestData() {
 		{User: typefile.User{ID: 1,Name: "user1", Email: "test@test.test"}},
 		{User: typefile.User{ID: 2,Name: "user2", Email: "test@inc.test-ac.jp"}},
 		{User: typefile.User{ID: 3,Name: "user3", Email: "test.test@test.com"}},
-		{User: typefile.User{ID: 4,Name: "user4", Email: "test@test.test"}},
-		{User: typefile.User{ID: 5,Name: "user5", Email: "test@inc.test-ac.jp"}}}
+		{User: typefile.User{ID: 4,Name: "user4", Email: "test2@test.test"}},
+		{User: typefile.User{ID: 5,Name: "user5", Email: "test2@inc.test-ac.jp"}}}
 	Db.Create(&clients)
 
 	var requests = []typefile.Request{
