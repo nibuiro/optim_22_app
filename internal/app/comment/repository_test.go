@@ -80,7 +80,7 @@ func (suite *CommentRepositoryTestSuite) TestCreate() {
       rows := sqlmock.NewRows([]string{"id"}).AddRow(requestID)
       //suite.mock.ExpectBegin()
       suite.mock.ExpectQuery(
-        regexp.QuoteMeta(`SELECT comments.id, comments.request_id, comments.user_id, users.name, comments.created_at, comments.title, comments.body, comments.reply_id, profiles.icon FROM "comments" INNER JOIN users ON comments.user_id = users.id INNER JOIN profiles ON profiles.id = users.id WHERE comments.request_id = $1`),
+        regexp.QuoteMeta(`SELECT users.name, comments.title, comments.body, profiles.icon, comments.id, comments.request_id, comments.user_id, comments.reply_id, comments.created_at FROM "comments" INNER JOIN users ON comments.user_id = users.id INNER JOIN profiles ON profiles.id = users.id WHERE comments.request_id = $1`),
       ).
       WillReturnRows(rows)
 

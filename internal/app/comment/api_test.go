@@ -55,7 +55,7 @@ func TestGetComments(t *testing.T) {
       Header: nil, 
       Body: "",
       WantStatus: http.StatusOK, 
-      WantResponse: `{"comments":[{"comment_id":1,"request_id":1,"user_id":1,"username":"テスト一郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":null,"icon":null}]}`,
+      WantResponse: `{"comments":[{"comment_id":1,"request_id":1,"user_id":1,"username":"テスト一郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":"","icon":""}]}`,
     },
     {
       Name: "Json Marshal read 2 comments", 
@@ -64,7 +64,7 @@ func TestGetComments(t *testing.T) {
       Header: nil, 
       Body: "",
       WantStatus: http.StatusOK, 
-      WantResponse: `{"comments":[{"comment_id":1,"request_id":1,"user_id":1,"username":"テスト一郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":null,"icon":null},{"comment_id":2,"request_id":1,"user_id":3,"username":"テスト三郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":null,"icon":null}]}`,
+      WantResponse: `{"comments":[{"comment_id":1,"request_id":1,"user_id":1,"username":"テスト一郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":"","icon":""},{"comment_id":2,"request_id":1,"user_id":3,"username":"テスト三郎","title":"test","text":"test","createdat":"0001-01-01T00:00:00Z","reply_id":0,"attachment":"","icon":""}]}`,
     },
   }
   for _, tc := range tests {
