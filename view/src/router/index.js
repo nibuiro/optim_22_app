@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HomePage from '@/components/HomePage'
+import AboutPage from '@/components/AboutPage'
 import RequestPage from '@/components/RequestPage'
 import SubmissionPage from '@/components/SubmissionPage'
 import MyPage from '@/components/MyPage'
@@ -16,6 +17,12 @@ export default new Router({
             path: '/',
             name: 'HomePage',
             component: HomePage
+        },
+        // サービス概要ページ
+        {
+            path: '/about',
+            name: 'AboutPage',
+            component: AboutPage
         },
         // リクエスト詳細ページ
         {

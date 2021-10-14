@@ -65,7 +65,7 @@ async function login(component, user) {
     // パスワードのハッシュ化
     const hashHex = await hashPassword(user.password);
     // ログイン情報をサーバに送信し，レスポンスを得る
-    const response = await fetch(`${process.env.API}/auth`, {
+    const response = await fetch(`${process.env.API.slice(0, -4)}/auth`, {
         method: "POST",
         body: JSON.stringify({
             email: user.email,
@@ -111,7 +111,7 @@ async function login(component, user) {
 // トークンの更新
 async function refreshToken(component, access_token, refresh_token) {
     // トークン情報をサーバに送信し，レスポンスを得る
-    const response = await fetch(`${process.env.API}/refresh_token`, {
+    const response = await fetch(`${process.env.API.slice(0, -4)}/auth/refresh_token`, {
         method: "GET",
         body: JSON.stringify({
             "Authorization": access_token,
@@ -163,7 +163,6 @@ async function getProfile(user_id, access_token) {
     // 更新成功時
     if (response.status === 200) {
         const profile = await response.json();
-        console.log(profile);
         if (process.env.PATCH) {
             profile.SNS = profile.sns;
             delete profile.sns;
@@ -192,15 +191,13 @@ async function getProfile(user_id, access_token) {
         for (let i = 0; i < profile.submissions.length; i++) {
             const request = await getRequest(profile.submissions[i].request_id);
             profile.submissions[i].request = request;
-            if (i === profile.submissions.length - 1) {
-                return profile;
-            }
         }
         if (process.env.NODE_ENV === "development") {
             console.log(`GET /api/user/${user_id}\tUserProfile`);
             console.log(`Profile of ${profile.username}:`);
             console.log(profile);
         }
+        return profile;
     }
 }
 
@@ -211,6 +208,16 @@ async function editProfile(component, user, access_token) {
     const hashHex = await hashPassword(user.password);
     const profile = user;
     profile.password = hashHex;
+    if (process.env.PATCH) {
+        profile.sns = profile.SNS;
+        delete profile.SNS;
+        profile.sns.github = profile.sns.Github;
+        delete profile.sns.Github;
+        profile.sns.twitter = profile.sns.Twitter;
+        delete profile.sns.Twitter;
+        profile.sns.facebook = profile.sns.Facebook;
+        delete profile.sns.Facebook;
+    }
     // プロフィール情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/user/${profile.user_id}`, {
         method: "PUT",
@@ -220,7 +227,7 @@ async function editProfile(component, user, access_token) {
         body: JSON.stringify(profile)
     });
     // 登録成功時
-    if (response.status === 200) {
+    if (response.status === 201) {
         if (process.env.NODE_ENV === "development") {
             console.log(`PUT /api/user/${user.user_id}\tEditProfile`);
         }
@@ -242,12 +249,16 @@ async function editProfile(component, user, access_token) {
 // リクエスト一覧取得API
 async function getRequests() {
     const response = await fetch(`${process.env.API}/requests`);
-    const requests = await response.json();
+    let requests = await response.json();
+    if (process.env.PATCH) {
+        requests = requests.requests;
+        delete requests.requests;
+    }
     if (process.env.NODE_ENV === "development") {
         console.log('GET /api/requests\tAllRequests');
-        console.log(requests.requests);
+        console.log(requests);
     }
-    return requests.requests;
+    return requests;
 }
 
 
@@ -291,9 +302,16 @@ async function getRequest(request_id) {
     if (process.env.PATCH) {
         request = request.request;
         delete request.request;
+        if (request.engineers === null) {
+            request.engineers = [];
+        }
+        if (request.submissions === null) {
+            request.submissions = [];
+        }
     }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/request/${request_id}\tShowRequest`);
+        console.log(request);
     }
     return request;
 }
@@ -331,13 +349,18 @@ async function editRequest(component, request, access_token) {
 
 // リクエスト参加API
 async function joinRequest(component, request, access_token) {
+    let patchedRequest = request;
+    if (process.env.PATCH) {
+        patchedRequest.request_id = String(patchedRequest.request_id);
+        patchedRequest.engineer_id = String(patchedRequest.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/request/${request.request_id}`, {
         method: "POST",
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(request)
+        body: JSON.stringify(patchedRequest)
     });
     // 登録成功時
     if (response.status === 200) {
@@ -410,13 +433,18 @@ async function getsubmission(submission_id) {
 
 // サブミッション編集API
 async function editSubmission(component, submission, access_token) {
+    let patchedSubmission = submission;
+    if (process.env.PATCH) {
+        patchedSubmission.request_id = String(patchedSubmission.request_id);
+        patchedSubmission.engineer_id = String(patchedSubmission.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/submission/${submission.submission_id}`, {
         method: "PUT",
         headers: {
             Authorization: access_token
         },
-        body: JSON.stringify(submission)
+        body: JSON.stringify(patchedSubmission)
     });
     // 登録成功時
     if (response.status === 200) {
@@ -441,17 +469,31 @@ async function editSubmission(component, submission, access_token) {
 // ディスカッション取得API
 async function getComments(request_id) {
     const response = await fetch(`${process.env.API}/discussion/${request_id}`);
-    const comments = await response.json();
+    let comments = (await response.json()).comments;
+    if (process.env.PATCH) {
+        if (comments === null) {
+            comments = [];
+        }
+        comments.forEach(comment => {
+            if (comment.reply_id === 0) {
+                comment.reply_id = null;
+            }
+        });
+    }
     if (process.env.NODE_ENV === "development") {
         console.log(`GET /api/discussion/${request_id}\tShowDiscussion`);
-        console.log(comments.comments);
+        console.log(comments);
     }
-    return comments.comments;
+    return comments;
 }
 
 
 // コメント投稿API
 async function addComment(component, comment, access_token) {
+    if (process.env.PATCH) {
+        comment.request_id = Number(comment.request_id);
+        comment.user_id = Number(comment.user_id);
+    }
     const response = await fetch(`${process.env.API}/discussion/${comment.request_id}`, {
         method: "POST",
         headers: {
@@ -460,12 +502,12 @@ async function addComment(component, comment, access_token) {
         body: JSON.stringify(comment)
     });
     // 登録成功時
-    if (response.status === 200) {
+    if (response.status === 201) {
         if (process.env.NODE_ENV === "development") {
             console.log(`POST /api/discussion/${comment.comment_id}\tNewComment`);
         }
-        // ユーザ登録成功メッセージを表示する
-        return true;
+        // コメント投稿成功メッセージを表示する
+        component.isMessageModalActive = true;
         //アクセストークンの有効期限が切れている場合
     } else if (response.status === 401) {
         const refresh_token = component.$cookies.get("refresh_token");
@@ -479,6 +521,12 @@ async function addComment(component, comment, access_token) {
 
 // 勝者決定API
 async function chooseWinner(component, request, access_token) {
+    let patchedRequest = request;
+    if (process.env.PATCH) {
+        patchedRequest.request_id = String(patchedRequest.request_id);
+        patchedRequest.client_id = String(patchedRequest.client_id);
+        patchedRequest.engineer_id = String(patchedRequest.engineer_id);
+    }
     // 提出物の情報をサーバに送信し，レスポンスを得る
     const response = await fetch(`${process.env.API}/winner/${request.request_id}`, {
         method: "POST",

@@ -16,13 +16,13 @@ type ReceiveRequestJson struct{
 	ClientID       string              `json:"client_id"`
 	// 要件はエンジニアのプロフィールデータであるが、プロフィール機能は担当外のため、EngineerIDを代用する。
 	Content        string              `json:"content"`
-	Finish         bool                `gorm:"not null",json:"finish"`
+	Finish         bool                `json:"finish"`
 }
 
 // フロントからサーバーサイドにwinnerのjsonデータが送られた際に利用する構造体
 type ReceiveWinnerJson struct{
-	EngineerID     string              `gorm:"not null",json:"engineer_id"`
-	RequestID      string              `gorm:"unique;not null",json:"request_id"`
+	EngineerID     string              `json:"engineer_id"`
+	RequestID      string              `json:"request_id"`
 }
 
 // クライアントがリクエストを依頼する。(入力内容をDBに格納)
@@ -56,8 +56,6 @@ func CreateRequest(c *gin.Context) {
     	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
         // c.Redirect(http.StatusSeeOther, "//localhost:8080/")
     // }
-    // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    //c.Redirect(http.StatusSeeOther, "//localhost:8080/")
 }
 
 // クライアントが依頼済みのリクエストを編集する。
@@ -101,11 +99,6 @@ func UpdateRequest(c *gin.Context) {
     	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
         // c.Redirect(http.StatusSeeOther, "//localhost:8080/")
     // }
-
-    // redirect先を追加している。
-    redirect_url := "//localhost:8080/api/request/" + request_id_string
-    // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, redirect_url)
 }
 
 // 勝者を決定するための関数
@@ -148,7 +141,4 @@ func DecideWinner(c *gin.Context) {
     	// StatusSeeOther = 303,違うコンテンツだけどリダイレクト
         // c.Redirect(http.StatusSeeOther, "//localhost:8080/")
     // }
-
-    // StatusSeeOther = 303,違うコンテンツだけどリダイレクト
-    c.Redirect(http.StatusSeeOther, "//localhost:8080/api/requests")
 }

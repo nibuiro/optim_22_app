@@ -1,11 +1,13 @@
 <!-- マイページ -->
 
 <template>
-  <div class="container" :profile="profile">
+  <div class="container">
     <section class="hero is-primary is-small mb-3">
       <b-tooltip
         style="position: absolute"
-        :label="profile.comment"
+        :label="
+          profile.comment !== '' ? profile.comment : 'よろしくお願いします！'
+        "
         type="is-light"
         position="is-right"
         always
@@ -269,6 +271,7 @@ export default {
     return {
       loggedin: false,
       profile: {
+        comment: "",
         SNS: {
           Github: "",
           Twitter: "",

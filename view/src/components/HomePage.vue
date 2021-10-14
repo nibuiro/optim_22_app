@@ -67,7 +67,6 @@
           field="client"
           label="依頼者"
           width="10%"
-          sortable
           centered
           v-slot="props"
         >
@@ -87,7 +86,6 @@
           field="request"
           label="依頼名"
           width="20%"
-          sortable
           v-slot="props"
         >
           <router-link

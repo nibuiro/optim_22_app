@@ -44,37 +44,37 @@ const ModalForm = {
     return {
       submission: {
         submission_id: this.submissionProps.submission_id,
-        engineer_id: this.submissionProps.engineer.engineer_id,
+        engineer_id: this.submissionProps.engineer.user_id,
         content: this.submissionProps.content,
-        url: this.submissionProps.url,
+        URL: this.submissionProps.URL
       },
       invalid: false,
-      errorMessage: "",
+      errorMessage: ""
     };
   },
   watch: {
     submission: {
       handler() {
         // 提出物URLと内容が入力されていればアラートを消す
-        if (this.submission.content.length * this.submission.url.length > 0) {
+        if (this.submission.content.length * this.submission.URL.length > 0) {
           this.invalid = false;
         }
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   methods: {
     // 提出物を編集する
     async editSubmission() {
       // 提出物のURLと内容が入力されていれば
-      if (this.submission.content.length * this.submission.url.length > 0) {
+      if (this.submission.content.length * this.submission.URL.length > 0) {
         const access_token = localStorage.getItem("access_token");
         api.editSubmission(this, this.submission, access_token);
       } else {
         this.errorMessage = "すべての項目を入力してください";
         this.invalid = true;
       }
-    },
+    }
   },
   /* html */
   template: `
@@ -92,7 +92,7 @@ const ModalForm = {
             <div class="control">
               <b-input
                 type="text"
-                v-model="submission.url"
+                v-model="submission.URL"
                 placeholder="アップロード先URL"
                 required
               />
@@ -116,14 +116,14 @@ const ModalForm = {
         </footer>
       </div>
     </form>
-  `,
+  `
 };
 
 export default {
   data() {
     return {
       isComponentModalActive: false,
-      isMessageModalActive: false,
+      isMessageModalActive: false
     };
   },
   watch: {
@@ -133,11 +133,11 @@ export default {
         const submission_id = this.$route.params.submission_id;
         this.$router.go({ name: "SubmissionPage", params: { submission_id } });
       }
-    },
+    }
   },
   props: ["submission"],
   components: {
-    ModalForm,
-  },
+    ModalForm
+  }
 };
 </script>

@@ -24,7 +24,7 @@
       </b-tooltip>
       <div
         class="hero-body is-flex pt-0 pb-5"
-        :style="{ 'margin-bottom': !myself ? '20px' : 0 }"
+        :style="{ 'margin-bottom': !myself || finish ? '20px' : 0 }"
       >
         <p class="title mb-0 pt-2" style="margin-left: 64px">
           {{ request.client.username }}さんの依頼
@@ -95,7 +95,7 @@
                   </router-link>
                 </div>
               </li>
-              <li>
+              <li v-if="request.submissions.length > 0">
                 提出物　：
                 <router-link
                   class="mr-3 is-inline-flex is-align-items-center"
@@ -110,6 +110,31 @@
                   {{ submission.engineer.username }}さんの提出
                 </router-link>
               </li>
+              <li v-if="finish" class="pt-3">
+                <div class="is-flex is-align-items-center">
+                  勝者　　：
+                  <router-link
+                    class="is-flex is-align-items-center"
+                    :to="{
+                      name: 'MyPage',
+                      params: { user_id: request.winner.user_id }
+                    }"
+                  >
+                    <b-tooltip
+                      :label="request.winner.username"
+                      style="position: relative;"
+                    >
+                      <b-icon
+                        icon="crown"
+                        style="position: absolute; top: -18px; left: 4px;"
+                      />
+                      <div :style="iconStyle(32, request.winner.icon)" />
+                    </b-tooltip>
+                    {{ request.winner.username }}
+                    <b-icon icon="sparkles" />
+                  </router-link>
+                </div>
+              </li>
             </ul>
           </div>
           <section class="is-flex is-justify-content-center">
@@ -121,7 +146,7 @@
             <!-- 依頼主以外で未参加あれば -->
             <request-applier
               v-else-if="!finish && !myself && loggedin && !joined"
-              :client_id="user_id"
+              :engineer_id="user_id"
             />
             <!-- 依頼主以外で参加済みであり未提出であれば -->
             <submission-submitter
@@ -153,6 +178,7 @@ import { iconStyle } from "iconStyle";
 export default {
   data() {
     return {
+      user_id: null,
       finish: false,
       loggedin: false,
       myself: false,

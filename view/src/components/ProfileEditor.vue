@@ -62,7 +62,7 @@ const ModalForm = {
     };
   },
   watch: {
-    user: {
+    profile: {
       handler() {
         // 少なくともユーザ名、メールアドレス、パスワードが入力されていればアラートを消す
         if (this.isNeedsEntered()) {
@@ -82,8 +82,8 @@ const ModalForm = {
       const ICON_WIDTH = 500; // リサイズ後のアイコンの幅
       const ICON_HEIGHT = 500; // リサイズ後のアイコンの高さ
 
-      // jpg画像もしくはpng画像でなければ中止
-      if (file.type !== "image/jpg" && file.type !== "image/png") {
+      // png画像でなければ中止
+      if (file.type !== "image/png") {
         return;
       }
 
@@ -141,7 +141,20 @@ const ModalForm = {
       // すべての情報が正しく入力されていれば
       if (this.isNeedsEntered() && this.isPasswordsCorrect()) {
         const access_token = localStorage.getItem("access_token");
-        api.editProfile(this, this.profile, access_token);
+        const user = {
+          user_id: this.profile.user_id,
+          username: this.profile.username,
+          email: this.profile.email,
+          password: this.password,
+          icon: this.profile.icon,
+          comment: this.profile.comment,
+          SNS: {
+            Github: this.profile.SNS.Github,
+            Twitter: this.profile.SNS.Twitter,
+            Facebook: this.profile.SNS.Facebook
+          }
+        };
+        api.editProfile(this, user, access_token);
       } else {
         this.invalid = true;
         if (!this.isNeedsEntered()) {
@@ -180,7 +193,7 @@ const ModalForm = {
               />
             </div>
           </b-field>
-          <b-field label="アイコン画像（.jpgまたは.png）">
+          <b-field label="アイコン画像（.png形式）">
             <p class="control">
               <div v-show="!!profile.icon" class="mr-3" :style="iconStyle(48, profile.icon)" />
               <div class="control has-icons-left">
@@ -189,7 +202,7 @@ const ModalForm = {
               </div>
             </p>
             <b-field class="file is-primary">
-              <b-upload class="file-label" v-model="file" accept=".jpg,.png">
+              <b-upload class="file-label" v-model="file" accept=".png">
                 <span class="file-cta">
                   <b-icon class="file-icon" icon="upload" />
                   <span class="file-label">アップロード</span>
@@ -213,12 +226,11 @@ const ModalForm = {
               <b-icon icon="comment" size="is-small"></b-icon>
               <b-input
                 v-model="profile.comment"
-                placeholder="email@example.com"
-                required
+                placeholder="よろしくお願いします！"
               />
             </div>
           </b-field>
-          <b-field label="SNSアカウント" grouped group-multiline>
+          <b-field label="SNSアカウントのID" grouped group-multiline>
             <p class="control">
               <b-field>
                 <p class="control">
