@@ -2,8 +2,8 @@ User
 id 1,name user1, email test@test.test,      password test
 id 2,name user2, email test@inc.test-ac.jp, password test
 id 3,name user3, email test.test@test.com,  password test
-id 4,name user4, email test@test.test,      password test
-id 5,name user5, email test@inc.test-ac.jp, password test
+id 4,name user4, email test2@test.test,      password test
+id 5,name user5, email test2@inc.test-ac.jp, password test
 
 Profile
 id 1, Bio C#, Sns {"github": "pole", "twitter": "pole", "facebook": "pole"}, Icon: <base64-encoded-img-data>
