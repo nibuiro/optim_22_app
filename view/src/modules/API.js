@@ -56,6 +56,9 @@ async function register(component, user) {
         component.$emit("close");
         // ユーザ登録成功メッセージを表示する
         component.$emit("displayMessage");
+    } else {
+        component.errorMessage = "ユーザ登録に失敗しました。入力内容が正しいか確認してください";
+        component.invalid = true;
     }
 }
 
