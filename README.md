@@ -4,27 +4,46 @@
 
 ```
 .
-├──configs               #各種設定ファイル（例：app.yaml, zap.yaml）。
-├──controller               
-│  ├──request
-│  ├──top
-│  ├──user     
-│  │   └──api               #APIエンドポイントハンドラ。リクエストの正常性確認後serviceに渡す。
-│  └── ...             
-├──model
-│  ├──user
-│  │   ├──repository        #DBとの通信処理。ORMを⽤いたスクリプトなど。
-│  │   └──service           #リクエストの内容がAPIの仕様に則しているか、repoを⽤いた⼀連の処理。
-│  └── ...
-├──mysql
-├──pkg
-│  ├──config
-│  └──log
-├──test
-├──typefile
-├──view
-│   └──top
-└── ...
+├─configs
+├─internal
+│  ├─app
+│  │  ├─client
+│  │  ├─comment
+│  │  ├─engineer
+│  │  ├─home
+│  │  ├─profile
+│  │  │  └─repository
+│  │  ├─request
+│  │  ├─submission
+│  │  └─user
+│  └─pkg
+│      ├─auth22
+│      │  └─test
+│      ├─config
+│      ├─test
+│      │  └─v2
+│      └─utils
+├─model
+├─mysql
+├─pkg
+│  └─log
+│      └─test
+├─typefile
+└─view
+    ├─build
+    ├─config
+    ├─src
+    │  ├─assets
+    │  ├─components
+    │  ├─modules
+    │  └─router
+    ├─static
+    └─test
+        ├─e2e
+        │  ├─custom-assertions
+        │  └─specs
+        └─unit
+            └─specs
 ```
 
 
