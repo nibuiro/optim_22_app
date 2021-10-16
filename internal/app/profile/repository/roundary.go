@@ -1,6 +1,6 @@
 package roundary //repository boundary  so roundary :)
 
-//モデル定義群のラッパー
+//モデル定義群のフォーク
 
 import (
 	"time"

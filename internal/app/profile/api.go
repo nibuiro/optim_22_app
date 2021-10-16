@@ -5,6 +5,7 @@ import (
   "net/http"
   "encoding/json"
   "optim_22_app/pkg/log"
+  //"optim_22_app/internal/app/user"
  // "optim_22_app/internal/pkg/utils"
 
 )
@@ -17,18 +18,11 @@ type resource struct {
 
 //プロフィール操作についてエンドポイントを登録
 func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
-
   rc := resource{service, logger}
-
   //取得
   r.GET("/api/user/:userID", rc.get())
-  //登録
-  r.POST("/api/user/:userID", rc.put())
   //修正
   r.PUT("/api/user/:userID", rc.put())
-  //削除
-  //r.DELETE("/api/profile", rc.delete())
-
 }
 
 
@@ -46,7 +40,6 @@ func (rc resource) get() gin.HandlerFunc {
         c.Status(http.StatusBadRequest)
         return
       } else {
-        //c.Header("Content-Type", "application/json")
         c.Header("Content-Type", "application/json")
         c.String(http.StatusOK, string(userProfileText[:]))
         return
@@ -56,44 +49,38 @@ func (rc resource) get() gin.HandlerFunc {
 }
 
 
-func (rc resource) post() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    var input profile
-  
-    //BodyからJSONをパースして読み取る
-    if err := c.BindJSON(&input); err != nil {
-      rc.logger.Error(err)
-      c.Status(http.StatusBadRequest)
-      return 
-    }
-    
-    //プロフィールを登録
-    err := rc.service.Post(c.Request.Context(), input)
-    if err != nil {
-      rc.logger.Error(err)
-      c.Status(http.StatusBadRequest)
-      return 
-    } else {
-      c.Status(http.StatusCreated)
-      return 
-    }
-  }
-}
-
-
 func (rc resource) put() gin.HandlerFunc {
   return func(c *gin.Context) {
-    var input profile
-  
-    //BodyからJSONをパースして読み取る
-    if err := c.BindJSON(&input); err != nil {
+    var profileUpdates profile
+    var credeentialUpdates RegistrationInformation
+
+    /*
+     * c.BindJSONの実行によりRequest.Bodyストリームを消費してしまうため
+     * bodyバッファに出力後encoding/jsonパッケージにて読み出し処理
+     *
+     */
+
+    //Request.Bodyストリームをbodyバッファに出力する
+    body, err := c.GetRawData(); 
+    if err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
-      return 
+      return
+    } 
+    //変更されたプロフィールをパースして読み取る
+    if err := json.Unmarshal(body, &profileUpdates); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return
     }
-    
-    //プロフィールを編集
-    err := rc.service.Put(c.Request.Context(), input)
+    //変更された資格情報をパースして読み取る
+    if err := json.Unmarshal(body, &credeentialUpdates); err != nil {
+      rc.logger.Error(err)
+      c.Status(http.StatusBadRequest)
+      return
+    }    
+    //プロフィールと資格情報を編集
+    err = rc.service.Put(c.Request.Context(), profileUpdates, credeentialUpdates)
     if err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
@@ -104,24 +91,3 @@ func (rc resource) put() gin.HandlerFunc {
     }
   }
 }
-
-
-//func (rc resource) delete() gin.HandlerFunc {
-//  return func(c *gin.Context) {
-//    userId := utils.GetUserIdFromHeaderAsString(c)
-//    err := rc.service.Delete(c.Request.Context(), userId)
-//    if err != nil {
-//      rc.logger.Error(err)
-//      c.Status(http.StatusBadRequest)
-//      return 
-//    } else {
-//      c.Status(http.StatusOK)
-//      return 
-//    }
-//  }
-//}
-
-
-
-
-

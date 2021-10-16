@@ -1,6 +1,7 @@
 package profile
 
 import (
+  "regexp"
 //  "regexp"
   "github.com/go-ozzo/ozzo-validation/v4"
 //  "github.com/go-ozzo/ozzo-validation/v4/is"
@@ -14,13 +15,12 @@ import (
 //  "optim_22_app/internal/app/profile/repository"
 )
 
-
+//#region プロフィール登録情報
 type sns struct {
-  Github         string          `json:"github"`
-  Twitter         string          `json:"twitter"`
-  Facebook        string          `json:"facebook"`
+  Github     string          `json:"github"`
+  Twitter    string          `json:"twitter"`
+  Facebook   string          `json:"facebook"`
 }
-
 
 type profile struct {
   Id         int             `json:"user_id"`
@@ -33,15 +33,6 @@ type profile struct {
   Request    json.RawMessage `json:"requests"`
 }
 
-/*
-func (m sns) Validate() error {
-  return validation.ValidateStruct(&m,
-    validation.Field(&m.Github, is.URL, validation.Match(regexp.MustCompile("https://github\\.com/.*"))),
-    validation.Field(&m.Twitter, is.URL, validation.Match(regexp.MustCompile("https://twitter\\.com/.*"))),
-    validation.Field(&m.Facebook, is.URL, validation.Match(regexp.MustCompile("https://.*\\.facebook\\.com/.*"))),
-  )
-}
-*/
 
 func (m profile) Validate() error {
   return validation.ValidateStruct(&m,
@@ -53,12 +44,31 @@ func (m profile) Validate() error {
     validation.Field(&m.Icon, validation.Length(0, 2.67e+6)),
   )
 }
+//#endregion
+//#region 資格情報
+type RegistrationInformation struct {
+  Id       int    `json:"user_id"`
+  Name     string `json:"username"`
+  Email    string `json:"email"`
+  Password string `json:"password"`
+}
 
+
+func (m RegistrationInformation) Validate() error {
+  return validation.ValidateStruct(&m,
+    validation.Field(&m.Name, validation.Required, validation.Length(1, 128)),
+    //is.Email@ozzo-validation/v4/isはテストケース`success#1`にてエラー
+    //{'.','-'}の許可及びアットマークとTLDの強制、半角1文字以上100文字以下制限のみ。
+    validation.Field(&m.Email, validation.Required, validation.Length(1, 100), validation.Match(regexp.MustCompile("[a-zA-Z]+[a-zA-Z0-9\\.\\-]+@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+"))),
+    //is SHA256
+    validation.Field(&m.Password, validation.Required, validation.Length(64, 64), validation.Match(regexp.MustCompile("[A-Fa-f0-9]{64}$"))),
+  )
+}
+//#endregion
 
 type Service interface {
   Get(ctx context.Context, req string) (profile, error)
-  Post(ctx context.Context, req profile) error
-  Put(ctx context.Context, req profile) error
+  Put(ctx context.Context, reqProfile profile, reqUser RegistrationInformation) error
   Delete(ctx context.Context, req string) error
 }
 
@@ -146,47 +156,32 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
 }
 
 
-func (s service) Put(ctx context.Context, req profile) error {
+func (s service) Put(ctx context.Context, reqProfile profile, reqUser RegistrationInformation) error {
   //SNS登録情報を読み込み
   sns := sns{}
-  json.Unmarshal(req.Sns, &sns)
+  json.Unmarshal(reqProfile.Sns, &sns)
   //リクエストの値を検証
-  if err := req.Validate(); err != nil {
+  if err := reqProfile.Validate(); err != nil {
+    return err
+  }
+  //リクエストの値を検証
+  if err := reqUser.Validate(); err != nil {
     return err
   }
   //クエリの値を定義
-  insertValues := typefile.Profile{
-    ID:      req.Id,
-    Bio:     req.Bio,
-    Sns:     req.Sns,
-    Icon:    req.Icon,
+  profileUpdates := typefile.Profile{
+    ID:   reqProfile.Id,
+    Bio:  reqProfile.Bio,
+    Sns:  reqProfile.Sns,
+    Icon: reqProfile.Icon,
   }
-  //INSERT
-  if err := s.repo.Update(ctx, &insertValues); err != nil {
-    return err
-  } else {
-    return nil
+  userUpdates := typefile.User{
+    ID:       reqUser.Id,
+    Email:    reqUser.Email,
+    Password: reqUser.Password,
   }
-}
-
-
-func (s service) Post(ctx context.Context, req profile) error {
-  //SNS登録情報を読み込み
-  snsUrl := sns{}
-  json.Unmarshal(req.Sns, &snsUrl)
-  //リクエストの値を検証
-  if err := req.Validate(); err != nil {
-    return err
-  }
-  //クエリの値を定義
-  insertValues := typefile.Profile{
-    ID:      req.Id,
-    Bio:     req.Bio,
-    Sns:     req.Sns,
-    Icon:    req.Icon,
-  }
-  //UPDATE
-  if err := s.repo.Update(ctx, &insertValues); err != nil {
+  //資格情報とプロフィールを更新
+  if err := s.repo.Update(ctx, &profileUpdates, &userUpdates); err != nil {
     return err
   } else {
     return nil

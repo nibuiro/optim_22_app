@@ -13,16 +13,16 @@ import (
  *
  *                |                                |
  *                |                                |
- *                u                                |
+ *                V                                |
  *  relational model definition                    |
  *                                                 |
  *                |                                |
  *                |                                |
  *                |                                |
  *    +---------  |  --------repository------------------------+
- *                |                                n
+ *                |                                A
  *                |                                |
- *                u                            roundary
+ *                V                            roundary
  *
  *
  *
@@ -32,7 +32,7 @@ import (
 type Repository interface {
   Get(ctx context.Context, userId int) (profile, error)
   Create(ctx context.Context, userProfile *typefile.Profile) error
-  Update(ctx context.Context, userProfile *typefile.Profile) error
+  Update(ctx context.Context, userProfile *typefile.Profile, userCredntial *typefile.User) error
   Delete(ctx context.Context, userId int) error
 
   GetProfiles(ctx context.Context, userIds []int) ([]roundary.Profile, error)
@@ -81,15 +81,24 @@ func (r repository) Create(ctx context.Context, userProfile *typefile.Profile) e
 }
 
 
-func (r repository) Update(ctx context.Context, userProfile *typefile.Profile) error {
-  /*
-   * idがユニークであることによりupdateと等しい操作になることを期待
-   * [MySQL ：： MySQL 5.6 リファレンスマニュアル ：： 13.2.5.3 INSERT ... ON DUPLICATE KEY UPDATE 構文]
-   * (https://dev.mysql.com/doc/refman/5.6/ja/insert-on-duplicate.html)
-   */
-  result := r.db.WithContext(ctx).Model(userProfile).
-  Updates(map[string]interface{}{"bio": userProfile.Bio, "sns": userProfile.Sns, "icon": userProfile.Icon})
-  return result.Error
+func (r repository) Update(ctx context.Context, userProfile *typefile.Profile, userCredntial *typefile.User) error {
+
+  tx := r.db.WithContext(ctx).Begin()
+  //ユーザ登録以降基本的に編集を受け付ける形となり初期エントリが必要
+  err := UpdateCredentialAndProfile(tx, userProfile, userCredntial)
+  defer func() {
+    if err != nil {
+      tx.Rollback()
+    } else {
+      tx.Commit()
+    }
+  }()
+
+  if err != nil {
+    return err
+  } else {
+    return nil
+  }
 }
 
 
@@ -151,5 +160,32 @@ func (r repository) GetSubmitted(ctx context.Context, userId int) ([]roundary.Su
 }
 
 //#endregion
+
+func UpdateCredentialAndProfile(tx *gorm.DB, userProfile *typefile.Profile, userCredntial *typefile.User) error {
+
+  result := tx.Model(userProfile).
+    Updates(map[string]interface{}{"bio": userProfile.Bio, "sns": userProfile.Sns, "icon": userProfile.Icon})
+  
+  if err := result.Error; err != nil {
+    return err
+  } else {
+    //pass
+  }
+
+  result = tx.Model(userCredntial).
+    Updates(map[string]interface{}{"email": userCredntial.Email, "password": userCredntial.Password})
+  
+  if err := result.Error; err != nil {
+    return err
+  } else {
+    //pass
+  }
+
+  return nil
+
+}
+
+
+
 
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
