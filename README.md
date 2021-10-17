@@ -1,50 +1,8 @@
 # optim_22_app
 
-## ディレクトリ構成
+## システム構成図
 
-```
-.
-├─configs
-├─internal
-│  ├─app
-│  │  ├─client
-│  │  ├─comment
-│  │  ├─engineer
-│  │  ├─home
-│  │  ├─profile
-│  │  │  └─repository
-│  │  ├─request
-│  │  ├─submission
-│  │  └─user
-│  └─pkg
-│      ├─auth22
-│      │  └─test
-│      ├─config
-│      ├─test
-│      │  └─v2
-│      └─utils
-├─model
-├─mysql
-├─pkg
-│  └─log
-│      └─test
-├─typefile
-└─view
-    ├─build
-    ├─config
-    ├─src
-    │  ├─assets
-    │  ├─components
-    │  ├─modules
-    │  └─router
-    ├─static
-    └─test
-        ├─e2e
-        │  ├─custom-assertions
-        │  └─specs
-        └─unit
-            └─specs
-```
+![システム構成図](https://raw.githubusercontent.com/optim22team/optim_22_app/add-architecture-diagram/architecture_diagram.svg  "システム構成図")
 
 
 ## 環境構築手順
@@ -102,4 +60,51 @@ step13 カレントディレクトリで以下のコマンドを実行する。
 ```
 go run main.go
 ```
-step14 ブラウザで[http://localhost:8081](http://localhost:8081)にアクセスする。
+step14 ブラウザで[http://localhost:8081](http://localhost:8081)にアクセスする。  
+
+
+## ディレクトリ構成
+
+```
+.
+├─configs
+├─internal
+│  ├─app
+│  │  ├─client
+│  │  ├─comment
+│  │  ├─engineer
+│  │  ├─home
+│  │  ├─profile
+│  │  │  └─repository
+│  │  ├─request
+│  │  ├─submission
+│  │  └─user
+│  └─pkg
+│      ├─auth22
+│      │  └─test
+│      ├─config
+│      ├─test
+│      │  └─v2
+│      └─utils
+├─model
+├─mysql
+├─pkg
+│  └─log
+│      └─test
+├─typefile
+└─view
+    ├─build
+    ├─config
+    ├─src
+    │  ├─assets
+    │  ├─components
+    │  ├─modules
+    │  └─router
+    ├─static
+    └─test
+        ├─e2e
+        │  ├─custom-assertions
+        │  └─specs
+        └─unit
+            └─specs
+```
