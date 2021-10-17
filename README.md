@@ -2,7 +2,7 @@
 
 ## システム構成図
 
-![システム構成図](https://raw.githubusercontent.com/optim22team/optim_22_app/add-architecture-diagram/architecture_diagram.svg  "システム構成図")
+![システム構成図](https://raw.githubusercontent.com/optim22team/optim_22_app/main/architecture_diagram.svg  "システム構成図")
 
 
 ## 環境構築手順
