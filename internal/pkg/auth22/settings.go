@@ -13,6 +13,7 @@ func GetRule() Rule {
       //"*": true,
       "/auth": true,
       "/auth/refresh_token": true,
+      "/api/user": true, //ユーザ登録エンドポイントを露出
     },
   }
 }
