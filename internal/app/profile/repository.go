@@ -173,7 +173,7 @@ func UpdateCredentialAndProfile(tx *gorm.DB, userProfile *typefile.Profile, user
   }
 
   result = tx.Model(userCredntial).
-    Updates(map[string]interface{}{"email": userCredntial.Email, "password": userCredntial.Password})
+    Updates(map[string]interface{}{"name": userCredntial.Name, "email": userCredntial.Email, "password": userCredntial.Password})
   
   if err := result.Error; err != nil {
     return err

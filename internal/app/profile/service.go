@@ -177,6 +177,7 @@ func (s service) Put(ctx context.Context, reqProfile profile, reqUser Registrati
   }
   userUpdates := typefile.User{
     ID:       reqUser.Id,
+    Name:     reqUser.Name,
     Email:    reqUser.Email,
     Password: reqUser.Password,
   }
