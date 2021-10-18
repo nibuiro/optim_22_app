@@ -34,7 +34,8 @@ func (m comment) Validate() error {
     validation.Field(&m.Title, validation.Required, validation.Length(3, 640)),
     validation.Field(&m.Body, validation.Required, validation.Length(3, 1280)),
     //validation.Field(&m.ReplyID, validation.Required, is.Int),
-    //validation.Field(&m.Attachment, validation.Length(3, 128)),
+    //URL
+    validation.Field(&m.Attachment, validation.Length(1, 2048)),
   )
 }
 //#endregion
@@ -89,11 +90,12 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
   }
   //クエリの値を定義
   insertValues := typefile.Comment{
-    RequestID: requestIDAsInt,
-    UserID:    req.UserID,
-    Title:     req.Title,
-    Body:      req.Body,
-    ReplyID:   req.ReplyID,
+    RequestID:  requestIDAsInt,
+    UserID:     req.UserID,
+    Title:      req.Title,
+    Body:       req.Body,
+    ReplyID:    req.ReplyID,
+    Attachment: req.Attachment,
   }
 
   if err := s.repo.Create(ctx, &insertValues); err != nil {
@@ -116,11 +118,12 @@ func (s service) Patch(ctx context.Context, req comment, requestID string) error
   }
   //クエリの値を定義
   insertValues := typefile.Comment{
-    RequestID: requestIDAsInt,
-    UserID:    req.UserID,
-    Title:     req.Title,
-    Body:      req.Body,
-    ReplyID:   req.ReplyID,
+    RequestID:  requestIDAsInt,
+    UserID:     req.UserID,
+    Title:      req.Title,
+    Body:       req.Body,
+    ReplyID:    req.ReplyID,
+    Attachment: req.Attachment,
   }
 
   if err := s.repo.Update(ctx, &insertValues); err != nil {

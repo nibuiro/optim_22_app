@@ -68,4 +68,5 @@ type Comment struct {
   Title      string    
   Body       string    
   ReplyID    int  
+  Attachment string              `gorm:"type:varchar(2048)"`  
 }

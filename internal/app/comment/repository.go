@@ -35,7 +35,7 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
   var comments []comment
   result := r.db.WithContext(ctx).
     Model(&typefile.Comment{}).
-    Select("users.name, comments.title, comments.body, profiles.icon, comments.id, comments.request_id, comments.user_id, comments.reply_id, comments.created_at").
+    Select("users.name, comments.title, comments.body, profiles.icon, comments.id, comments.request_id, comments.user_id, comments.reply_id, comments.created_at, comments.attachment").
     Joins("INNER JOIN users ON comments.user_id = users.id").
     Joins("INNER JOIN profiles ON profiles.id = users.id").
     Find(&comments, "comments.request_id = ?", requestID)
@@ -44,8 +44,8 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
 }
 
 
-func (r repository) Create(ctx context.Context, comments *typefile.Comment) error {
-  result := r.db.WithContext(ctx).Create(comments)
+func (r repository) Create(ctx context.Context, comment *typefile.Comment) error {
+  result := r.db.WithContext(ctx).Create(comment)
   return result.Error
 }
 
