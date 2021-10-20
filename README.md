@@ -1,9 +1,13 @@
-# optim_22_app
+# <ruby>SubReq<rp> (</rp><rt>サブリク</rt><rp>) </rp></ruby>
+
+<div align="center">
+    <img src="https://raw.githubusercontent.com/optim22team/optim_22_app/main/view/src/assets/logo.png" alt="SubReq(サブリク)のロゴ" title="ロゴ" width="250">
+    <p>ロゴ</p>
+</div>
 
 ## システム構成図
 
 ![システム構成図](https://raw.githubusercontent.com/optim22team/optim_22_app/main/architecture_diagram.svg  "システム構成図")
-
 
 ## 環境構築手順
 
