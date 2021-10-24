@@ -55,7 +55,7 @@ func (rc resource) put() gin.HandlerFunc {
     var credeentialUpdates RegistrationInformation
 
     /*
-     * c.BindJSONの実行によりRequest.Bodyストリームを消費してしまうため
+     * c.ShouldBindJSONの実行によりRequest.Bodyストリームを消費してしまうため
      * bodyバッファに出力後encoding/jsonパッケージにて読み出し処理
      *
      */

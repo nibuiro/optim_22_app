@@ -101,7 +101,7 @@ func (rc resource) patch() gin.HandlerFunc {
     requestID := c.Param("requestID")
   
     //BodyからJSONをパースして読み取る
-    if err := c.BindJSON(&input); err != nil {
+    if err := c.ShouldBindJSON(&input); err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
       return 

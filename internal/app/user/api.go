@@ -31,7 +31,7 @@ func (rc resource) post() gin.HandlerFunc {
     var input RegistrationInformation
   
     //BodyからJSONをパースして読み取る
-    if err := c.BindJSON(&input); err != nil {
+    if err := c.ShouldBindJSON(&input); err != nil {
       rc.logger.Error(err)
       c.Status(http.StatusBadRequest)
       return 
