@@ -27,7 +27,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
   return repository{db, logger}
 }
 
-
+//資格情報をデータベースに照会
 func (r repository) GetUserIdByCredential(ctx context.Context, credential *typefile.User) (int, error) {
   var userId UserId
   result := r.db.WithContext(ctx).
