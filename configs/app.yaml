@@ -1,3 +1,4 @@
+#担当：石森
 server_port: 8080
 dsn: "root:rootpass@tcp(mysql_container:3306)/optim_dev"
 refresh_token_expiration: 30
