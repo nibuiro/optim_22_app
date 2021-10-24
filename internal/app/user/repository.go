@@ -11,7 +11,6 @@ import (
 
 type Repository interface {
   Create(ctx context.Context, user *typefile.User) error
-  Delete(ctx context.Context, userId int) error
 }
 
 
@@ -27,7 +26,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) Repository {
 
 
 func (r repository) Create(ctx context.Context, user *typefile.User) error {
-  
+  //セッション開始
   tx := r.db.WithContext(ctx).Begin()
   //ユーザ登録以降基本的に編集を受け付ける形となり初期エントリが必要
   err := CreateInitialEntries(tx, user)
@@ -44,12 +43,6 @@ func (r repository) Create(ctx context.Context, user *typefile.User) error {
   } else {
     return nil
   }
-}
-
-
-func (r repository) Delete(ctx context.Context, userId int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.User{}, userId)
-  return result.Error
 }
 
 
@@ -87,7 +80,9 @@ func CreateInitialEntries(tx *gorm.DB, user *typefile.User) error {
   profile := &typefile.Profile{}
   profile.ID = user.ID
   profile.Bio = ``
+  //フロントエンドが必要とする初期データ
   profile.Sns = []byte(`{"github":"","twitter":"","facebook":""}`)
+  //1x1のRGB=(255,255,255)データ
   profile.Icon =  `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII=`
 
   
@@ -99,10 +94,6 @@ func CreateInitialEntries(tx *gorm.DB, user *typefile.User) error {
 
   return nil
 }
-
-
-
-
 
 
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}
