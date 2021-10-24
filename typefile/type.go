@@ -7,10 +7,10 @@ import (
 )
 
 type User struct{
-	ID             int            `gorm:"primaryKey",json:"user_id"`
-	Name           string         `gorm:"not null",json:"username"`
-	Email          string         `gorm:"type:varchar(100);unique",json:"email"`  
-	Password       string         `gorm:"not null",json:"password"`     
+	ID             int            `gorm:"primaryKey"`
+	Name           string         `gorm:"not null"`
+	Email          string         `gorm:"type:varchar(100);unique"`  
+	Password       string         `gorm:"not null"`     
 }
 
 type Profile struct{

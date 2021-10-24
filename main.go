@@ -82,7 +82,7 @@ func main() {
     Addr:    address,
     Handler: buildHandler(model.Db, logger, cfg),
   }
-  //#endregion
+  //#endregion 
 
   g.Go(func() error {
       return hs.ListenAndServe()
@@ -98,13 +98,13 @@ func main() {
 //任意のポートについてのHTTPハンドラを構築
 func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
 
-  //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得
+  //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得 //担当：石森
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
   e := gin.New()
   e.Use(CORS())
-  //ginのログをloggerでとる //フォーマット形式はloggerに依存する
+  //ginのログをloggerでとる //フォーマット形式はloggerに依存する //担当：石森
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
-  //パニック時ステータスコード500を送出
+  //パニック時ステータスコード500を送出 //担当：石森
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
 
   //#region 認証機能群
@@ -117,7 +117,7 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   e.POST("/auth/refresh_token", auth.RefreshAccessTokenAndRefreshToken())
   //許可されたメソッドとパスのペア以外についてアクセストークンを検証
   e.Use(auth.ValidateAccessToken(auth22.GetRule(), true))
-  //#endregion
+  //#endregion //担当：石森
 
   // homepageを表示するハンドラ
   e.GET("/api/requests",home.ShowHomepage)
@@ -141,33 +141,28 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   e.POST("/api/submission/:request_id",engineer.CreateSubmission)
 
   
+  //#region ユーザエンドポイントの構築
   userRepository := user.NewRepository(db, logger)
   userService := user.NewService(userRepository, logger)
   user.RegisterHandlers(e.Group(""), userService, logger)
+  //#endregion //担当：石森
   
+  //#region プロフィールエンドポイントの構築
   profileRepository := profile.NewRepository(db, logger)
   profileService := profile.NewService(profileRepository, logger)
   profile.RegisterHandlers(e.Group(""), profileService, logger)
+  //#endregion //担当：石森
 
+  //#region ディスカッションエンドポイントの構築
   commentRepository := comment.NewRepository(db, logger)
   commentService := comment.NewService(commentRepository, logger)
   comment.RegisterHandlers(e.Group(""), commentService, logger)
-  //authHandler := auth.Handler(cfg.JWTSigningKey)
-
-//  user.RegisterHandlers(rg.Group(""),
-//    user.NewService(user.NewRepository(db, logger), logger),
-//    authHandler, logger,
-//  )
-//
-//  auth.RegisterHandlers(rg.Group(""),
-//    auth.NewService(cfg.JWTSigningKey, cfg.JWTExpiration, logger),
-//    logger,
-//  )
+  //#endregion //担当：石森
 
   return e
 }
 
-
+//担当：石森
 func CORS() gin.HandlerFunc {
   return cors.New(cors.Config{
     // アクセスを許可したいHTTPメソッド
