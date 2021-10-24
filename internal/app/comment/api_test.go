@@ -97,37 +97,3 @@ func TestPostComment(t *testing.T) {
     test.Endpoint(t, router, tc)
   }
 }
-
-
-func TestDeleteComment(t *testing.T) {
-
-  logger := log.New()
-  router := gin.New()
-
-  repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
-  
-  tests := []test.APITestCase{
-    {
-      Name: "double check test (/<invalid>/#m)", 
-      Method: "DELETE", 
-      URL: "/api/discussion/test/1", 
-      Header: nil, 
-      Body: ``,
-      WantStatus: http.StatusBadRequest, 
-      WantResponse: "",
-    },
-    {
-      Name: "double check test (/#n/#m)", 
-      Method: "DELETE", 
-      URL: "/api/discussion/1/1", 
-      Header: nil, 
-      Body: ``,
-      WantStatus: http.StatusOK, 
-      WantResponse: "",
-    },
-  }
-  for _, tc := range tests {
-    test.Endpoint(t, router, tc)
-  }
-}
