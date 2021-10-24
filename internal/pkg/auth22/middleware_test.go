@@ -71,7 +71,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
 
 
   router.POST("/test", func(c *gin.Context) {
-    c.String(http.StatusCreated, "")
+    c.String(http.StatusOK, "")
   })
 
   tests := []test.APITestCase{
@@ -81,7 +81,7 @@ func TestAccessTokenAuthentication(t *testing.T) {
       "/test", 
       "", 
       MakeAuthorizationHeader("", accessToken2100), 
-      http.StatusCreated, 
+      http.StatusOK, 
       "",
     },
     {
