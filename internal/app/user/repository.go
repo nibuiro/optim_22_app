@@ -11,7 +11,6 @@ import (
 
 type Repository interface {
   Create(ctx context.Context, user *typefile.User) error
-  Delete(ctx context.Context, userId int) error
 }
 
 
@@ -44,12 +43,6 @@ func (r repository) Create(ctx context.Context, user *typefile.User) error {
   } else {
     return nil
   }
-}
-
-
-func (r repository) Delete(ctx context.Context, userId int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.User{}, userId)
-  return result.Error
 }
 
 
@@ -99,10 +92,6 @@ func CreateInitialEntries(tx *gorm.DB, user *typefile.User) error {
 
   return nil
 }
-
-
-
-
 
 
 func StubNewRepository(args ...interface{}) Repository {return repository{nil, nil}}

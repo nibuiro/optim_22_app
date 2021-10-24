@@ -32,7 +32,6 @@ func (m RegistrationInformation) Validate() error {
 
 type Service interface {
   Create(ctx context.Context, input RegistrationInformation) (int, error)
-  Delete(ctx context.Context, userId int) error
 }
 
 
@@ -67,16 +66,6 @@ func (s service) Create(ctx context.Context, req RegistrationInformation) (int, 
   }
 
   return userId, nil
-}
-
-
-func (s service) Delete(ctx context.Context, userId int) error {
-  //該当useriDのエントリを削除
-  if err := s.repo.Delete(ctx, userId); err != nil {
-    return err
-  } else {
-    return nil
-  }
 }
 
 

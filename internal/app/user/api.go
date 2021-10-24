@@ -4,7 +4,6 @@ import (
   "net/http"
   "github.com/gin-gonic/gin"
   "optim_22_app/pkg/log"
-  "optim_22_app/internal/pkg/utils"
   "encoding/json"
   "optim_22_app/internal/pkg/auth22"
   "bytes"
@@ -24,8 +23,6 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
 
   //登録する
   r.POST("/api/user", rc.post())
-  //退会する
-  r.DELETE("/api/user", rc.delete())
 
 }
 
@@ -87,24 +84,3 @@ func (rc resource) post() gin.HandlerFunc {
     }
   }
 }
-
-
-func (rc resource) delete() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    userId := utils.GetUserIdFromHeaderAsInt(c)
-    err := rc.service.Delete(c.Request.Context(), userId)
-    if err != nil {
-      rc.logger.Error(err)
-      c.Status(http.StatusBadRequest)
-      return 
-    } else {
-      c.Status(http.StatusOK)
-      return 
-    }
-  }
-}
-
-
-
-
-
