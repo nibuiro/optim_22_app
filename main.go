@@ -6,10 +6,12 @@ import (
   "fmt"
   "time"
   "net/http"
+  "context"
+  "os/signal"
+  "syscall"
   "gorm.io/gorm"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/zap"
-  "golang.org/x/sync/errgroup"
   "github.com/gin-contrib/cors"
   "optim_22_app/model"
   "optim_22_app/typefile"
@@ -26,14 +28,15 @@ import (
   "optim_22_app/internal/app/comment"  
 )
 
-var (
-    g errgroup.Group
-)
-
 //このファイルmain.goの引数の定義
 var flagConfig = flag.String("config", "./configs/app.yaml", "Appの設定ファイルへのパス")
 
 func main() {
+  //Ctrl+CなどのOSからの割り込み信号を待機させるリスナ, それに対する応答を定義
+  ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+  //main終了時 //リスナを削除 //NotifyContextへのバイパスを解除
+  defer stop()
+
   //引数をパース
   flag.Parse()
 
@@ -47,10 +50,6 @@ func main() {
     logger.Errorf("failed to load application configuration: %s", err)
     os.Exit(-1)
   }
-
-
-  logger.Debugf(cfg.DSN)
-  
 
   // DB接続後、マイグレーションを実行する。
   // 手順としては、まずコンテナを立ち上げた後、mysqlでoptim_devデータベースを作成する。
@@ -78,7 +77,7 @@ func main() {
   //#region HTTPサーバをビルド
   address := fmt.Sprintf(":%v", cfg.ServerPort)
 
-  server := &http.Server{
+  srv := &http.Server{
     Addr:              address,
     Handler:           buildHandler(model.Db, logger, cfg),
     ReadTimeout:       time.Duration(cfg.ReadTimeout * int64(time.Second)),
@@ -89,15 +88,29 @@ func main() {
   }
   //#endregion 
 
-  g.Go(func() error {
-      return server.ListenAndServe()
-  })
+  //httpサーバスレッドを発行
+  go func() {
+    if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+      logger.Errorf("listen: %s\n", err)
+    }
+  }()
+  //割り込みシグナルを待機
+  <-ctx.Done()
 
-  if err := g.Wait(); err != nil {
-      logger.Error(err)
+  //リスナを削除
+  stop()
+
+  //タイムアウトつきコンテキストを発行
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+  defer cancel()
+  //新たなHTTPセッションを受け付けないようにロックする
+  if err := srv.Shutdown(ctx); err != nil {
+    logger.Info("Server forced to shutdown: ", err)
   }
 
+  logger.Info("Server exiting")
 }
+
 
 
 //任意のポートについてのHTTPハンドラを構築
