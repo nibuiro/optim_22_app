@@ -78,14 +78,19 @@ func main() {
   //#region HTTPサーバをビルド
   address := fmt.Sprintf(":%v", cfg.ServerPort)
 
-  hs := &http.Server{
-    Addr:    address,
-    Handler: buildHandler(model.Db, logger, cfg),
+  server := &http.Server{
+    Addr:              address,
+    Handler:           buildHandler(model.Db, logger, cfg),
+    ReadTimeout:       time.Duration(cfg.ReadTimeout * int64(time.Second)),
+    ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeout * int64(time.Second)),
+    WriteTimeout:      time.Duration(cfg.WriteTimeout * int64(time.Second)),
+    IdleTimeout:       time.Duration(cfg.IdleTimeout * int64(time.Second)),
+    MaxHeaderBytes:    1<<20,
   }
   //#endregion 
 
   g.Go(func() error {
-      return hs.ListenAndServe()
+      return server.ListenAndServe()
   })
 
   if err := g.Wait(); err != nil {
