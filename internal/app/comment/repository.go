@@ -12,10 +12,6 @@ import (
 type Repository interface {
   Get(ctx context.Context, requestID int) ([]comment, error)
   Create(ctx context.Context, comment *typefile.Comment) error
-  Update(ctx context.Context, comment *typefile.Comment) error
-  Delete(ctx context.Context, commentID int) error
-
-  DeleteByRequestID(ctx context.Context, requestID int) error
 }
 
 
@@ -40,29 +36,34 @@ func (r repository) Get(ctx context.Context, requestID int) ([]comment, error) {
     Joins("INNER JOIN profiles ON profiles.id = users.id").
     Find(&comments, "comments.request_id = ?", requestID)
 
-  return comments, result.Error
+  if err := result.Error; err != nil {
+    r.logger.Error(err)
+    return comments, result.Error
+  } else {
+    return comments, nil
+  }
 }
 
 
 func (r repository) Create(ctx context.Context, comment *typefile.Comment) error {
   result := r.db.WithContext(ctx).Create(comment)
-  return result.Error
+
+  if err := result.Error; err != nil {
+    r.logger.Error(err)
+    return result.Error
+  } else {
+    return nil
+  }  
 }
 
 
 func (r repository) Update(ctx context.Context, comment *typefile.Comment) error {
   result := r.db.WithContext(ctx).Create(comment)
-  return result.Error
+  if err := result.Error; err != nil {
+    r.logger.Error(err)
+    return result.Error
+  } else {
+    return nil
+  }  
 }
 
-
-func (r repository) Delete(ctx context.Context, commentID int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.Comment{}, commentID)
-  return result.Error
-}
-
-
-func (r repository) DeleteByRequestID(ctx context.Context, requestID int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.Comment{}, requestID)
-  return result.Error
-}

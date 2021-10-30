@@ -14,11 +14,13 @@ import (
 
 func TestGetComments(t *testing.T) {
 
+  gin.SetMode(gin.ReleaseMode)
+
   logger := log.New()
   router := gin.New()
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
+  RegisterHandlers(router.Group("/api/discussion/"), NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {
@@ -76,11 +78,13 @@ func TestGetComments(t *testing.T) {
 
 func TestPostComment(t *testing.T) {
 
+  gin.SetMode(gin.ReleaseMode)
+
   logger := log.New()
   router := gin.New()
 
   repo := StubNewRepository()
-  RegisterHandlers(router.Group(""), NewServiceStub(repo), logger)
+  RegisterHandlers(router.Group("/api/discussion/"), NewServiceStub(repo), logger)
   
   tests := []test.APITestCase{
     {

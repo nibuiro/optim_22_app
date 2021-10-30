@@ -44,8 +44,6 @@ func (m comment) Validate() error {
 type Service interface {
   Get(ctx context.Context, req string) ([]comment, error)
   Post(ctx context.Context, req comment, requestID string) error
-  Patch(ctx context.Context, req comment, requestID string) error
-  Delete(ctx context.Context, requestID string, commentID string) error
 }
 
 
@@ -65,10 +63,12 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
   //var userId int
   requestIDAsInt, err := strconv.Atoi(req)
   if err != nil {
+    s.logger.Error(err)
     return make([]comment, 1), err
   }
   //該当リクエストのコメントを取得
   if pastComments, err := s.repo.Get(ctx, requestIDAsInt); err != nil {
+    s.logger.Error(err)
     return make([]comment, 1), err
   } else {
     comments := pastComments
@@ -81,11 +81,13 @@ func (s service) Get(ctx context.Context, req string) ([]comment, error) {
 func (s service) Post(ctx context.Context, req comment, requestID string) error {
   //コメント登録情報を検証
   if err := req.Validate(); err != nil {
+    s.logger.Error(err)
     return err
   }
   //リクエストID文字列をintに変換
   requestIDAsInt, err := strconv.Atoi(requestID)
   if err != nil {
+    s.logger.Error(err)
     return err
   }
   //クエリの値を定義
@@ -99,52 +101,9 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
   }
 
   if err := s.repo.Create(ctx, &insertValues); err != nil {
+    s.logger.Error(err)
     return err
   } else {
     return nil
-  }
-}
-
-
-func (s service) Patch(ctx context.Context, req comment, requestID string) error {
-  //コメント登録情報を検証
-  if err := req.Validate(); err != nil {
-    return err
-  }
-  //リクエストID文字列を整数型に変換
-  requestIDAsInt, err := strconv.Atoi(requestID)
-  if err != nil {
-    return err
-  }
-  //クエリの値を定義
-  insertValues := typefile.Comment{
-    RequestID:  requestIDAsInt,
-    UserID:     req.UserID,
-    Title:      req.Title,
-    Body:       req.Body,
-    ReplyID:    req.ReplyID,
-    Attachment: req.Attachment,
-  }
-
-  if err := s.repo.Update(ctx, &insertValues); err != nil {
-    return err
-  } else {
-    return nil
-  }
-}
-
-
-func (s service) Delete(ctx context.Context, requestID string, commentID string) error{
-  //コメントID文字列を整数型に変換
-  commentIDAsInt, err := strconv.Atoi(commentID)
-  if err != nil {
-    return err
-  } else {
-    //コメント削除
-    if err := s.repo.Delete(ctx, commentIDAsInt); err != nil {
-      return err
-    } else {
-      return nil
-    }
   }
 }

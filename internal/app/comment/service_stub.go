@@ -71,13 +71,3 @@ func (s serviceStub) Get(ctx context.Context, req string) ([]comment, error) {
 func (s serviceStub) Post(ctx context.Context, req comment, requestID string) error {
   return nil
 }
-
-
-func (s serviceStub) Patch(ctx context.Context, req comment, requestID string) error {
-  return nil
-}
-
-
-func (s serviceStub) Delete(ctx context.Context, requestID string, commentID string) error{
-  return nil
-}
