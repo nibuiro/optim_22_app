@@ -10,7 +10,6 @@ import (
   "encoding/json"
   "strconv"
   "context"
-  "errors"
   "optim_22_app/internal/app/profile/repository"
 //  "optim_22_app/internal/app/profile/repository"
 )
@@ -69,7 +68,6 @@ func (m RegistrationInformation) Validate() error {
 type Service interface {
   Get(ctx context.Context, req string) (profile, error)
   Put(ctx context.Context, reqProfile profile, reqUser RegistrationInformation) error
-  Delete(ctx context.Context, req string) error
 }
 
 
@@ -89,6 +87,7 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
   //var userId int
   userId, err := strconv.Atoi(req)
   if err != nil {
+    s.logger.Error(err)
     return profile{}, err
   }
   //該当ユーザのプロフィールを取得
@@ -113,6 +112,7 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
       }//
       //参照されたuserIdのプロフィールを取得
       if engineerProfiles, err := s.repo.GetProfiles(ctx, userIds); err != nil {
+        s.logger.Error(err)
         return profile{}, err
       } else {
         //取得したプロフィールをuserIdをキーとするハッシュテーブルに落とし込む
@@ -134,12 +134,15 @@ func (s service) Get(ctx context.Context, req string) (profile, error) {
         }
         //#endregion
         if requestedsText, err := json.Marshal(requesteds); err != nil {
+          s.logger.Error(err)
           return profile{}, err
         } else {
           if submitteds, err := s.repo.GetSubmitted(ctx, userId); err != nil {
+            s.logger.Error(err)
             return profile{}, err
           } else {
             if submittedsText, err := json.Marshal(submitteds); err != nil {
+              s.logger.Error(err)
               return profile{}, err
             } else {
               //#region as userProfileWithRecords
@@ -162,10 +165,12 @@ func (s service) Put(ctx context.Context, reqProfile profile, reqUser Registrati
   json.Unmarshal(reqProfile.Sns, &sns)
   //リクエストの値を検証
   if err := reqProfile.Validate(); err != nil {
+    s.logger.Error(err)
     return err
   }
   //リクエストの値を検証
   if err := reqUser.Validate(); err != nil {
+    s.logger.Error(err)
     return err
   }
   //クエリの値を定義
@@ -183,6 +188,7 @@ func (s service) Put(ctx context.Context, reqProfile profile, reqUser Registrati
   }
   //資格情報とプロフィールを更新
   if err := s.repo.Update(ctx, &profileUpdates, &userUpdates); err != nil {
+    s.logger.Error(err)
     return err
   } else {
     return nil
@@ -190,70 +196,3 @@ func (s service) Put(ctx context.Context, reqProfile profile, reqUser Registrati
 }
 
 
-func (s service) Delete(ctx context.Context, req string) error {
-  //リクエスト文字列を数値型ユーザIDに変換
-  //var userId int
-  userId, err := strconv.Atoi(req)
-  if err != nil {
-    return err
-  }
-  //該当ユーザのプロフィールを削除
-  if err := s.repo.Delete(ctx, userId); err != nil {
-    return err
-  } else {
-    return nil
-  }
-}
-
-
-
-//#region スタブ
-type ServiceStub interface {
-  Get(ctx context.Context, req string) (profile, error)
-  Post(ctx context.Context, req profile) error
-  Patch(ctx context.Context, req profile) error
-  Delete(ctx context.Context, req string) error
-}
-
-
-type serviceStub struct {
-  repo   Repository
-  logger log.Logger
-}
-
-
-func (s serviceStub) Get(ctx context.Context, req string) (profile, error) {
-  if "" == req {
-    return profile{}, errors.New("不明なユーザのプロフィールを参照しました。")
-  }
-  dummyProfile := profile{
-    Bio: "test", 
-    Sns: []byte(`{"twitter": "twitter.com/pole", "facebook": "facebook.com/pole"}`), 
-    Submission: []byte(`{}`), 
-    Request: []byte(`{}`), 
-    Icon: "test",
-  }
-  return dummyProfile, nil
-}
-
-
-func (s serviceStub) Post(ctx context.Context, req profile) error {
-  return nil
-}
-
-
-func (s serviceStub) Patch(ctx context.Context, req profile) error {
-  return nil
-}
-
-
-func (s serviceStub) Delete(ctx context.Context, req string) error {
-  return nil
-}
-
-
-func NewServiceStub(args ...interface{}) ServiceStub { 
-  return serviceStub{nil, nil}
-}
-
-//#endregion

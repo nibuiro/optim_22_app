@@ -37,7 +37,6 @@ func (rc resource) post() gin.HandlerFunc {
       c.Status(http.StatusBadRequest)
       return 
     }
-    rc.logger.Debug(input)
   
     //ユーザ作成及び認証情報取得 
     _, err := rc.service.Create(c.Request.Context(), input)
@@ -52,18 +51,17 @@ func (rc resource) post() gin.HandlerFunc {
       }
       credentialJSON, err := json.Marshal(reader)
       if err != nil {
-        rc.logger.Debug(err, string(credentialJSON))
+        rc.logger.Error(err)
         c.Status(http.StatusInternalServerError)
         return
       } else {
-        rc.logger.Debug(string(credentialJSON))
         //c.Redirect(http.StatusTemporaryRedirect, "/auth")
         
         //トークン取得
         resp, err := http.Post("http://localhost:8080/auth", "application/json", bytes.NewBuffer(credentialJSON))
         defer resp.Body.Close()
         if err != nil {
-          rc.logger.Debug(err)
+          rc.logger.Error(err)
           c.Status(http.StatusInternalServerError)
           return
         } else {

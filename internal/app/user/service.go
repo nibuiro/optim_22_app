@@ -49,6 +49,7 @@ func NewService(repo Repository, logger log.Logger) Service {
 func (s service) Create(ctx context.Context, req RegistrationInformation) (int, error) {
   //リクエストの値を検証
   if err := req.Validate(); err != nil {
+    s.logger.Error(err)
     return 0, err
   }
   //クエリの値を定義
@@ -60,6 +61,7 @@ func (s service) Create(ctx context.Context, req RegistrationInformation) (int, 
   //INSERTと割り当てられるuserIDを取得
   var userId int
   if err := s.repo.Create(ctx, &insertValues); err != nil {
+    s.logger.Error(err)
     return 0, err
   } else {
     userId = insertValues.ID

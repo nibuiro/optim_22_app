@@ -39,6 +39,7 @@ func (r repository) Create(ctx context.Context, user *typefile.User) error {
   }()
 
   if err != nil {
+    r.logger.Error(err)
     return err
   } else {
     return nil

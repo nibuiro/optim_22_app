@@ -33,7 +33,6 @@ type Repository interface {
   Get(ctx context.Context, userId int) (profile, error)
   Create(ctx context.Context, userProfile *typefile.Profile) error
   Update(ctx context.Context, userProfile *typefile.Profile, userCredntial *typefile.User) error
-  Delete(ctx context.Context, userId int) error
 
   GetProfiles(ctx context.Context, userIds []int) ([]roundary.Profile, error)
   GetRequested(ctx context.Context, userId int) ([]roundary.Request, error)
@@ -64,7 +63,8 @@ func (r repository) Get(ctx context.Context, userId int) (profile, error) {
     Where("profiles.id = ?", userId).
     Scan(&userProfile)
 
-  if result.Error != nil {
+  if err := result.Error; err != nil {
+    r.logger.Error(err)
     return profile{}, result.Error
   } else {
     return userProfile, nil
@@ -72,12 +72,14 @@ func (r repository) Get(ctx context.Context, userId int) (profile, error) {
 }
 
 
-
-
-
 func (r repository) Create(ctx context.Context, userProfile *typefile.Profile) error {
   result := r.db.WithContext(ctx).Create(userProfile)
-  return result.Error
+  if err := result.Error; err != nil {
+    r.logger.Error(err)
+    return result.Error
+  } else {
+    return nil
+  }
 }
 
 
@@ -99,12 +101,6 @@ func (r repository) Update(ctx context.Context, userProfile *typefile.Profile, u
   } else {
     return nil
   }
-}
-
-
-func (r repository) Delete(ctx context.Context, userId int) error {
-  result := r.db.WithContext(ctx).Delete(&roundary.Profile{}, userId)
-  return result.Error
 }
 
 
