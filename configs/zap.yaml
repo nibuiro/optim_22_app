@@ -1,5 +1,5 @@
 #担当：石森
-level: "debug"
+level: "info"
 encoding: "json"
 encoderConfig:
   messageKey: "Msg"
@@ -13,6 +13,6 @@ encoderConfig:
   durationEncoder: "string"
   callerEncoder: "short"
 outputPaths:
-  - "stdout"
+  - "log/stdout.log"
 errorOutputPaths:
-  - "stderr"
+  - "log/stderr.log"
