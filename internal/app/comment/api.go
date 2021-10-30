@@ -20,9 +20,9 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   rc := resource{service, logger}
 
   //ディスカッション ID(:requestID) のコメント一覧を取得
-  r.GET("/api/discussion/:requestID", rc.get())
+  r.GET("/:requestID", rc.get())
   //ディスカッション ID(:requestID) にコメントを投稿
-  r.POST("/api/discussion/:requestID", rc.post())
+  r.POST("/:requestID", rc.post())
 
 }
 

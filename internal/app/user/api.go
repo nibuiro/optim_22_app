@@ -22,12 +22,13 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   rc := resource{service, logger}
 
   //登録する
-  r.POST("/api/user", rc.post())
+  r.POST("/", rc.post())
 
 }
 
 func (rc resource) post() gin.HandlerFunc {
   return func(c *gin.Context) {
+    
     var input RegistrationInformation
   
     //BodyからJSONをパースして読み取る

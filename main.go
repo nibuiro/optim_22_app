@@ -150,19 +150,19 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   //#region ユーザエンドポイントの構築
   userRepository := user.NewRepository(db, logger)
   userService := user.NewService(userRepository, logger)
-  user.RegisterHandlers(e.Group(""), userService, logger)
+  user.RegisterHandlers(e.Group("/api/user/"), userService, logger)
   //#endregion //担当：石森
   
   //#region プロフィールエンドポイントの構築
   profileRepository := profile.NewRepository(db, logger)
   profileService := profile.NewService(profileRepository, logger)
-  profile.RegisterHandlers(e.Group(""), profileService, logger)
+  profile.RegisterHandlers(e.Group("/api/user/"), profileService, logger)
   //#endregion //担当：石森
 
   //#region ディスカッションエンドポイントの構築
   commentRepository := comment.NewRepository(db, logger)
   commentService := comment.NewService(commentRepository, logger)
-  comment.RegisterHandlers(e.Group(""), commentService, logger)
+  comment.RegisterHandlers(e.Group("/api/discussion/"), commentService, logger)
   //#endregion //担当：石森
 
   return e

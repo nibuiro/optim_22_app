@@ -20,9 +20,9 @@ type resource struct {
 func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   rc := resource{service, logger}
   //取得
-  r.GET("/api/user/:userID", rc.get())
+  r.GET("/:userID", rc.get())
   //修正
-  r.PUT("/api/user/:userID", rc.put())
+  r.PUT("/:userID", rc.put())
 }
 
 
