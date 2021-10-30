@@ -97,7 +97,8 @@ func main() {
 
 //任意のポートについてのHTTPハンドラを構築
 func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
-
+  //[GIN-DEBUG]出力を無効化
+  gin.SetMode(gin.ReleaseMode)
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得 //担当：石森
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
   e := gin.New()
