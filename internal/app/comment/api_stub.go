@@ -20,16 +20,6 @@ func (rc resource) createStub() gin.HandlerFunc {
 }
 
 
-func (rc resource) deleteStub() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    c.Status(http.StatusOK)
-  }
-}
-
-
-
-
-
 
 
 

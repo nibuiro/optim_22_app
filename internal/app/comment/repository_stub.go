@@ -28,15 +28,3 @@ func (r repositoryStub) Create(ctx context.Context, comment *typefile.Comment) e
 }
 
 
-func (r repositoryStub) Update(ctx context.Context, comment *typefile.Comment) error {
-  return nil
-}
-
-
-func (r repositoryStub) Delete(ctx context.Context, commentID int) error {
-  return nil
-}
-
-func (r repositoryStub) DeleteByRequestID(ctx context.Context, requestID int) error {
-  return nil
-}

@@ -12,10 +12,6 @@ import (
 type Repository interface {
   Get(ctx context.Context, requestID int) ([]comment, error)
   Create(ctx context.Context, comment *typefile.Comment) error
-  Update(ctx context.Context, comment *typefile.Comment) error
-  Delete(ctx context.Context, commentID int) error
-
-  DeleteByRequestID(ctx context.Context, requestID int) error
 }
 
 
@@ -71,24 +67,3 @@ func (r repository) Update(ctx context.Context, comment *typefile.Comment) error
   }  
 }
 
-
-func (r repository) Delete(ctx context.Context, commentID int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.Comment{}, commentID)
-  if err := result.Error; err != nil {
-    r.logger.Error(err)
-    return result.Error
-  } else {
-    return nil
-  }  
-}
-
-
-func (r repository) DeleteByRequestID(ctx context.Context, requestID int) error {
-  result := r.db.WithContext(ctx).Delete(&typefile.Comment{}, requestID)
-  if err := result.Error; err != nil {
-    r.logger.Error(err)
-    return result.Error
-  } else {
-    return nil
-  }  
-}

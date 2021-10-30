@@ -44,8 +44,6 @@ func (m comment) Validate() error {
 type Service interface {
   Get(ctx context.Context, req string) ([]comment, error)
   Post(ctx context.Context, req comment, requestID string) error
-  Patch(ctx context.Context, req comment, requestID string) error
-  Delete(ctx context.Context, requestID string, commentID string) error
 }
 
 
@@ -107,54 +105,5 @@ func (s service) Post(ctx context.Context, req comment, requestID string) error 
     return err
   } else {
     return nil
-  }
-}
-
-
-func (s service) Patch(ctx context.Context, req comment, requestID string) error {
-  //コメント登録情報を検証
-  if err := req.Validate(); err != nil {
-    s.logger.Error(err)
-    return err
-  }
-  //リクエストID文字列を整数型に変換
-  requestIDAsInt, err := strconv.Atoi(requestID)
-  if err != nil {
-    s.logger.Error(err)
-    return err
-  }
-  //クエリの値を定義
-  insertValues := typefile.Comment{
-    RequestID:  requestIDAsInt,
-    UserID:     req.UserID,
-    Title:      req.Title,
-    Body:       req.Body,
-    ReplyID:    req.ReplyID,
-    Attachment: req.Attachment,
-  }
-
-  if err := s.repo.Update(ctx, &insertValues); err != nil {
-    s.logger.Error(err)
-    return err
-  } else {
-    return nil
-  }
-}
-
-
-func (s service) Delete(ctx context.Context, requestID string, commentID string) error{
-  //コメントID文字列を整数型に変換
-  commentIDAsInt, err := strconv.Atoi(commentID)
-  if err != nil {
-    s.logger.Error(err)
-    return err
-  } else {
-    //コメント削除
-    if err := s.repo.Delete(ctx, commentIDAsInt); err != nil {
-      s.logger.Error(err)
-      return err
-    } else {
-      return nil
-    }
   }
 }
