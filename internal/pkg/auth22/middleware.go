@@ -1,5 +1,10 @@
 package auth22
 
+/*
+ * * [Middleware c.next() ignored? · Issue #287 · gin-gonic/gin · GitHub](https://github.com/gin-gonic/gin/issues/287)
+ *   ginのmiddlewareの作成方法
+ */
+
 import (
   "net/http"
 //  "fmt"

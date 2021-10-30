@@ -68,9 +68,14 @@ func NewService(cfg *config.Config, repo Repository, logger log.Logger) Service 
   return newservice
 }
 
-
+/*
+ * * [The Go Programming Language Specification - The Go Programming Language](https://golang.org/ref/spec#Variable_declarations)
+ *   var t, ok = x.(T)      // t is T, ok is bool
+ *   型変換に成功すれば2番目の戻り値はtrue
+ */
 func (s service) ReadRefreshToken(writer jwt.MapClaims, tokenString string) (bool, error) {
   token, err := jwt.Parse(tokenString, MakeTokenSecretSender(s.RefreshTokenSecret))
+  //jwtパッケージのMapClaims型にキャスト
   claims, ok := token.Claims.(jwt.MapClaims)
   for key, value := range claims {
     writer[key] = value
@@ -84,6 +89,7 @@ func (s service) ReadRefreshToken(writer jwt.MapClaims, tokenString string) (boo
 
 func (s service) ReadAccessToken(writer jwt.MapClaims, tokenString string) (bool, error) {
   token, err := jwt.Parse(tokenString, MakeTokenSecretSender(s.AccessTokenSecret))
+  //jwtパッケージのMapClaims型にキャスト
   claims, ok := token.Claims.(jwt.MapClaims)
   for key, value := range claims {
     writer[key] = value
@@ -145,7 +151,7 @@ func (s service) ValidateCredential(ctx context.Context, writer jwt.MapClaims, r
     Password: reader.Password,
   }
   
-  //資格情報の検証とユーザIDの取
+  //資格情報の検証とユーザIDの取得
   if userId, err := s.repo.GetUserIdByCredential(ctx, &filter); err != nil {
     s.logger.Error(err)
     return false, err

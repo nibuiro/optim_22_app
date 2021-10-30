@@ -1,5 +1,10 @@
 package auth22
 
+/*
+ * * [JWT の最新ベスト プラクティスに関するドラフトを読み解く](https://auth0.com/blog/jp-a-look-at-the-latest-draft-for-jwt-bcp/)
+ *   * コンパクト表現
+ *     `[Base64-URL encoded header].[Base64-URL encoded payload].[Signature]`
+ */
 
 import (
   //"io"

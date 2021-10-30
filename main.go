@@ -31,10 +31,30 @@ import (
 //このファイルmain.goの引数の定義
 var flagConfig = flag.String("config", "./configs/app.yaml", "Appの設定ファイルへのパス")
 
+/*
+ * [Go Gin Graceful-Shutdownについて](https://sourjp.github.io/posts/go-gin-graceful/)
+ * [examples/graceful-shutdown at master · gin-gonic/examples · GitHub](https://github.com/gin-gonic/examples/tree/master/graceful-shutdown)
+ * これらを参考にGraceful-Shutdownを実装
+ */
+
 func main() {
   //Ctrl+CなどのOSからの割り込み信号を待機させるリスナ, それに対する応答を定義
   ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
   //main終了時 //リスナを削除 //NotifyContextへのバイパスを解除
+  /*
+   * * [signal package - os/signal - pkg.go.dev](https://pkg.go.dev/os/signal#NotifyContext)
+   *   > The stop function unregisters the signal behavior, 
+   *   > which, like signal.Reset, may restore the default behavior
+   *   > for a given signal. For example, the default behavior of a 
+   *   > Go program receiving os.Interrupt is to exit. Calling 
+   *   > NotifyContext(parent, os.Interrupt) will change the behavior 
+   *   > to cancel the returned context. Future interrupts received 
+   *   > will not trigger the default (exit) behavior until the returned 
+   *   > stop function is called.
+   *
+   * * [Go1.7のcontextパッケージ | Taichi Nakashima](https://deeeet.com/writing/2016/07/22/context/)
+   * contextについての参考文献
+   */
   defer stop()
 
   //引数をパース
@@ -44,10 +64,11 @@ func main() {
   logger := log.New()
   logger.Debugf("start app")
 
-  // load application configurations
+  //設定をロード
   cfg, err := config.Load(*flagConfig, logger)
   if err != nil {
     logger.Errorf("failed to load application configuration: %s", err)
+    //未知のエラー
     os.Exit(-1)
   }
 
@@ -77,6 +98,11 @@ func main() {
   //#region HTTPサーバをビルド
   address := fmt.Sprintf(":%v", cfg.ServerPort)
 
+  /*
+   * * [http.ListenAndServe() をインターネットに公開してはいけない - Qiita](https://qiita.com/methane/items/2453ed86305f6950775b)
+   *   タイムアウトを適切に設定しなければリソースリークの危険性がある。
+  */
+
   srv := &http.Server{
     Addr:              address,
     Handler:           buildHandler(model.Db, logger, cfg),
@@ -84,23 +110,45 @@ func main() {
     ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeout * int64(time.Second)),
     WriteTimeout:      time.Duration(cfg.WriteTimeout * int64(time.Second)),
     IdleTimeout:       time.Duration(cfg.IdleTimeout * int64(time.Second)),
+    //[http package - net/http - pkg.go.dev](https://pkg.go.dev/net/http)
+    //本来であれば考えうる最大サイズを計算して設定すべき
     MaxHeaderBytes:    1<<20,
   }
   //#endregion 
 
-  //httpサーバスレッドを発行
+  //httpサーバスレッドを発行 //ショットダウン・クローズ処理がされていなければエラーを出力
+  /*
+   * * [http package - net/http - pkg.go.dev](https://pkg.go.dev/net/http#ErrServerClosed)
+   *   >  ErrServerClosed is returned by the Server's Serve, ServeTLS, 
+   *   >  ListenAndServe, and ListenAndServeTLS methods after a call to 
+   *   >  Shutdown or Close.
+   */
+  /*
+   * * [Channel_types](https://golang.org/ref/spec#Channel_types)
+   * * [Go by Example： Channels](https://gobyexample.com/channels)
+   * * [Go by Example： Select](https://gobyexample.com/select)
+   * チャンネルについての参考
+  */
   go func() {
     if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
       logger.Errorf("listen: %s\n", err)
     }
   }()
-  //割り込みシグナルを待機
+  //割り込みシグナルを待機 
   <-ctx.Done()
 
   //リスナを削除
   stop()
 
-  //タイムアウトつきコンテキストを発行
+  /*
+   * * [context package - context - pkg.go.dev](https://pkg.go.dev/context#Background)
+   *   > Background returns a non-nil, empty Context. 
+   *   > It is never canceled, has no values, and has no deadline. 
+   *   > It is typically used by the main function, initialization, 
+   *   > and tests, and as the top-level Context for incoming requests.
+   * タイマ付きコンテキストを注入しタイムアウトより前に処理が終わらなかった場合
+   * httpサーバスレッドを強制停止
+   */
   ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
   defer cancel()
   //新たなHTTPセッションを受け付けないようにロックする
@@ -160,6 +208,10 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   e.POST("/api/submission/:request_id",engineer.CreateSubmission)
 
   
+/*
+ * * [HTTP status codes](https://golang.org/src/net/http/status.go)
+ */
+
   //#region ユーザエンドポイントの構築
   userRepository := user.NewRepository(db, logger)
   userService := user.NewService(userRepository, logger)
