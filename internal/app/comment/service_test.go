@@ -8,7 +8,6 @@ import (
 //  "optim_22_app/pkg/log"
 //  "optim_22_app/typefile"
   "github.com/stretchr/testify/assert"
-  "optim_22_app/pkg/log"
 )
   
 
@@ -17,7 +16,6 @@ func TestTypeCommentValidate(t *testing.T) {
    *  主にutf8のカウント検証テスト
    *  utf8では日本語文字は3バイト
    */
-  logger := log.New()
   tests := []struct {
     name      string
     model     comment
@@ -60,7 +58,6 @@ func TestTypeCommentValidate(t *testing.T) {
   for _, tt := range tests {
     t.Run(tt.name, func(t *testing.T) {
       err := tt.model.Validate()
-      logger.Debug(err)
       assert.Equal(t, tt.wantError, err != nil)
     })
   }
