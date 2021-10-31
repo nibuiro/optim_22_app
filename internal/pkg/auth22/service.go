@@ -83,6 +83,7 @@ func (s service) ReadRefreshToken(writer jwt.MapClaims, tokenString string) (boo
   if ok {
     return token.Valid, nil
   } else {
+    //トークンを型変換できなかった場合token.Validの値に関わらず偽
     return false, err
   }
 }
@@ -97,6 +98,7 @@ func (s service) ReadAccessToken(writer jwt.MapClaims, tokenString string) (bool
   if ok {
     return token.Valid, nil
   } else {
+    //トークンを型変換できなかった場合token.Validの値に関わらず偽
     return false, err
   }
 }
