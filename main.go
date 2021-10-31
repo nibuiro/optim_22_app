@@ -60,6 +60,13 @@ func main() {
   //引数をパース
   flag.Parse()
 
+  /* 
+   * * [uber-go/zap： Blazing fast, structured, leveled logging in Go.](https://github.com/uber-go/zap)
+   *   Why zap ? 
+   *   zapがユースケースの多さ、開発元がuberであるなどの理由
+   *   速く開発するためエラー出力について悩む必要がないようにSugaredLoggerを採用
+   */
+
   //zapロガーを設定ファイル`config/zap.yaml`を元に取得
   logger := log.New()
   logger.Debugf("start app")
@@ -163,16 +170,31 @@ func main() {
 
 //任意のポートについてのHTTPハンドラを構築
 func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handler {
-  //[GIN-DEBUG]出力を無効化
+  //[GIN-DEBUG]出力を無効化 //stdoutは高負荷
   gin.SetMode(gin.ReleaseMode)
   //ミドルウェアが接続されていない新しい空のEngineインスタンスを取得 //担当：石森
   //!! Default()は、LoggerとRecoveryのミドルウェアが既にアタッチされているEngineインスタンスを返す
   e := gin.New()
+  /*
+   * * [gin package - github.com/gin-gonic/gin - pkg.go.dev](https://pkg.go.dev/github.com/gin-gonic/gin#Default)
+   * * [gin package - github.com/gin-gonic/gin - pkg.go.dev](https://pkg.go.dev/github.com/gin-gonic/gin#New)
+   * * [gin/gin.go at v1.7.4 · gin-gonic/gin](https://github.com/gin-gonic/gin/blob/v1.7.4/gin.go#L182)
+   * Default()の処理の理解を通じて独自設定を適用するためNew()を採用
+  */
   e.Use(CORS())
+  /*
+   * * [Go+GinでCors設定を行い、クロスオリジンのアクセスを制御する - 親バカエンジニアのナレッジ帳](https://ti-tomo-knowledge.hatenablog.com/entry/2020/06/15/213401)
+   * * [gin-contrib/cors： Official CORS gin's middleware](https://github.com/gin-contrib/cors)
+   * これらを参考にCORS()を実装
+   */
   //ginのログをloggerでとる //フォーマット形式はloggerに依存する //担当：石森
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出 //担当：石森
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
+  /*
+   * * [gin-contrib/zap： Alternative logging through zap](https://github.com/gin-contrib/zap#example)
+   *   Exampleを参考
+   */
 
   //#region 認証機能群
   authRepository := auth22.NewRepository(db, logger)
