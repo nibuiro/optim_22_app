@@ -22,7 +22,7 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, logger log.Logger) {
   rc := resource{service, logger}
 
   //登録する
-  r.POST("/", rc.post())
+  r.POST("", rc.post())
 
 }
 
