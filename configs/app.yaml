@@ -7,5 +7,5 @@ refresh_token_secret: "secret_key_for_refresh"
 access_token_secret: "secret_key"
 read_timeout: 30
 read_header_timeout: 30 
-write_timeout:  30
+write_timeout: 30
 idle_timeout: 30

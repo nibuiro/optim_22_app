@@ -1,2 +1,0 @@
-{"Level":"INFO","Time":"2021-10-31T04:36:01.945Z","Caller":"zap@v0.0.1/zap.go:46","Msg":"/debug/pprof/profile","status":404,"method":"GET","path":"/debug/pprof/profile","query":"seconds=60","ip":"127.0.0.1","user-agent":"Go-http-client/1.1","time":"2021-10-31T04:36:01Z","latency":"61.8µs"}
-{"Level":"INFO","Time":"2021-10-31T04:36:16.693Z","Caller":"optim_22_app/main.go:111","Msg":"Server exiting"}
