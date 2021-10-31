@@ -11,6 +11,7 @@ import (
   "syscall"
   "gorm.io/gorm"
   "github.com/gin-gonic/gin"
+  "github.com/gin-contrib/pprof"
   "github.com/gin-contrib/zap"
   "github.com/gin-contrib/cors"
   "optim_22_app/model"
@@ -125,6 +126,7 @@ func buildHandler(db *gorm.DB, logger log.Logger, cfg *config.Config) http.Handl
   e.Use(ginzap.Ginzap(logger.Desugar(), time.RFC3339, true))
   //パニック時ステータスコード500を送出 //担当：石森
   e.Use(ginzap.RecoveryWithZap(logger.Desugar(), true))
+  pprof.Register(e)
 
   //#region 認証機能群
   authRepository := auth22.NewRepository(db, logger)
